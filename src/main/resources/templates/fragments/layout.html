@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' | StockFlow'">StockFlow</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<nav th:fragment="nav" class="topbar">
+    <a class="brand" th:href="@{/}">
+        <span class="brand-mark">SF</span>
+        <span>
+            <strong>StockFlow</strong>
+            <small>Lanka Fresh Distributors</small>
+        </span>
+    </a>
+    <div class="nav-links">
+        <a th:href="@{/products}">Products</a>
+        <a href="#" class="disabled">Suppliers</a>
+        <a href="#" class="disabled">Receiving</a>
+        <a href="#" class="disabled">Warehouses</a>
+        <a href="#" class="disabled">Issues</a>
+        <a href="#" class="disabled">Dashboard</a>
+    </div>
+</nav>
+</body>
+</html>

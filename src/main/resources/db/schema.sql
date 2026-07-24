@@ -1,0 +1,15 @@
+CREATE DATABASE IF NOT EXISTS stockflow_db;
+USE stockflow_db;
+
+CREATE TABLE IF NOT EXISTS products (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    sku VARCHAR(40) NOT NULL UNIQUE,
+    name VARCHAR(120) NOT NULL,
+    category VARCHAR(80) NOT NULL,
+    brand VARCHAR(80),
+    unit VARCHAR(30) NOT NULL,
+    description VARCHAR(255),
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL
+);

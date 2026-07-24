@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Product Catalogue Management</p>
+            <h1 th:text="${pageTitle}">Add Product</h1>
+            <p>Enter accurate product details so all stock workflows use the same master record.</p>
+        </div>
+    </div>
+
+    <form class="form-panel" th:action="@{${formAction}}" th:object="${product}" method="post">
+        <div class="form-grid">
+            <label>
+                SKU / Barcode
+                <input th:field="*{sku}" placeholder="Example: MILK-400G">
+                <small class="error" th:if="${#fields.hasErrors('sku')}" th:errors="*{sku}"></small>
+            </label>
+
+            <label>
+                Product Name
+                <input th:field="*{name}" placeholder="Example: Milk Powder 400g">
+                <small class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+            </label>
+
+            <label>
+                Category
+                <input th:field="*{category}" placeholder="Example: Food">
+                <small class="error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></small>
+            </label>
+
+            <label>
+                Brand
+                <input th:field="*{brand}" placeholder="Example: Lanka Fresh">
+                <small class="error" th:if="${#fields.hasErrors('brand')}" th:errors="*{brand}"></small>
+            </label>
+
+            <label>
+                Unit
+                <input th:field="*{unit}" placeholder="Example: pack, box, kg">
+                <small class="error" th:if="${#fields.hasErrors('unit')}" th:errors="*{unit}"></small>
+            </label>
+
+            <label class="checkbox-line">
+                <input type="checkbox" th:field="*{active}">
+                Active product
+            </label>
+        </div>
+
+        <label>
+            Description
+            <textarea th:field="*{description}" rows="4" placeholder="Short product description"></textarea>
+            <small class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
+        </label>
+
+        <div class="form-actions">
+            <a class="button ghost" th:href="@{/products}">Cancel</a>
+            <button class="button primary" type="submit">Save Product</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>
