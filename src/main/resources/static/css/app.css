@@ -377,3 +377,24 @@ label textarea {
         overflow-x: auto;
     }
 }
+
+/* Add this block at the end of static/css/app.css. */
+
+select {
+    width: 100%;
+    padding: 12px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font: inherit;
+    color: var(--ink);
+    background: #ffffff;
+}
+
+select:focus {
+    outline: 3px solid rgba(20, 184, 166, 0.18);
+    border-color: var(--teal);
+}
+
+label select {
+    margin-top: 8px;
+}

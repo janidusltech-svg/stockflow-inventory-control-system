@@ -23,7 +23,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public String list(@RequestParam(required = false) String keyword, Model model) {
+    public String list(
+            @RequestParam(required = false) String keyword,
+            Model model
+    ) {
         model.addAttribute("products", productService.findAll(keyword));
         model.addAttribute("keyword", keyword);
         return "products/list";
@@ -31,71 +34,102 @@ public class ProductController {
 
     @GetMapping("/new")
     public String createForm(Model model) {
-        model.addAttribute("product", new Product());
-        model.addAttribute("pageTitle", "Add Product");
-        model.addAttribute("formAction", "/products");
+        model.addAttribute("productForm", new ProductForm());
+        addFormData(model, "Add Product", "/products");
         return "products/form";
     }
 
     @PostMapping
-    public String create(@Valid @ModelAttribute Product product,
-                         BindingResult bindingResult,
-                         Model model,
-                         RedirectAttributes redirectAttributes) {
+    public String create(
+            @Valid @ModelAttribute("productForm") ProductForm form,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("pageTitle", "Add Product");
-            model.addAttribute("formAction", "/products");
+            addFormData(model, "Add Product", "/products");
             return "products/form";
         }
 
         try {
-            productService.create(product);
-            redirectAttributes.addFlashAttribute("successMessage", "Product created successfully");
+            productService.create(form);
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Product created successfully"
+            );
             return "redirect:/products";
-        } catch (IllegalArgumentException ex) {
-            bindingResult.rejectValue("sku", "duplicate", ex.getMessage());
-            model.addAttribute("pageTitle", "Add Product");
-            model.addAttribute("formAction", "/products");
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject(
+                    "catalogue.error",
+                    exception.getMessage()
+            );
+            addFormData(model, "Add Product", "/products");
             return "products/form";
         }
     }
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        model.addAttribute("product", productService.findById(id));
-        model.addAttribute("pageTitle", "Edit Product");
-        model.addAttribute("formAction", "/products/" + id);
+        model.addAttribute("productForm", productService.getForm(id));
+        addFormData(model, "Edit Product", "/products/" + id);
         return "products/form";
     }
 
     @PostMapping("/{id}")
-    public String update(@PathVariable Long id,
-                         @Valid @ModelAttribute Product product,
-                         BindingResult bindingResult,
-                         Model model,
-                         RedirectAttributes redirectAttributes) {
+    public String update(
+            @PathVariable Long id,
+            @Valid @ModelAttribute("productForm") ProductForm form,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("pageTitle", "Edit Product");
-            model.addAttribute("formAction", "/products/" + id);
+            addFormData(model, "Edit Product", "/products/" + id);
             return "products/form";
         }
 
         try {
-            productService.update(id, product);
-            redirectAttributes.addFlashAttribute("successMessage", "Product updated successfully");
+            productService.update(id, form);
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Product updated successfully"
+            );
             return "redirect:/products";
-        } catch (IllegalArgumentException ex) {
-            bindingResult.rejectValue("sku", "duplicate", ex.getMessage());
-            model.addAttribute("pageTitle", "Edit Product");
-            model.addAttribute("formAction", "/products/" + id);
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject(
+                    "catalogue.error",
+                    exception.getMessage()
+            );
+            addFormData(model, "Edit Product", "/products/" + id);
             return "products/form";
         }
     }
 
     @PostMapping("/{id}/deactivate")
-    public String deactivate(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deactivate(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes
+    ) {
         productService.deactivate(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Product deactivated successfully");
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Product deactivated successfully"
+        );
         return "redirect:/products";
+    }
+
+    private void addFormData(
+            Model model,
+            String pageTitle,
+            String formAction
+    ) {
+        model.addAttribute("pageTitle", pageTitle);
+        model.addAttribute("formAction", formAction);
+        model.addAttribute(
+                "categories",
+                productService.findActiveCategories()
+        );
+        model.addAttribute("brands", productService.findActiveBrands());
+        model.addAttribute("units", productService.findActiveUnits());
     }
 }
