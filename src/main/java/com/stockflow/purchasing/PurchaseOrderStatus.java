@@ -1,4 +1,8 @@
 package com.stockflow.purchasing;
 
-public class PurchaseOrderStatus {
+public enum PurchaseOrderStatus {
+    DRAFT,
+    APPROVED,
+    RECEIVED,
+    CANCELLED
 }
