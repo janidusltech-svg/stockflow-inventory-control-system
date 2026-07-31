@@ -1,10 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${purchaseOrder.orderNumber})}"></head>
 <body>
-$END$
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Purchase Order Details</p>
+            <div class="title-line">
+                <h1 th:text="${purchaseOrder.orderNumber}">PO-2026-0001</h1>
+                <span class="status large"
+                      th:classappend="${#strings.toLowerCase(purchaseOrder.status.name())}"
+                      th:text="${purchaseOrder.status}">DRAFT</span>
+            </div>
+            <p>
+                <strong th:text="${purchaseOrder.supplier.name}">Supplier</strong>
+                <span th:text="${' | Ordered ' + #temporals.format(purchaseOrder.orderDate, 'dd MMM yyyy')}"></span>
+            </p>
+        </div>
+        <div class="header-actions">
+            <a class="button" th:href="@{/purchase-orders}">Back to Orders</a>
+            <a class="button"
+               th:if="${purchaseOrder.editable}"
+               th:href="@{/purchase-orders/{id}/edit(id=${purchaseOrder.id})}">Edit Header</a>
+        </div>
+    </div>
+
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <section class="summary-grid">
+        <div class="summary-card">
+            <span>Supplier Code</span>
+            <strong th:text="${purchaseOrder.supplier.supplierCode}">SUP-001</strong>
+        </div>
+        <div class="summary-card">
+            <span>Expected Delivery</span>
+            <strong th:text="${purchaseOrder.expectedDate != null
+                ? #temporals.format(purchaseOrder.expectedDate, 'dd MMM yyyy') : 'Not set'}">Not set</strong>
+        </div>
+        <div class="summary-card">
+            <span>Product Lines</span>
+            <strong th:text="${purchaseOrder.items.size()}">0</strong>
+        </div>
+        <div class="summary-card">
+            <span>Order Total (LKR)</span>
+            <strong th:text="${#numbers.formatDecimal(purchaseOrder.totalAmount, 1, 'COMMA', 2, 'POINT')}">0.00</strong>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <div>
+                <h2>Ordered Products</h2>
+                <p>Each product can appear once. The total is calculated from quantity multiplied by unit price.</p>
+            </div>
+        </div>
+
+        <div class="table-panel">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit Price (LKR)</th>
+                        <th>Line Total (LKR)</th>
+                        <th class="actions" th:if="${purchaseOrder.editable}">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(purchaseOrder.items)}">
+                        <td th:colspan="${purchaseOrder.editable ? 6 : 5}" class="empty">
+                            No products have been added to this order.
+                        </td>
+                    </tr>
+                    <tr th:each="item : ${purchaseOrder.items}">
+                        <td th:text="${item.product.sku}">SKU</td>
+                        <td>
+                            <strong th:text="${item.product.name}">Product</strong>
+                            <small th:text="${item.product.unit.name}">Unit</small>
+                        </td>
+                        <td th:text="${item.quantity}">1</td>
+                        <td th:text="${#numbers.formatDecimal(item.unitPrice, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                        <td>
+                            <strong th:text="${#numbers.formatDecimal(item.lineTotal, 1, 'COMMA', 2, 'POINT')}">0.00</strong>
+                        </td>
+                        <td class="actions" th:if="${purchaseOrder.editable}">
+                            <form th:action="@{/purchase-orders/{orderId}/items/{itemId}/remove(
+                                      orderId=${purchaseOrder.id}, itemId=${item.id})}"
+                                  method="post">
+                                <button class="button small danger" type="submit">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot th:unless="${#lists.isEmpty(purchaseOrder.items)}">
+                    <tr>
+                        <td colspan="4" class="total-label">Order Total</td>
+                        <td>
+                            <strong th:text="${'LKR ' + #numbers.formatDecimal(
+                                purchaseOrder.totalAmount, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</strong>
+                        </td>
+                        <td th:if="${purchaseOrder.editable}"></td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="form-panel compact" th:if="${purchaseOrder.editable}">
+        <div class="section-heading">
+            <div>
+                <h2>Add Product Line</h2>
+                <p>Select an active catalogue product and enter the agreed purchasing details.</p>
+            </div>
+        </div>
+
+        <form th:action="@{/purchase-orders/{id}/items(id=${purchaseOrder.id})}"
+              th:object="${orderItemForm}"
+              method="post">
+            <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}">
+                <span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span>
+            </div>
+            <div class="inline-form-grid">
+                <label>
+                    Product
+                    <select th:field="*{productId}">
+                        <option value="">Select a product</option>
+                        <option th:each="product : ${products}"
+                                th:value="${product.id}"
+                                th:text="${product.sku + ' - ' + product.name}">
+                            SKU - Product
+                        </option>
+                    </select>
+                    <small class="error"
+                           th:if="${#fields.hasErrors('productId')}"
+                           th:errors="*{productId}"></small>
+                </label>
+                <label>
+                    Quantity
+                    <input type="number" min="1" th:field="*{quantity}" placeholder="10">
+                    <small class="error"
+                           th:if="${#fields.hasErrors('quantity')}"
+                           th:errors="*{quantity}"></small>
+                </label>
+                <label>
+                    Unit Price (LKR)
+                    <input type="number" min="0.01" step="0.01" th:field="*{unitPrice}" placeholder="1250.00">
+                    <small class="error"
+                           th:if="${#fields.hasErrors('unitPrice')}"
+                           th:errors="*{unitPrice}"></small>
+                </label>
+                <button class="button primary" type="submit">Add Product</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="workflow-panel">
+        <div>
+            <h2>Order Workflow</h2>
+            <p th:if="${purchaseOrder.notes}">
+                <strong>Notes:</strong> <span th:text="${purchaseOrder.notes}">Notes</span>
+            </p>
+            <p th:unless="${purchaseOrder.notes}">No additional notes were entered for this purchase order.</p>
+        </div>
+        <div class="workflow-actions">
+            <form th:if="${purchaseOrder.status.name() == 'DRAFT'}"
+                  th:action="@{/purchase-orders/{id}/status(id=${purchaseOrder.id})}"
+                  method="post">
+                <input type="hidden" name="status" value="APPROVED">
+                <button class="button primary" type="submit">Approve Order</button>
+            </form>
+            <span class="workflow-note" th:if="${purchaseOrder.status.name() == 'APPROVED'}">
+                Awaiting confirmation from Goods Receiving
+            </span>
+            <form th:if="${purchaseOrder.status.name() == 'DRAFT'
+                          || purchaseOrder.status.name() == 'APPROVED'}"
+                  th:action="@{/purchase-orders/{id}/status(id=${purchaseOrder.id})}"
+                  method="post">
+                <input type="hidden" name="status" value="CANCELLED">
+                <button class="button danger" type="submit">Cancel Order</button>
+            </form>
+        </div>
+    </section>
+</main>
 </body>
 </html>

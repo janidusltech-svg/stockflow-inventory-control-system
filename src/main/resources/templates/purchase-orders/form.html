@@ -1,10 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
 <body>
-$END$
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Supplier and Purchase Order Management</p>
+            <h1 th:text="${pageTitle}">Create Purchase Order</h1>
+            <p th:if="${orderNumber}">
+                Editing <strong th:text="${orderNumber}">PO-2026-0001</strong>. Product lines are managed on the order page.
+            </p>
+            <p th:unless="${orderNumber}">
+                Create the draft order first, then add products, quantities and unit prices.
+            </p>
+        </div>
+    </div>
+
+    <form class="form-panel"
+          th:action="@{${formAction}}"
+          th:object="${purchaseOrderForm}"
+          method="post">
+        <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}">
+            <span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span>
+        </div>
+
+        <div class="form-grid">
+            <label class="full-width">
+                Supplier
+                <select th:field="*{supplierId}">
+                    <option value="">Select an active supplier</option>
+                    <option th:each="supplier : ${suppliers}"
+                            th:value="${supplier.id}"
+                            th:text="${supplier.supplierCode + ' - ' + supplier.name
+                                + (supplier.active ? '' : ' (Inactive)')}">
+                        SUP-001 - Supplier
+                    </option>
+                </select>
+                <small class="error"
+                       th:if="${#fields.hasErrors('supplierId')}"
+                       th:errors="*{supplierId}"></small>
+            </label>
+
+            <label>
+                Order Date
+                <input type="date" th:field="*{orderDate}">
+                <small class="error"
+                       th:if="${#fields.hasErrors('orderDate')}"
+                       th:errors="*{orderDate}"></small>
+            </label>
+
+            <label>
+                Expected Delivery Date
+                <input type="date" th:field="*{expectedDate}">
+                <small class="error"
+                       th:if="${#fields.hasErrors('expectedDate')}"
+                       th:errors="*{expectedDate}"></small>
+            </label>
+        </div>
+
+        <label>
+            Notes
+            <textarea th:field="*{notes}" rows="4"
+                      placeholder="Optional purchasing or delivery instructions"></textarea>
+            <small class="error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></small>
+        </label>
+
+        <div class="form-actions">
+            <a class="button ghost" th:href="@{/purchase-orders}">Cancel</a>
+            <button class="button primary" type="submit">Save Draft Order</button>
+        </div>
+    </form>
+</main>
 </body>
 </html>
