@@ -1,10 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Suppliers')}"></head>
 <body>
-$END$
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Tharinya - Supplier and Purchase Order Management</p>
+            <h1>Suppliers</h1>
+            <p>Maintain verified supplier details used when creating purchase orders.</p>
+        </div>
+        <div class="header-actions">
+            <a class="button" th:href="@{/purchase-orders}">View Purchase Orders</a>
+            <a class="button primary" th:href="@{/suppliers/new}">Add Supplier</a>
+        </div>
+    </div>
+
+    <form class="toolbar" th:action="@{/suppliers}" method="get">
+        <input type="search" name="keyword" placeholder="Search by code, name or email" th:value="${keyword}">
+        <button class="button" type="submit">Search</button>
+        <a class="button ghost" th:href="@{/suppliers}">Reset</a>
+    </form>
+
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+
+    <section class="table-panel">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Supplier</th>
+                    <th>Contact Person</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th class="actions">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(suppliers)}">
+                    <td colspan="7" class="empty">No suppliers found.</td>
+                </tr>
+                <tr th:each="supplier : ${suppliers}">
+                    <td th:text="${supplier.supplierCode}">SUP-001</td>
+                    <td>
+                        <strong th:text="${supplier.name}">Supplier name</strong>
+                        <small th:if="${supplier.address}" th:text="${supplier.address}">Address</small>
+                    </td>
+                    <td th:text="${supplier.contactPerson ?: '-'}">Contact person</td>
+                    <td th:text="${supplier.phone}">Phone</td>
+                    <td th:text="${supplier.email}">Email</td>
+                    <td>
+                        <span class="status active" th:if="${supplier.active}">Active</span>
+                        <span class="status inactive" th:unless="${supplier.active}">Inactive</span>
+                    </td>
+                    <td class="actions">
+                        <a class="button small" th:href="@{/suppliers/{id}/edit(id=${supplier.id})}">Edit</a>
+                        <form th:if="${supplier.active}"
+                              th:action="@{/suppliers/{id}/deactivate(id=${supplier.id})}"
+                              method="post">
+                            <button class="button small danger" type="submit">Deactivate</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
 </body>
 </html>
