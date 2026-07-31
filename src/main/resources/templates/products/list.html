@@ -9,53 +9,79 @@
         <div>
             <p class="eyebrow">Chamidu - Product Catalogue Management</p>
             <h1>Products</h1>
-            <p>Maintain product master records for purchasing, receiving, issuing and inventory control.</p>
+            <p>Maintain the product master records used by all StockFlow modules.</p>
         </div>
         <a class="button primary" th:href="@{/products/new}">Add Product</a>
     </div>
 
     <form class="toolbar" th:action="@{/products}" method="get">
-        <input type="search" name="keyword" placeholder="Search by SKU, name or category" th:value="${keyword}">
+        <input type="search"
+               name="keyword"
+               placeholder="Search SKU, barcode, name, category or brand"
+               th:value="${keyword}">
         <button class="button" type="submit">Search</button>
         <a class="button ghost" th:href="@{/products}">Reset</a>
     </form>
 
-    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert success"
+         th:if="${successMessage}"
+         th:text="${successMessage}">
+    </div>
 
     <section class="table-panel">
         <table>
             <thead>
             <tr>
                 <th>SKU</th>
-                <th>Name</th>
+                <th>Product</th>
                 <th>Category</th>
                 <th>Brand</th>
                 <th>Unit</th>
+                <th>Batch</th>
                 <th>Status</th>
                 <th class="actions">Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${#lists.isEmpty(products)}">
-                <td colspan="7" class="empty">No products found.</td>
+                <td colspan="8" class="empty">No products found.</td>
             </tr>
             <tr th:each="product : ${products}">
                 <td th:text="${product.sku}">SKU</td>
                 <td>
                     <strong th:text="${product.name}">Product name</strong>
-                    <small th:if="${product.description}" th:text="${product.description}">Description</small>
+                    <small th:if="${product.barcode}"
+                           th:text="${'Barcode: ' + product.barcode}">
+                    </small>
+                    <small th:if="${product.description}"
+                           th:text="${product.description}">
+                    </small>
                 </td>
-                <td th:text="${product.category}">Category</td>
-                <td th:text="${product.brand ?: '-'}">Brand</td>
-                <td th:text="${product.unit}">Unit</td>
+                <td th:text="${product.category.name}">Category</td>
+                <td th:text="${product.brand == null ? '-' : product.brand.name}">
+                    Brand
+                </td>
+                <td th:text="${product.unit.name}">Unit</td>
+                <td th:text="${product.batchTracked ? 'Tracked' : 'Not tracked'}">
+                    Batch
+                </td>
                 <td>
-                    <span class="status active" th:if="${product.active}">Active</span>
-                    <span class="status inactive" th:unless="${product.active}">Inactive</span>
+                    <span class="status active"
+                          th:if="${product.active}">Active</span>
+                    <span class="status inactive"
+                          th:unless="${product.active}">Inactive</span>
                 </td>
                 <td class="actions">
-                    <a class="button small" th:href="@{/products/{id}/edit(id=${product.id})}">Edit</a>
-                    <form th:if="${product.active}" th:action="@{/products/{id}/deactivate(id=${product.id})}" method="post">
-                        <button class="button small danger" type="submit">Deactivate</button>
+                    <a class="button small"
+                       th:href="@{/products/{id}/edit(id=${product.id})}">
+                        Edit
+                    </a>
+                    <form th:if="${product.active}"
+                          th:action="@{/products/{id}/deactivate(id=${product.id})}"
+                          method="post">
+                        <button class="button small danger" type="submit">
+                            Deactivate
+                        </button>
                     </form>
                 </td>
             </tr>
