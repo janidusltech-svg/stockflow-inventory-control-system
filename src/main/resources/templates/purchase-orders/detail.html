@@ -65,7 +65,9 @@
                     <tr>
                         <th>SKU</th>
                         <th>Product</th>
-                        <th>Quantity</th>
+                        <th>Ordered</th>
+                        <th>Received</th>
+                        <th>Remaining</th>
                         <th>Unit Price (LKR)</th>
                         <th>Line Total (LKR)</th>
                         <th class="actions" th:if="${purchaseOrder.editable}">Action</th>
@@ -73,7 +75,7 @@
                     </thead>
                     <tbody>
                     <tr th:if="${#lists.isEmpty(purchaseOrder.items)}">
-                        <td th:colspan="${purchaseOrder.editable ? 6 : 5}" class="empty">
+                        <td th:colspan="${purchaseOrder.editable ? 8 : 7}" class="empty">
                             No products have been added to this order.
                         </td>
                     </tr>
@@ -84,6 +86,8 @@
                             <small th:text="${item.product.unit.name}">Unit</small>
                         </td>
                         <td th:text="${item.quantity}">1</td>
+                        <td th:text="${item.receivedQuantity}">0</td>
+                        <td th:text="${item.remainingQuantity}">1</td>
                         <td th:text="${#numbers.formatDecimal(item.unitPrice, 1, 'COMMA', 2, 'POINT')}">0.00</td>
                         <td>
                             <strong th:text="${#numbers.formatDecimal(item.lineTotal, 1, 'COMMA', 2, 'POINT')}">0.00</strong>
@@ -99,7 +103,7 @@
                     </tbody>
                     <tfoot th:unless="${#lists.isEmpty(purchaseOrder.items)}">
                     <tr>
-                        <td colspan="4" class="total-label">Order Total</td>
+                        <td colspan="6" class="total-label">Order Total</td>
                         <td>
                             <strong th:text="${'LKR ' + #numbers.formatDecimal(
                                 purchaseOrder.totalAmount, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</strong>
@@ -169,14 +173,25 @@
             <p th:unless="${purchaseOrder.notes}">No additional notes were entered for this purchase order.</p>
         </div>
         <div class="workflow-actions">
+            <a class="button primary"
+               th:if="${purchaseOrder.status.name() == 'APPROVED'
+                    || purchaseOrder.status.name() == 'PARTIALLY_RECEIVED'}"
+               th:href="@{/goods-receipts/new(purchaseOrderId=${purchaseOrder.id})}">
+                Receive Goods
+            </a>
             <form th:if="${purchaseOrder.status.name() == 'DRAFT'}"
                   th:action="@{/purchase-orders/{id}/status(id=${purchaseOrder.id})}"
                   method="post">
                 <input type="hidden" name="status" value="APPROVED">
                 <button class="button primary" type="submit">Approve Order</button>
             </form>
-            <span class="workflow-note" th:if="${purchaseOrder.status.name() == 'APPROVED'}">
-                Awaiting confirmation from Goods Receiving
+            <span class="workflow-note"
+                  th:if="${purchaseOrder.status.name() == 'APPROVED'
+                       || purchaseOrder.status.name() == 'PARTIALLY_RECEIVED'}"
+                  th:text="${purchaseOrder.status.name() == 'APPROVED'
+                       ? 'Ready for Goods Receiving'
+                       : 'Partially received - more stock is pending'}">
+                Receiving status
             </span>
             <form th:if="${purchaseOrder.status.name() == 'DRAFT'
                           || purchaseOrder.status.name() == 'APPROVED'}"
@@ -190,3 +205,4 @@
 </main>
 </body>
 </html>
+

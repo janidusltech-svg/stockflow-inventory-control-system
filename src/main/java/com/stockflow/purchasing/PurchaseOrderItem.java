@@ -32,6 +32,9 @@ public class PurchaseOrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Column(nullable = false)
+    private Integer receivedQuantity = 0;
+
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal unitPrice;
 
@@ -40,6 +43,11 @@ public class PurchaseOrderItem {
             return BigDecimal.ZERO;
         }
         return unitPrice.multiply(BigDecimal.valueOf(quantity));
+    }
+
+    public int getRemainingQuantity() {
+        int ordered = quantity == null ? 0 : quantity;
+        return Math.max(ordered - getReceivedQuantity(), 0);
     }
 
     public Long getId() {
@@ -68,6 +76,14 @@ public class PurchaseOrderItem {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Integer getReceivedQuantity() {
+        return receivedQuantity == null ? 0 : receivedQuantity;
+    }
+
+    public void setReceivedQuantity(Integer receivedQuantity) {
+        this.receivedQuantity = receivedQuantity;
     }
 
     public BigDecimal getUnitPrice() {

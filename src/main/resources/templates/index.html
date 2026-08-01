@@ -22,14 +22,14 @@
         </a>
         <a class="module-card active" th:href="@{/purchase-orders}">
             <span>02</span>
-            <h2>Suppliers & Purchase Orders</h2>
+            <h2>Suppliers & Orders</h2>
             <p>Maintain suppliers, create purchase orders and monitor purchasing status.</p>
         </a>
-        <div class="module-card">
+        <a class="module-card active" th:href="@{/goods-receipts}">
             <span>03</span>
-            <h2>Goods Receiving</h2>
-            <p>Record deliveries, batches and expiry details.</p>
-        </div>
+            <h2>Goods Receiving &amp; Batches</h2>
+            <p>Record deliveries, rejected quantities, batches and confirmed stock.</p>
+        </a>
         <div class="module-card">
             <span>04</span>
             <h2>Warehouses</h2>
@@ -49,3 +49,4 @@
 </main>
 </body>
 </html>
+
