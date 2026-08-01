@@ -2,60 +2,23 @@ package com.stockflow.inventory;
 
 import com.stockflow.product.Product;
 import com.stockflow.warehouse.StorageLocation;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Service
-@Transactional
-public class InventoryService {
+import java.util.Optional;
 
-    private final InventoryBalanceRepository inventoryBalanceRepository;
-    private final StockMovementRepository stockMovementRepository;
+public interface InventoryBalanceRepository
+        extends JpaRepository<InventoryBalance, Long> {
 
-    public InventoryService(InventoryBalanceRepository inventoryBalanceRepository,
-                            StockMovementRepository stockMovementRepository) {
-        this.inventoryBalanceRepository = inventoryBalanceRepository;
-        this.stockMovementRepository = stockMovementRepository;
-    }
+    Optional<InventoryBalance>
+    findByProductAndLocationAndBatch(
+            Product product,
+            StorageLocation location,
+            Batch batch
+    );
 
-    public void receive(Product product,
-                        StorageLocation location,
-                        Batch batch,
-                        int acceptedQuantity,
-                        String receiptNumber) {
-        if (acceptedQuantity <= 0) {
-            return;
-        }
-
-        InventoryBalance balance = batch == null
-                ? inventoryBalanceRepository
-                .findByProductAndLocationAndBatchIsNull(product, location)
-                .orElseGet(() -> newBalance(product, location, null))
-                : inventoryBalanceRepository
-                .findByProductAndLocationAndBatch(product, location, batch)
-                .orElseGet(() -> newBalance(product, location, batch));
-
-        balance.addQuantity(acceptedQuantity);
-        inventoryBalanceRepository.save(balance);
-
-        StockMovement movement = new StockMovement();
-        movement.setMovementType(StockMovementType.GOODS_RECEIPT);
-        movement.setProduct(product);
-        movement.setLocation(location);
-        movement.setBatch(batch);
-        movement.setQuantityChange(acceptedQuantity);
-        movement.setReferenceNumber(receiptNumber);
-        stockMovementRepository.save(movement);
-    }
-
-    private InventoryBalance newBalance(Product product,
-                                        StorageLocation location,
-                                        Batch batch) {
-        InventoryBalance balance = new InventoryBalance();
-        balance.setProduct(product);
-        balance.setLocation(location);
-        balance.setBatch(batch);
-        balance.setQuantityAvailable(0);
-        return balance;
-    }
+    Optional<InventoryBalance>
+    findByProductAndLocationAndBatchIsNull(
+            Product product,
+            StorageLocation location
+    );
 }

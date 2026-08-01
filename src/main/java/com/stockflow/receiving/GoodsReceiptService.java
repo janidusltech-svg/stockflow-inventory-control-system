@@ -234,6 +234,14 @@ public class GoodsReceiptService {
     private void validateItem(GoodsReceiptItemForm form,
                               PurchaseOrderItem orderItem,
                               LocalDate receivedDate) {
+        if (form.getDeliveredQuantity() == null
+                || form.getAcceptedQuantity() == null
+                || form.getRejectedQuantity() == null) {
+
+            throw new IllegalArgumentException(
+                    "Enter delivered, accepted and rejected quantities"
+            );
+        }
         int delivered = form.getDeliveredQuantity();
         int accepted = form.getAcceptedQuantity();
         int rejected = form.getRejectedQuantity();
@@ -246,9 +254,9 @@ public class GoodsReceiptService {
                     "Accepted quantity plus rejected quantity must equal delivered quantity"
             );
         }
-        if (delivered > orderItem.getRemainingQuantity()) {
+        if (accepted > orderItem.getRemainingQuantity()) {
             throw new IllegalArgumentException(
-                    "Delivered quantity cannot exceed the remaining ordered quantity of "
+                    "Accepted quantity cannot exceed the remaining ordered quantity of "
                             + orderItem.getRemainingQuantity()
             );
         }
