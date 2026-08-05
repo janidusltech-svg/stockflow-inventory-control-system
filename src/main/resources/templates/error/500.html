@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Request Error')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page narrow">
+    <section class="friendly-error-card">
+        <p class="friendly-error-code">500</p>
+        <p class="eyebrow">Request not completed</p>
+        <h1>StockFlow could not complete this request.</h1>
+        <p>Return to the dashboard and try again. If the problem continues, record the action and ask the IT and Systems Officer to review it.</p>
+        <div class="friendly-error-actions">
+            <a class="button primary" th:href="@{/dashboard}">Return to dashboard</a>
+            <button class="button" type="button" onclick="window.location.reload()">Try again</button>
+        </div>
+    </section>
+</main>
+</body>
+</html>

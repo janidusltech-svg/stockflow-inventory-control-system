@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Request Error')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page narrow">
+    <section class="friendly-error-card">
+        <p class="friendly-error-code" th:text="${status != null ? status : 'Error'}">Error</p>
+        <p class="eyebrow">Request not completed</p>
+        <h1>We could not open that StockFlow page.</h1>
+        <p>Please return to the dashboard and continue from an available function.</p>
+        <div class="friendly-error-actions">
+            <a class="button primary" th:href="@{/dashboard}">Return to dashboard</a>
+            <a class="button" th:href="@{/}">Open welcome page</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

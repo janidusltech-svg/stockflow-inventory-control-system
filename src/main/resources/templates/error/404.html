@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Page Not Found')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page narrow">
+    <section class="friendly-error-card">
+        <p class="friendly-error-code">404</p>
+        <p class="eyebrow">Page not found</p>
+        <h1>That StockFlow page is unavailable.</h1>
+        <p>The address may be incorrect, or the page may have moved to another function.</p>
+        <div class="friendly-error-actions">
+            <a class="button primary" th:href="@{/dashboard}">Return to dashboard</a>
+            <a class="button" th:href="@{/}">Open welcome page</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

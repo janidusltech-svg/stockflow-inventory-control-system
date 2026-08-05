@@ -73,6 +73,33 @@ class RouteSmokeTest {
     }
 
     @Test
+    void dashboardContainsThePhaseTwoWorkspaceComponents() throws Exception {
+        mockMvc.perform(get("/dashboard").session(operationsSession))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("class=\"topbar app-sidebar\"")))
+                .andExpect(content().string(containsString("class=\"dashboard-status-grid\"")))
+                .andExpect(content().string(containsString("class=\"workflow-overview\"")))
+                .andExpect(content().string(containsString("id=\"confirm-dialog\"")))
+                .andExpect(content().string(containsString("/js/app.js")));
+    }
+
+    @Test
+    void storeSupervisorSeesAReadOnlyIndicatorOnPurchasingPages() throws Exception {
+        MockHttpSession session = login("store");
+
+        mockMvc.perform(get("/purchase-orders").session(session))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("View only")));
+    }
+
+    @Test
+    void workspaceJavascriptIsPubliclyAvailable() throws Exception {
+        mockMvc.perform(get("/js/app.js"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("initialiseTablePagination")));
+    }
+
+    @Test
     void anonymousUsersAreSentToTheLoginPage() throws Exception {
         mockMvc.perform(get("/dashboard"))
                 .andExpect(status().is3xxRedirection())
