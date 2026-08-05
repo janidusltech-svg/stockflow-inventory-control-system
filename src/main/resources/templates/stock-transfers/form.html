@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page narrow">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Stock Transfer</p>
+            <h1 th:text="${pageTitle}">Create Stock Transfer</h1>
+            <p th:if="${transferNumber}" th:text="${'Transfer ' + transferNumber}"></p>
+            <p th:unless="${transferNumber}">Choose two different active locations.</p>
+        </div>
+        <a class="button" th:href="@{/stock-transfers}">Back</a>
+    </header>
+
+    <form class="form-panel"
+          th:action="${formAction}"
+          th:object="${stockTransferForm}"
+          method="post">
+        <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}"
+             th:each="error : ${#fields.globalErrors()}" th:text="${error}"></div>
+
+        <div class="form-grid">
+            <label>
+                Source Location
+                <select th:field="*{sourceLocationId}">
+                    <option value="">Select source</option>
+                    <option th:each="location : ${locations}"
+                            th:value="${location.id}"
+                            th:text="${location.displayName}">Main - Receiving</option>
+                </select>
+                <small class="error" th:errors="*{sourceLocationId}"></small>
+            </label>
+            <label>
+                Destination Location
+                <select th:field="*{destinationLocationId}">
+                    <option value="">Select destination</option>
+                    <option th:each="location : ${locations}"
+                            th:value="${location.id}"
+                            th:text="${location.displayName}">Main - Rack A</option>
+                </select>
+                <small class="error" th:errors="*{destinationLocationId}"></small>
+            </label>
+            <label>
+                Transfer Date
+                <input type="date" th:field="*{transferDate}">
+                <small class="error" th:errors="*{transferDate}"></small>
+            </label>
+            <label class="wide-field">
+                Notes
+                <textarea rows="3" th:field="*{notes}"
+                          placeholder="Reason or handling instruction"></textarea>
+                <small class="error" th:errors="*{notes}"></small>
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <a class="button" th:href="@{/stock-transfers}">Cancel</a>
+            <button class="button primary" type="submit">Save Draft</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

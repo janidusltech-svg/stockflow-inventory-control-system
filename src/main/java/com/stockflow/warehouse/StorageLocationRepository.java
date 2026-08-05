@@ -7,15 +7,21 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface StorageLocationRepository
-        extends JpaRepository<StorageLocation, Long> {
+public interface StorageLocationRepository extends JpaRepository<StorageLocation, Long> {
 
     @Query("""
             select location
             from StorageLocation location
             join fetch location.warehouse warehouse
-            where location.active = true
-              and warehouse.active = true
+            order by warehouse.name, location.name
+            """)
+    List<StorageLocation> findAllWithWarehouse();
+
+    @Query("""
+            select location
+            from StorageLocation location
+            join fetch location.warehouse warehouse
+            where location.active = true and warehouse.active = true
             order by warehouse.name, location.name
             """)
     List<StorageLocation> findAllActiveWithWarehouse();
@@ -26,7 +32,24 @@ public interface StorageLocationRepository
             join fetch location.warehouse
             where location.id = :id
             """)
-    Optional<StorageLocation> findByIdWithWarehouse(
-            @Param("id") Long id
+    Optional<StorageLocation> findByIdWithWarehouse(@Param("id") Long id);
+
+    @Query("""
+            select location
+            from StorageLocation location
+            join fetch location.warehouse
+            where location.warehouse.id = :warehouseId
+            order by location.name
+            """)
+    List<StorageLocation> findByWarehouseIdWithWarehouse(
+            @Param("warehouseId") Long warehouseId
+    );
+
+    boolean existsByWarehouseIdAndCodeIgnoreCase(Long warehouseId, String code);
+
+    boolean existsByWarehouseIdAndCodeIgnoreCaseAndIdNot(
+            Long warehouseId,
+            String code,
+            Long id
     );
 }

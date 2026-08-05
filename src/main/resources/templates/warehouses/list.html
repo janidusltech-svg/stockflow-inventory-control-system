@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Warehouses')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Function 04</p>
+            <h1>Warehouses &amp; Storage Locations</h1>
+            <p>Maintain the physical places used for receiving and transferring stock.</p>
+        </div>
+        <div class="header-actions">
+            <a class="button" th:href="@{/stock-transfers}">Stock Transfers</a>
+            <a class="button" th:href="@{/warehouses/locations/new}">Add Location</a>
+            <a class="button primary" th:href="@{/warehouses/new}">Add Warehouse</a>
+        </div>
+    </header>
+
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <div>
+                <h2>Warehouses</h2>
+                <p>Deactivate only after all stock has been moved out.</p>
+            </div>
+        </div>
+        <div class="table-panel table-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                    <th class="actions">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="warehouse : ${warehouses}">
+                    <td><strong th:text="${warehouse.code}">WH-MAIN</strong></td>
+                    <td th:text="${warehouse.name}">Main Warehouse</td>
+                    <td th:text="${warehouse.address != null ? warehouse.address : '-'}">Address</td>
+                    <td>
+                        <span class="status"
+                              th:classappend="${warehouse.active ? 'active' : 'inactive'}"
+                              th:text="${warehouse.active ? 'Active' : 'Inactive'}">Active</span>
+                    </td>
+                    <td class="actions">
+                        <a class="button small"
+                           th:href="@{/warehouses/{id}/edit(id=${warehouse.id})}">Edit</a>
+                        <a class="button small"
+                           th:if="${warehouse.active}"
+                           th:href="@{/warehouses/locations/new(warehouseId=${warehouse.id})}">Add Location</a>
+                        <form th:if="${warehouse.active}"
+                              th:action="@{/warehouses/{id}/deactivate(id=${warehouse.id})}"
+                              method="post"
+                              onsubmit="return confirm('Deactivate this warehouse?');">
+                            <button class="button small danger" type="submit">Deactivate</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(warehouses)}">
+                    <td colspan="5" class="empty">No warehouses have been added.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <div>
+                <h2>Storage Locations</h2>
+                <p>Each location belongs to one warehouse and holds its own stock balance.</p>
+            </div>
+        </div>
+        <div class="table-panel table-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Warehouse</th>
+                    <th>Location Code</th>
+                    <th>Location Name</th>
+                    <th>Status</th>
+                    <th class="actions">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="location : ${locations}">
+                    <td>
+                        <strong th:text="${location.warehouse.code}">WH-MAIN</strong>
+                        <small th:text="${location.warehouse.name}">Main Warehouse</small>
+                    </td>
+                    <td th:text="${location.code}">RECEIVING</td>
+                    <td th:text="${location.name}">Receiving Area</td>
+                    <td>
+                        <span class="status"
+                              th:classappend="${location.active ? 'active' : 'inactive'}"
+                              th:text="${location.active ? 'Active' : 'Inactive'}">Active</span>
+                    </td>
+                    <td class="actions">
+                        <a class="button small"
+                           th:href="@{/warehouses/locations/{id}/edit(id=${location.id})}">Edit</a>
+                        <form th:if="${location.active}"
+                              th:action="@{/warehouses/locations/{id}/deactivate(id=${location.id})}"
+                              method="post"
+                              onsubmit="return confirm('Deactivate this storage location?');">
+                            <button class="button small danger" type="submit">Deactivate</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(locations)}">
+                    <td colspan="5" class="empty">No storage locations have been added.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

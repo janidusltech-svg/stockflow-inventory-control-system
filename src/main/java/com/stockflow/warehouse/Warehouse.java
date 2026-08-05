@@ -15,18 +15,10 @@ public class Warehouse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(
-            nullable = false,
-            unique = true,
-            length = 30
-    )
+    @Column(nullable = false, unique = true, length = 30)
     private String code;
 
-    @Column(
-            nullable = false,
-            unique = true,
-            length = 100
-    )
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
 
     @Column(length = 255)
@@ -44,7 +36,7 @@ public class Warehouse {
     }
 
     public void setCode(String code) {
-        this.code = code;
+        this.code = code == null ? null : code.trim().toUpperCase();
     }
 
     public String getName() {
@@ -52,7 +44,7 @@ public class Warehouse {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name == null ? null : name.trim();
     }
 
     public String getAddress() {
@@ -60,7 +52,7 @@ public class Warehouse {
     }
 
     public void setAddress(String address) {
-        this.address = address;
+        this.address = address == null || address.isBlank() ? null : address.trim();
     }
 
     public boolean isActive() {
@@ -69,5 +61,9 @@ public class Warehouse {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getDisplayName() {
+        return code + " - " + name;
     }
 }

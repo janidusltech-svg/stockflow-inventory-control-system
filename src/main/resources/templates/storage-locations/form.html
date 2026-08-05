@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page narrow">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Storage Location Master</p>
+            <h1 th:text="${pageTitle}">Add Storage Location</h1>
+            <p>Create a location such as Receiving, Rack A or Dispatch Area.</p>
+        </div>
+        <a class="button" th:href="@{/warehouses}">Back</a>
+    </header>
+
+    <form class="form-panel"
+          th:action="${formAction}"
+          th:object="${storageLocationForm}"
+          method="post">
+        <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}"
+             th:each="error : ${#fields.globalErrors()}" th:text="${error}"></div>
+
+        <div class="form-grid">
+            <label class="wide-field">
+                Warehouse
+                <select th:field="*{warehouseId}">
+                    <option value="">Select warehouse</option>
+                    <option th:each="warehouse : ${warehouses}"
+                            th:value="${warehouse.id}"
+                            th:text="${warehouse.displayName}">WH-MAIN - Main Warehouse</option>
+                </select>
+                <small class="error" th:errors="*{warehouseId}"></small>
+            </label>
+            <label>
+                Location Code
+                <input type="text" th:field="*{code}" placeholder="RACK-A">
+                <small class="error" th:errors="*{code}"></small>
+            </label>
+            <label>
+                Location Name
+                <input type="text" th:field="*{name}" placeholder="Storage Rack A">
+                <small class="error" th:errors="*{name}"></small>
+            </label>
+            <label class="checkbox-line">
+                <input type="checkbox" th:field="*{active}">
+                Active storage location
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <a class="button" th:href="@{/warehouses}">Cancel</a>
+            <button class="button primary" type="submit">Save Location</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

@@ -9,9 +9,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "storage_locations")
+@Table(
+        name = "storage_locations",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_storage_location_code",
+                columnNames = {"warehouse_id", "code"}
+        )
+)
 public class StorageLocation {
 
     @Id
@@ -48,7 +55,7 @@ public class StorageLocation {
     }
 
     public void setCode(String code) {
-        this.code = code;
+        this.code = code == null ? null : code.trim().toUpperCase();
     }
 
     public String getName() {
@@ -56,7 +63,7 @@ public class StorageLocation {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name == null ? null : name.trim();
     }
 
     public boolean isActive() {
