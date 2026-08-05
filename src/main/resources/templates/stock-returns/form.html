@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page narrow">
+    <div class="page-header"><div><p class="eyebrow">Stock Return</p><h1 th:text="${pageTitle}">Create Stock Return</h1><p th:if="${returnNumber}" th:text="${'Editing ' + returnNumber}"></p><p th:unless="${returnNumber}">Start from a confirmed issue that still has returnable products.</p></div><a class="button" th:href="@{/stock-returns}">Back to Returns</a></div>
+    <section class="form-panel"><form th:action="${formAction}" th:object="${stockReturnForm}" method="post">
+        <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}"><span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span></div>
+        <div class="form-grid"><label>Confirmed Stock Issue<select th:field="*{stockIssueId}"><option value="">Select an issue</option><option th:each="issue : ${stockIssues}" th:value="${issue.id}" th:text="${issue.issueNumber + ' - ' + issue.recipient.name + ' | Returnable: ' + (issue.totalQuantity - issue.totalReturnedQuantity)}"></option></select><small class="error" th:if="${#fields.hasErrors('stockIssueId')}" th:errors="*{stockIssueId}"></small></label><label>Return Date<input type="date" th:field="*{returnDate}"><small class="error" th:if="${#fields.hasErrors('returnDate')}" th:errors="*{returnDate}"></small></label></div>
+        <label>Notes<textarea rows="4" th:field="*{notes}" placeholder="General reason or observations"></textarea><small class="error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></small></label>
+        <div class="form-actions"><a class="button" th:href="@{/stock-returns}">Cancel</a><button class="button primary" type="submit">Save Draft Return</button></div>
+    </form></section>
+</main>
+</body>
+</html>

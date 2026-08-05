@@ -20,26 +20,26 @@
             <h2>Product Catalogue</h2>
             <p>Manage product master records used by every stock workflow.</p>
         </a>
-        <div class="module-card">
+        <a class="module-card active" th:href="@{/purchase-orders}">
             <span>02</span>
             <h2>Suppliers & Orders</h2>
-            <p>Supplier and purchase order management.</p>
-        </div>
-        <div class="module-card">
+            <p>Maintain suppliers, create purchase orders and monitor purchasing status.</p>
+        </a>
+        <a class="module-card active" th:href="@{/goods-receipts}">
             <span>03</span>
-            <h2>Goods Receiving</h2>
-            <p>Record deliveries, batches and expiry details.</p>
-        </div>
+            <h2>Goods Receiving &amp; Batches</h2>
+            <p>Record deliveries, rejected quantities, batches and confirmed stock.</p>
+        </a>
         <div class="module-card">
             <span>04</span>
             <h2>Warehouses</h2>
             <p>Manage locations and stock transfers.</p>
         </div>
-        <div class="module-card">
+        <a class="module-card active" th:href="@{/stock-issues}">
             <span>05</span>
             <h2>Issues & Returns</h2>
             <p>Track outgoing stock and returned products.</p>
-        </div>
+        </a>
         <div class="module-card">
             <span>06</span>
             <h2>Inventory Control</h2>

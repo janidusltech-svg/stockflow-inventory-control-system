@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page narrow">
+    <div class="page-header"><div><p class="eyebrow">Stock Issue &amp; Return Management</p><h1 th:text="${pageTitle}">Add Recipient</h1><p>Recipients are customers or internal departments that receive stock.</p></div><a class="button" th:href="@{/recipients}">Back to Recipients</a></div>
+    <section class="form-panel">
+        <form th:action="${formAction}" th:object="${recipientForm}" method="post">
+            <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}"><span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span></div>
+            <div class="form-grid">
+                <label>Recipient Code<input th:field="*{code}" placeholder="Example: CUS-001"><small class="error" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></small></label>
+                <label>Recipient Name<input th:field="*{name}" placeholder="Example: Green Mart Colombo"><small class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small></label>
+                <label>Recipient Type<select th:field="*{recipientType}"><option value="">Select type</option><option th:each="type : ${recipientTypes}" th:value="${type}" th:text="${#strings.replace(type.name(), '_', ' ')}"></option></select><small class="error" th:if="${#fields.hasErrors('recipientType')}" th:errors="*{recipientType}"></small></label>
+                <label>Contact Name<input th:field="*{contactName}" placeholder="Example: Nimal Perera"><small class="error" th:if="${#fields.hasErrors('contactName')}" th:errors="*{contactName}"></small></label>
+                <label>Phone<input th:field="*{phone}" placeholder="Example: 0771234567"><small class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></small></label>
+                <label>Email<input type="email" th:field="*{email}" placeholder="orders@example.lk"><small class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small></label>
+                <label class="checkbox-line"><input type="checkbox" th:field="*{active}">Active recipient</label>
+            </div>
+            <label>Address<textarea rows="3" th:field="*{address}" placeholder="Recipient address"></textarea><small class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></small></label>
+            <div class="form-actions"><a class="button" th:href="@{/recipients}">Cancel</a><button class="button primary" type="submit">Save Recipient</button></div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

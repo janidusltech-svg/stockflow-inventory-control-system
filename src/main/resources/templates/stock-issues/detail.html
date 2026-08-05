@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${stockIssue.issueNumber})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page">
+    <div class="page-header">
+        <div><p class="eyebrow">Stock Issue Details</p><div class="title-line"><h1 th:text="${stockIssue.issueNumber}">ISS</h1><span class="status large" th:classappend="${#strings.toLowerCase(stockIssue.status.name())}" th:text="${#strings.replace(stockIssue.status.name(), '_', ' ')}">DRAFT</span></div><p><strong th:text="${stockIssue.recipient.name}">Recipient</strong><span th:text="${' · ' + #strings.replace(stockIssue.recipient.recipientType.name(), '_', ' ')}"></span></p></div>
+        <div class="header-actions"><a class="button" th:href="@{/stock-issues}">Back to Issues</a><a class="button" th:if="${stockIssue.editable}" th:href="@{/stock-issues/{id}/edit(id=${stockIssue.id})}">Edit Header</a><a class="button primary" th:if="${stockIssue.returnable}" th:href="@{/stock-returns/new(stockIssueId=${stockIssue.id})}">Create Return</a></div>
+    </div>
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div><div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+    <section class="summary-grid issue-summary">
+        <div class="summary-card"><span>Issue Date</span><strong th:text="${#temporals.format(stockIssue.issueDate, 'dd MMM yyyy')}">Date</strong></div>
+        <div class="summary-card"><span>External Reference</span><strong th:text="${stockIssue.externalReference != null ? stockIssue.externalReference : 'Not provided'}">Reference</strong></div>
+        <div class="summary-card"><span>Issued Quantity</span><strong th:text="${stockIssue.totalQuantity}">0</strong></div>
+        <div class="summary-card"><span>Returned Quantity</span><strong th:text="${stockIssue.totalReturnedQuantity}">0</strong></div>
+    </section>
+    <section class="content-section"><div class="section-heading"><div><h2>Issued Products</h2><p>Stock is deducted only when the draft issue is confirmed.</p></div></div>
+        <div class="table-panel"><div class="table-scroll"><table>
+            <thead><tr><th>Product</th><th>Warehouse / Location</th><th>Batch</th><th>Issue Qty</th><th>Returned</th><th>Remaining Returnable</th><th class="actions" th:if="${stockIssue.editable}">Action</th></tr></thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(stockIssue.items)}"><td th:colspan="${stockIssue.editable ? 7 : 6}" class="empty">No products have been added.</td></tr>
+            <tr th:each="item : ${stockIssue.items}">
+                <td><strong th:text="${item.product.sku + ' - ' + item.product.name}">Product</strong><small th:text="${item.product.unit.name}">Unit</small></td>
+                <td><span th:text="${item.location.warehouse.name}">Warehouse</span><small th:text="${item.location.code + ' / ' + item.location.name}">Location</small></td>
+                <td th:text="${item.batch != null ? item.batch.batchNumber : 'Not batch tracked'}">Batch</td>
+                <td th:text="${item.quantity}">0</td><td th:text="${item.returnedQuantity}">0</td><td th:text="${item.remainingReturnableQuantity}">0</td>
+                <td class="actions" th:if="${stockIssue.editable}"><form th:action="@{/stock-issues/{issueId}/items/{itemId}/remove(issueId=${stockIssue.id},itemId=${item.id})}" method="post"><button class="button small danger" type="submit">Remove</button></form></td>
+            </tr>
+            </tbody>
+        </table></div></div>
+    </section>
+    <section class="form-panel compact" th:if="${stockIssue.editable}">
+        <div class="section-heading"><div><h2>Add Available Stock</h2><p>Select one product, location and batch. The available quantity is shown.</p></div></div>
+        <form th:action="@{/stock-issues/{id}/items(id=${stockIssue.id})}" th:object="${stockIssueItemForm}" method="post">
+            <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}"><span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span></div>
+            <div class="issue-item-grid">
+                <label class="wide-field">Available Stock<select th:field="*{inventoryBalanceId}"><option value="">Select available stock</option><option th:each="balance : ${availableStock}" th:value="${balance.id}" th:text="${balance.product.sku + ' - ' + balance.product.name + ' | ' + balance.location.displayName + ' | Batch: ' + (balance.batch != null ? balance.batch.batchNumber : 'N/A') + ' | Available: ' + balance.quantityAvailable}"></option></select><small class="error" th:if="${#fields.hasErrors('inventoryBalanceId')}" th:errors="*{inventoryBalanceId}"></small></label>
+                <label>Quantity<input type="number" min="1" th:field="*{quantity}" placeholder="1"><small class="error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></small></label>
+            </div><div class="form-actions"><button class="button primary" type="submit">Add Product</button></div>
+        </form>
+    </section>
+    <section class="workflow-panel"><div><h2>Issue Workflow</h2><p th:if="${stockIssue.notes}"><strong>Notes:</strong> <span th:text="${stockIssue.notes}"></span></p><p th:unless="${stockIssue.notes}">Review product, location, batch and quantity before confirmation.</p><p th:if="${stockIssue.confirmedAt}" th:text="${'Confirmed ' + #temporals.format(stockIssue.confirmedAt, 'dd MMM yyyy HH:mm')}"></p></div>
+        <div class="workflow-actions" th:if="${stockIssue.editable}"><form th:action="@{/stock-issues/{id}/confirm(id=${stockIssue.id})}" method="post"><button class="button primary" type="submit">Confirm Issue &amp; Deduct Stock</button></form><form th:action="@{/stock-issues/{id}/cancel(id=${stockIssue.id})}" method="post"><button class="button danger" type="submit">Cancel Draft</button></form><form th:action="@{/stock-issues/{id}/delete(id=${stockIssue.id})}" method="post"><button class="button danger" type="submit">Delete Draft</button></form></div>
+    </section>
+</main>
+</body>
+</html>
