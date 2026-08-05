@@ -5,13 +5,36 @@
 <nav th:replace="~{fragments/layout :: nav}"></nav>
 
 <main class="page">
-    <section class="hero">
-        <p class="eyebrow">SE2030 Inventory Control System</p>
+    <section class="dashboard-hero">
+        <p class="eyebrow">StockFlow secured workspace</p>
         <h1>Welcome, <span th:text="${currentUsername}">user</span>.</h1>
         <p>
-            Your dashboard shows only the StockFlow functions authorized for your assigned role.
+            Continue with the inventory functions assigned to your role. StockFlow keeps product,
+            purchasing, receiving, movement and control records connected through one system.
         </p>
+        <div class="dashboard-status-grid" aria-label="Workspace status">
+            <div class="dashboard-status-item">
+                <small>Current role</small>
+                <strong th:text="${currentRoleLabel}">Authorized user</strong>
+            </div>
+            <div class="dashboard-status-item">
+                <small>Session</small>
+                <strong>Authenticated and protected</strong>
+            </div>
+            <div class="dashboard-status-item">
+                <small>Shared data source</small>
+                <strong>StockFlow MySQL database</strong>
+            </div>
+        </div>
     </section>
+
+    <div class="dashboard-section-heading">
+        <div>
+            <p class="eyebrow">Authorized workspace</p>
+            <h2>Functions available to your role</h2>
+        </div>
+        <p>Open a function to view or manage its records.</p>
+    </div>
 
     <section class="module-grid">
         <a class="module-card active"
@@ -20,6 +43,13 @@
             <span>01</span>
             <h2>Product Catalogue</h2>
             <p>Access product master records used by every stock workflow.</p>
+        </a>
+        <a class="module-card active"
+           th:if="${canManageProducts}"
+           th:href="@{/reference-data}">
+            <span>DATA</span>
+            <h2>Reference Data</h2>
+            <p>Maintain the categories, brands and measurement units used by products.</p>
         </a>
         <a class="module-card active"
            th:if="${canViewPurchasing}"
@@ -68,6 +98,19 @@
             <h2>User &amp; Role Management</h2>
             <p>Create staff accounts, assign roles, reset passwords and control access.</p>
         </a>
+    </section>
+
+    <section class="workflow-overview" aria-labelledby="workflow-overview-title">
+        <p class="eyebrow">Connected inventory flow</p>
+        <h2 id="workflow-overview-title">How StockFlow records move across the six functions</h2>
+        <ol>
+            <li><span>01</span>Catalogue<br>Identify products</li>
+            <li><span>02</span>Purchase<br>Order from suppliers</li>
+            <li><span>03</span>Receive<br>Verify goods and batches</li>
+            <li><span>04</span>Transfer<br>Move stock by location</li>
+            <li><span>05</span>Issue &amp; return<br>Record outgoing stock</li>
+            <li><span>06</span>Control<br>Audit and reorder</li>
+        </ol>
     </section>
 </main>
 </body>

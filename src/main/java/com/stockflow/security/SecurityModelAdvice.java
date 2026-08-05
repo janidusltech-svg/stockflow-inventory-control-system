@@ -1,5 +1,6 @@
 package com.stockflow.security;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,32 @@ public class SecurityModelAdvice {
     public String currentRoleLabel(Authentication authentication) {
         UserRole role = currentRole(authentication);
         return role == null ? "" : role.getDisplayName();
+    }
+
+    @ModelAttribute("currentPath")
+    public String currentPath(HttpServletRequest request) {
+        return request == null ? "" : request.getRequestURI();
+    }
+
+    @ModelAttribute("currentPageReadOnly")
+    public boolean currentPageReadOnly(Authentication authentication,
+                                       HttpServletRequest request) {
+        UserRole role = currentRole(authentication);
+        String path = request == null ? "" : request.getRequestURI();
+        if (role == null || path.equals("/dashboard")) {
+            return false;
+        }
+        if (role == UserRole.CUSTOMER_SERVICE_COORDINATOR) {
+            return startsWithAny(path, "/products", "/inventory-control",
+                    "/recipients", "/stock-issues", "/stock-returns");
+        }
+        if (role == UserRole.FINANCE_EXECUTIVE) {
+            return startsWithAny(path, "/products", "/goods-receipts", "/inventory-control");
+        }
+        if (role == UserRole.STORE_SUPERVISOR) {
+            return startsWithAny(path, "/suppliers", "/purchase-orders");
+        }
+        return false;
     }
 
     @ModelAttribute("canViewProducts")
@@ -141,5 +168,9 @@ public class SecurityModelAdvice {
         } catch (IllegalArgumentException exception) {
             return null;
         }
+    }
+
+    private boolean startsWithAny(String path, String... prefixes) {
+        return Arrays.stream(prefixes).anyMatch(path::startsWith);
     }
 }

@@ -28,7 +28,22 @@ StockFlow is a web-based inventory control system for Lanka Fresh Distributors (
 The integrated build includes all six major functions, a public landing page, a secured
 staff workspace, BCrypt password storage, role-based navigation and server-side access
 control. User and role management is maintained as a common function by the IT and
-Systems Officer.
+Systems Officer. Operations and Store staff can also maintain active product categories,
+brands and measurement units through the shared Reference Data area. Permanent deletion
+is intentionally unavailable so existing product relationships remain valid. The secured
+workspace now uses one responsive sidebar, active role-aware navigation, automatic page
+context, read-only indicators, client-side table pagination, confirmation dialogs and
+friendly error pages across all six modules.
+
+## Internal Workspace UI
+
+- One responsive navigation shell is shared by every secured page.
+- Links are shown only when the signed-in role is authorized for that function.
+- Read-only roles receive a clear page indicator while the server continues to enforce access.
+- Tables with more than ten visible records receive browser-side pagination automatically.
+- Important workflow actions receive a confirmation dialog before submission.
+- The dashboard summarizes the authenticated role and the connected six-function workflow.
+- The UI respects reduced-motion settings and adapts to tablet and mobile widths.
 
 ## Authorized Roles
 
@@ -98,4 +113,6 @@ feature/warehouse-transfer-tesara
 feature/stock-issue-return-raveesha
 feature/inventory-control-janidu
 feature/auth-role-access-janidu
+feature/reference-data-management-janidu
+feature/internal-ui-phase-2-janidu
 ```

@@ -3,51 +3,134 @@
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#063844">
     <title th:text="${title} + ' | StockFlow'">StockFlow</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
     <link rel="stylesheet" th:href="@{/css/stock-issue-return.css}">
     <link rel="stylesheet" th:href="@{/css/warehouse-transfer.css}">
     <link rel="stylesheet" th:href="@{/css/inventory-control.css}">
+    <link rel="stylesheet" th:href="@{/css/workspace.css}">
+    <script defer th:src="@{/js/app.js}"></script>
 </head>
 <body>
-<nav th:fragment="nav" class="topbar">
-    <a class="brand" th:href="@{/dashboard}">
-        <span class="brand-mark">SF</span>
-        <span>
-            <strong>StockFlow</strong>
-            <small>Lanka Fresh Distributors</small>
-        </span>
-    </a>
-    <div class="nav-links">
-        <a th:if="${canViewProducts}"
-           th:href="@{/products}">Products</a>
-        <a th:if="${canManageProducts}"
-           th:href="@{/reference-data}">Reference Data</a>
-        <a th:if="${canViewPurchasing}"
-           th:href="@{/purchase-orders}">Purchasing</a>
-        <a th:if="${canViewReceiving}"
-           th:href="@{/goods-receipts}">Receiving</a>
-        <a th:if="${canManageWarehouses}"
-           th:href="@{/warehouses}">Warehouses</a>
-        <a th:if="${canManageWarehouses}"
-           th:href="@{/stock-transfers}">Transfers</a>
-        <a th:if="${canViewIssuesAndReturns}"
-           th:href="@{/stock-issues}">Issues &amp; Returns</a>
-        <a th:if="${canManageInventoryControl}"
-           th:href="@{/inventory-control}">Inventory Control</a>
-        <a th:if="${canManageUsers}"
-           th:href="@{/user-accounts}">User Accounts</a>
-    </div>
-    <div class="nav-account" th:if="${authenticatedUser}">
-        <span class="account-avatar" aria-hidden="true">U</span>
-        <div class="account-copy">
-            <strong th:text="${currentUsername}">username</strong>
-            <small th:text="${currentRoleLabel}">Authorized user</small>
+<div th:fragment="nav" class="app-navigation">
+    <aside class="topbar app-sidebar" id="app-sidebar" aria-label="StockFlow navigation">
+        <div class="sidebar-heading">
+            <a class="brand" th:href="@{/dashboard}">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z"></path><path d="m4.4 7.7 7.6 4.2 7.6-4.2M12 12v8.5"></path></svg>
+                </span>
+                <span>
+                    <strong>StockFlow</strong>
+                    <small>Lanka Fresh Distributors</small>
+                </span>
+            </a>
+            <button class="sidebar-close" type="button" data-sidebar-close aria-label="Close navigation">
+                <span></span><span></span>
+            </button>
         </div>
-        <form th:action="@{/logout}" method="post">
-            <button class="sign-out-button" type="submit" title="Sign out">Sign out</button>
-        </form>
+
+        <div class="workspace-identity" th:if="${authenticatedUser}">
+            <span class="identity-dot" aria-hidden="true"></span>
+            <div>
+                <small>Signed in as</small>
+                <strong th:text="${currentRoleLabel}">Authorized user</strong>
+            </div>
+            <span class="view-mode" th:if="${currentPageReadOnly}">View only</span>
+        </div>
+
+        <div class="nav-section-label">Workspace</div>
+        <div class="nav-links">
+            <a th:href="@{/dashboard}"
+               th:classappend="${currentPath == '/dashboard'} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"></path></svg>
+                <span>Dashboard</span>
+            </a>
+            <a th:if="${canViewProducts}" th:href="@{/products}"
+               th:classappend="${#strings.startsWith(currentPath, '/products')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4-8-4Z"></path><path d="m4 7 8 4 8-4v10l-8 4-8-4V7Z"></path></svg>
+                <span>Products</span>
+            </a>
+            <a th:if="${canManageProducts}" th:href="@{/reference-data}"
+               th:classappend="${#strings.startsWith(currentPath, '/reference-data')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M5 4h14v5H5V4Zm0 7.5h14v3H5v-3ZM5 17h14v3H5v-3Z"></path></svg>
+                <span>Reference Data</span>
+            </a>
+            <a th:if="${canViewPurchasing}" th:href="@{/purchase-orders}"
+               th:classappend="${#strings.startsWith(currentPath, '/purchase-orders') or #strings.startsWith(currentPath, '/suppliers')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M5 3h14v18H5V3Z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg>
+                <span>Purchasing</span>
+            </a>
+            <a th:if="${canViewReceiving}" th:href="@{/goods-receipts}"
+               th:classappend="${#strings.startsWith(currentPath, '/goods-receipts')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M3 8h12v10H3V8Zm12 3h3l3 3v4h-6v-7Z"></path><path d="M7 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm10 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path></svg>
+                <span>Receiving</span>
+            </a>
+            <a th:if="${canManageWarehouses}" th:href="@{/warehouses}"
+               th:classappend="${#strings.startsWith(currentPath, '/warehouses') or #strings.startsWith(currentPath, '/storage-locations')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="m3 9 9-6 9 6v12H3V9Z"></path><path d="M7 13h4v4H7v-4Zm6 0h4v4h-4v-4Z"></path></svg>
+                <span>Warehouses</span>
+            </a>
+            <a th:if="${canManageWarehouses}" th:href="@{/stock-transfers}"
+               th:classappend="${#strings.startsWith(currentPath, '/stock-transfers')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M4 7h14M14 3l4 4-4 4M20 17H6m4 4-4-4 4-4"></path></svg>
+                <span>Stock Transfers</span>
+            </a>
+            <a th:if="${canViewIssuesAndReturns}" th:href="@{/stock-issues}"
+               th:classappend="${#strings.startsWith(currentPath, '/stock-issues') or #strings.startsWith(currentPath, '/stock-returns') or #strings.startsWith(currentPath, '/recipients')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M4 5h11v14H4V5Zm11 4h5v10h-5V9Z"></path><path d="M7 9h5M7 13h5"></path></svg>
+                <span>Issues &amp; Returns</span>
+            </a>
+            <a th:if="${canManageInventoryControl}" th:href="@{/inventory-control}"
+               th:classappend="${#strings.startsWith(currentPath, '/inventory-control') or #strings.startsWith(currentPath, '/reorder-rules') or #strings.startsWith(currentPath, '/stock-counts') or #strings.startsWith(currentPath, '/stock-adjustments')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V3"></path></svg>
+                <span>Inventory Control</span>
+            </a>
+            <a th:if="${canViewStockOnly}" th:href="@{/inventory-control/stock}"
+               th:classappend="${#strings.startsWith(currentPath, '/inventory-control')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16v14H4V6Zm3-3h10v3H7V3Z"></path><path d="M8 11h8M8 15h5"></path></svg>
+                <span>Stock Visibility</span>
+            </a>
+            <a th:if="${canManageUsers}" th:href="@{/user-accounts}"
+               th:classappend="${#strings.startsWith(currentPath, '/user-accounts')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0H5Z"></path><path d="M19 8v6m-3-3h6"></path></svg>
+                <span>User Accounts</span>
+            </a>
+        </div>
+
+        <div class="nav-account" th:if="${authenticatedUser}">
+            <span class="account-avatar" aria-hidden="true"
+                  th:text="${#strings.toUpperCase(#strings.substring(currentUsername, 0, 1))}">U</span>
+            <div class="account-copy">
+                <strong th:text="${currentUsername}">username</strong>
+                <small th:text="${currentRoleLabel}">Authorized user</small>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button class="sign-out-button" type="submit" title="Sign out" aria-label="Sign out">
+                    <svg viewBox="0 0 24 24"><path d="M10 4H5v16h5M14 8l4 4-4 4m4-4H9"></path></svg>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <button class="mobile-menu-toggle" type="button" data-sidebar-open aria-label="Open navigation">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-scrim" data-sidebar-close></div>
+
+    <div class="confirm-dialog" id="confirm-dialog" role="dialog" aria-modal="true"
+         aria-labelledby="confirm-dialog-title" hidden>
+        <div class="confirm-dialog-card">
+            <span class="confirm-dialog-icon" aria-hidden="true">!</span>
+            <p class="eyebrow">Please confirm</p>
+            <h2 id="confirm-dialog-title">Continue with this action?</h2>
+            <p id="confirm-dialog-message">This may update inventory information.</p>
+            <div class="confirm-dialog-actions">
+                <button class="button" type="button" data-confirm-cancel>Cancel</button>
+                <button class="button primary" type="button" data-confirm-accept>Continue</button>
+            </div>
+        </div>
     </div>
-</nav>
+</div>
 </body>
 </html>
