@@ -39,6 +39,7 @@ class RouteSmokeTest {
     @ValueSource(strings = {
             "/dashboard",
             "/products",
+            "/reference-data",
             "/suppliers",
             "/purchase-orders",
             "/goods-receipts",
@@ -96,6 +97,18 @@ class RouteSmokeTest {
                 .andExpect(status().isOk());
         mockMvc.perform(get("/warehouses").session(session))
                 .andExpect(status().isForbidden());
+        mockMvc.perform(get("/reference-data").session(session))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void storeSupervisorCanManageProductReferenceData() throws Exception {
+        MockHttpSession session = login("store");
+
+        mockMvc.perform(get("/reference-data").session(session))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Product Categories")))
+                .andExpect(content().string(containsString("Measurement Units")));
     }
 
     @Test
