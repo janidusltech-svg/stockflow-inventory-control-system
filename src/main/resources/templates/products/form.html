@@ -9,40 +9,88 @@
         <div>
             <p class="eyebrow">Product Catalogue Management</p>
             <h1 th:text="${pageTitle}">Add Product</h1>
-            <p>Enter accurate product details so all stock workflows use the same master record.</p>
+            <p>Enter the product master information used by every stock process.</p>
         </div>
     </div>
 
-    <form class="form-panel" th:action="@{${formAction}}" th:object="${product}" method="post">
+    <form class="form-panel"
+          th:action="${formAction}"
+          th:object="${productForm}"
+          method="post">
+
+        <div class="alert"
+             th:if="${#fields.hasGlobalErrors()}">
+            <p th:each="error : ${#fields.globalErrors()}"
+               th:text="${error}"></p>
+        </div>
+
         <div class="form-grid">
             <label>
-                SKU / Barcode
+                SKU
                 <input th:field="*{sku}" placeholder="Example: MILK-400G">
-                <small class="error" th:if="${#fields.hasErrors('sku')}" th:errors="*{sku}"></small>
+                <small class="error"
+                       th:if="${#fields.hasErrors('sku')}"
+                       th:errors="*{sku}"></small>
+            </label>
+
+            <label>
+                Barcode
+                <input th:field="*{barcode}" placeholder="Optional barcode">
+                <small class="error"
+                       th:if="${#fields.hasErrors('barcode')}"
+                       th:errors="*{barcode}"></small>
             </label>
 
             <label>
                 Product Name
                 <input th:field="*{name}" placeholder="Example: Milk Powder 400g">
-                <small class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+                <small class="error"
+                       th:if="${#fields.hasErrors('name')}"
+                       th:errors="*{name}"></small>
             </label>
 
             <label>
                 Category
-                <input th:field="*{category}" placeholder="Example: Food">
-                <small class="error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></small>
+                <select th:field="*{categoryId}">
+                    <option value="">Select category</option>
+                    <option th:each="category : ${categories}"
+                            th:value="${category.id}"
+                            th:text="${category.name}">
+                    </option>
+                </select>
+                <small class="error"
+                       th:if="${#fields.hasErrors('categoryId')}"
+                       th:errors="*{categoryId}"></small>
             </label>
 
             <label>
                 Brand
-                <input th:field="*{brand}" placeholder="Example: Lanka Fresh">
-                <small class="error" th:if="${#fields.hasErrors('brand')}" th:errors="*{brand}"></small>
+                <select th:field="*{brandId}">
+                    <option value="">No brand</option>
+                    <option th:each="brand : ${brands}"
+                            th:value="${brand.id}"
+                            th:text="${brand.name}">
+                    </option>
+                </select>
             </label>
 
             <label>
                 Unit
-                <input th:field="*{unit}" placeholder="Example: pack, box, kg">
-                <small class="error" th:if="${#fields.hasErrors('unit')}" th:errors="*{unit}"></small>
+                <select th:field="*{unitId}">
+                    <option value="">Select unit</option>
+                    <option th:each="unit : ${units}"
+                            th:value="${unit.id}"
+                            th:text="${unit.name}">
+                    </option>
+                </select>
+                <small class="error"
+                       th:if="${#fields.hasErrors('unitId')}"
+                       th:errors="*{unitId}"></small>
+            </label>
+
+            <label class="checkbox-line">
+                <input type="checkbox" th:field="*{batchTracked}">
+                Track batch and expiry information
             </label>
 
             <label class="checkbox-line">
@@ -53,8 +101,12 @@
 
         <label>
             Description
-            <textarea th:field="*{description}" rows="4" placeholder="Short product description"></textarea>
-            <small class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
+            <textarea th:field="*{description}"
+                      rows="4"
+                      placeholder="Short product description"></textarea>
+            <small class="error"
+                   th:if="${#fields.hasErrors('description')}"
+                   th:errors="*{description}"></small>
         </label>
 
         <div class="form-actions">

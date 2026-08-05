@@ -2,14 +2,15 @@ package com.stockflow.product;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
@@ -21,32 +22,32 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "SKU is required")
-    @Size(max = 40, message = "SKU must be 40 characters or less")
     @Column(nullable = false, unique = true, length = 40)
     private String sku;
 
-    @NotBlank(message = "Product name is required")
-    @Size(max = 120, message = "Product name must be 120 characters or less")
+    @Column(unique = true, length = 80)
+    private String barcode;
+
     @Column(nullable = false, length = 120)
     private String name;
 
-    @NotBlank(message = "Category is required")
-    @Size(max = 80, message = "Category must be 80 characters or less")
-    @Column(nullable = false, length = 80)
-    private String category;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
-    @Size(max = 80, message = "Brand must be 80 characters or less")
-    @Column(length = 80)
-    private String brand;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
 
-    @NotBlank(message = "Unit is required")
-    @Size(max = 30, message = "Unit must be 30 characters or less")
-    @Column(nullable = false, length = 30)
-    private String unit;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "unit_id", nullable = false)
+    private Unit unit;
 
-    @Size(max = 255, message = "Description must be 255 characters or less")
+    @Column(length = 255)
     private String description;
+
+    @Column(name = "batch_tracked", nullable = false)
+    private boolean batchTracked;
 
     @Column(nullable = false)
     private boolean active = true;
@@ -73,16 +74,20 @@ public class Product {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getSku() {
         return sku;
     }
 
     public void setSku(String sku) {
-        this.sku = sku == null ? null : sku.trim().toUpperCase();
+        this.sku = sku;
+    }
+
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
     }
 
     public String getName() {
@@ -90,31 +95,31 @@ public class Product {
     }
 
     public void setName(String name) {
-        this.name = name == null ? null : name.trim();
+        this.name = name;
     }
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
-        this.category = category == null ? null : category.trim();
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
-    public String getBrand() {
+    public Brand getBrand() {
         return brand;
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand == null ? null : brand.trim();
+    public void setBrand(Brand brand) {
+        this.brand = brand;
     }
 
-    public String getUnit() {
+    public Unit getUnit() {
         return unit;
     }
 
-    public void setUnit(String unit) {
-        this.unit = unit == null ? null : unit.trim();
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public String getDescription() {
@@ -122,7 +127,15 @@ public class Product {
     }
 
     public void setDescription(String description) {
-        this.description = description == null ? null : description.trim();
+        this.description = description;
+    }
+
+    public boolean isBatchTracked() {
+        return batchTracked;
+    }
+
+    public void setBatchTracked(boolean batchTracked) {
+        this.batchTracked = batchTracked;
     }
 
     public boolean isActive() {

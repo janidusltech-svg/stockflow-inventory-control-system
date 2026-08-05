@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Supplier and Purchase Order Management</p>
+            <h1 th:text="${pageTitle}">Add Supplier</h1>
+            <p>Use accurate contact details so purchasing staff can trace every order to its supplier.</p>
+        </div>
+    </div>
+
+    <form class="form-panel" th:action="@{${formAction}}" th:object="${supplier}" method="post">
+        <div class="form-grid">
+            <label>
+                Supplier Code
+                <input th:field="*{supplierCode}" placeholder="Example: SUP-001">
+                <small class="error"
+                       th:if="${#fields.hasErrors('supplierCode')}"
+                       th:errors="*{supplierCode}"></small>
+            </label>
+
+            <label>
+                Supplier Name
+                <input th:field="*{name}" placeholder="Example: Fresh Foods Lanka">
+                <small class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+            </label>
+
+            <label>
+                Contact Person
+                <input th:field="*{contactPerson}" placeholder="Example: Nimal Perera">
+                <small class="error"
+                       th:if="${#fields.hasErrors('contactPerson')}"
+                       th:errors="*{contactPerson}"></small>
+            </label>
+
+            <label>
+                Phone Number
+                <input th:field="*{phone}" placeholder="Example: 0771234567">
+                <small class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></small>
+            </label>
+
+            <label>
+                Email Address
+                <input type="email" th:field="*{email}" placeholder="Example: orders@supplier.lk">
+                <small class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+            </label>
+
+            <label class="checkbox-line">
+                <input type="checkbox" th:field="*{active}">
+                Active supplier
+            </label>
+        </div>
+
+        <label>
+            Address
+            <textarea th:field="*{address}" rows="3" placeholder="Supplier business address"></textarea>
+            <small class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></small>
+        </label>
+
+        <div class="form-actions">
+            <a class="button ghost" th:href="@{/suppliers}">Cancel</a>
+            <button class="button primary" type="submit">Save Supplier</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

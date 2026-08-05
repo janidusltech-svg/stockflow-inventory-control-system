@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${goodsReceipt.receiptNumber})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Goods Receipt Details</p>
+            <div class="title-line">
+                <h1 th:text="${goodsReceipt.receiptNumber}">GRN-2026-0001</h1>
+                <span class="status large"
+                      th:classappend="${#strings.toLowerCase(goodsReceipt.status.name())}"
+                      th:text="${goodsReceipt.status}">DRAFT</span>
+            </div>
+            <p>
+                <strong th:text="${goodsReceipt.purchaseOrder.supplier.name}">Supplier</strong>
+                <span th:text="${' | ' + goodsReceipt.purchaseOrder.orderNumber}">PO</span>
+            </p>
+        </div>
+        <div class="header-actions">
+            <a class="button" th:href="@{/goods-receipts}">Back to Receipts</a>
+            <a class="button" th:if="${goodsReceipt.editable}"
+               th:href="@{/goods-receipts/{id}/edit(id=${goodsReceipt.id})}">Edit Header</a>
+        </div>
+    </div>
+
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <section class="summary-grid receipt-summary">
+        <div class="summary-card">
+            <span>Received Date</span>
+            <strong th:text="${#temporals.format(goodsReceipt.receivedDate, 'dd MMM yyyy')}">Date</strong>
+        </div>
+        <div class="summary-card">
+            <span>Destination</span>
+            <strong th:text="${goodsReceipt.location.warehouse.name}">Warehouse</strong>
+            <small th:text="${goodsReceipt.location.code + ' / ' + goodsReceipt.location.name}">Location</small>
+        </div>
+        <div class="summary-card">
+            <span>Accepted Quantity</span>
+            <strong th:text="${goodsReceipt.totalAcceptedQuantity}">0</strong>
+        </div>
+        <div class="summary-card">
+            <span>Rejected Quantity</span>
+            <strong th:text="${goodsReceipt.totalRejectedQuantity}">0</strong>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <div>
+                <h2>Delivered Products</h2>
+                <p>Accepted stock is added to inventory only after this receipt is confirmed.</p>
+            </div>
+        </div>
+
+        <div class="table-panel">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Ordered / Previously Received</th>
+                        <th>Delivered</th>
+                        <th>Accepted</th>
+                        <th>Rejected</th>
+                        <th>Batch / Expiry</th>
+                        <th class="actions" th:if="${goodsReceipt.editable}">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(goodsReceipt.items)}">
+                        <td th:colspan="${goodsReceipt.editable ? 7 : 6}" class="empty">
+                            No delivered products have been recorded.
+                        </td>
+                    </tr>
+                    <tr th:each="item : ${goodsReceipt.items}">
+                        <td>
+                            <strong th:text="${item.product.sku + ' - ' + item.product.name}">Product</strong>
+                            <small th:text="${item.product.unit.name}">Unit</small>
+                        </td>
+                        <td>
+                            <span th:text="${item.purchaseOrderItem.quantity}">0</span>
+                            <small th:text="${'Previously accepted: '
+                                + item.purchaseOrderItem.receivedQuantity}">Previously accepted</small>
+                        </td>
+                        <td th:text="${item.deliveredQuantity}">0</td>
+                        <td th:text="${item.acceptedQuantity}">0</td>
+                        <td>
+                            <span th:text="${item.rejectedQuantity}">0</span>
+                            <small th:if="${item.rejectionReason}" th:text="${item.rejectionReason}"></small>
+                        </td>
+                        <td>
+                            <span th:text="${item.batchNumber != null ? item.batchNumber : 'Not batch tracked'}"></span>
+                            <small th:if="${item.expiryDate}"
+                                   th:text="${'Expires ' + #temporals.format(item.expiryDate, 'dd MMM yyyy')}"></small>
+                        </td>
+                        <td class="actions" th:if="${goodsReceipt.editable}">
+                            <form th:action="@{/goods-receipts/{receiptId}/items/{itemId}/remove(
+                                      receiptId=${goodsReceipt.id}, itemId=${item.id})}" method="post">
+                                <button class="button small danger" type="submit">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="form-panel compact" th:if="${goodsReceipt.editable}">
+        <div class="section-heading">
+            <div>
+                <h2>Add Delivered Product</h2>
+                <p>Select a product from the related purchase order. Use batch fields when required.</p>
+            </div>
+        </div>
+
+        <form th:action="@{/goods-receipts/{id}/items(id=${goodsReceipt.id})}"
+              th:object="${receiptItemForm}" method="post">
+            <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}">
+                <span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span>
+            </div>
+
+            <div class="receipt-item-grid">
+                <label class="wide-field">
+                    Purchase-Order Product
+                    <select th:field="*{purchaseOrderItemId}">
+                        <option value="">Select a product</option>
+                        <option th:each="orderItem : ${availableOrderItems}"
+                                th:value="${orderItem.id}"
+                                th:text="${orderItem.product.sku + ' - ' + orderItem.product.name
+                                    + ' | Remaining: ' + orderItem.remainingQuantity
+                                    + (orderItem.product.batchTracked ? ' | Batch required' : '')}">
+                            Product
+                        </option>
+                    </select>
+                    <small class="error" th:if="${#fields.hasErrors('purchaseOrderItemId')}"
+                           th:errors="*{purchaseOrderItemId}"></small>
+                </label>
+                <label>
+                    Delivered
+                    <input type="number" min="1" th:field="*{deliveredQuantity}" placeholder="10">
+                    <small class="error" th:if="${#fields.hasErrors('deliveredQuantity')}"
+                           th:errors="*{deliveredQuantity}"></small>
+                </label>
+                <label>
+                    Accepted
+                    <input type="number" min="0" th:field="*{acceptedQuantity}" placeholder="10">
+                    <small class="error" th:if="${#fields.hasErrors('acceptedQuantity')}"
+                           th:errors="*{acceptedQuantity}"></small>
+                </label>
+                <label>
+                    Rejected
+                    <input type="number" min="0" th:field="*{rejectedQuantity}" placeholder="0">
+                    <small class="error" th:if="${#fields.hasErrors('rejectedQuantity')}"
+                           th:errors="*{rejectedQuantity}"></small>
+                </label>
+                <label class="wide-field">
+                    Rejection Reason
+                    <input type="text" th:field="*{rejectionReason}"
+                           placeholder="Required only when rejected quantity is greater than zero">
+                    <small class="error" th:if="${#fields.hasErrors('rejectionReason')}"
+                           th:errors="*{rejectionReason}"></small>
+                </label>
+                <label>
+                    Batch Number
+                    <input type="text" th:field="*{batchNumber}" placeholder="Example: B-2026-045">
+                    <small class="error" th:if="${#fields.hasErrors('batchNumber')}"
+                           th:errors="*{batchNumber}"></small>
+                </label>
+                <label>
+                    Manufacture Date
+                    <input type="date" th:field="*{manufactureDate}">
+                </label>
+                <label>
+                    Expiry Date
+                    <input type="date" th:field="*{expiryDate}">
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button class="button primary" type="submit">Add Delivered Product</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="workflow-panel">
+        <div>
+            <h2>Receipt Workflow</h2>
+            <p th:if="${goodsReceipt.notes}">
+                <strong>Notes:</strong> <span th:text="${goodsReceipt.notes}"></span>
+            </p>
+            <p th:unless="${goodsReceipt.notes}">Check all quantities and batch details before confirmation.</p>
+            <p th:if="${goodsReceipt.confirmedAt}"
+               th:text="${'Confirmed ' + #temporals.format(goodsReceipt.confirmedAt, 'dd MMM yyyy HH:mm')}"></p>
+        </div>
+        <div class="workflow-actions" th:if="${goodsReceipt.editable}">
+            <form th:action="@{/goods-receipts/{id}/confirm(id=${goodsReceipt.id})}" method="post">
+                <button class="button primary" type="submit">Confirm Receipt &amp; Update Stock</button>
+            </form>
+            <form th:action="@{/goods-receipts/{id}/cancel(id=${goodsReceipt.id})}" method="post">
+                <button class="button danger" type="submit">Cancel Draft</button>
+            </form>
+            <form th:action="@{/goods-receipts/{id}/delete(id=${goodsReceipt.id})}" method="post">
+                <button class="button danger" type="submit">Delete Draft</button>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

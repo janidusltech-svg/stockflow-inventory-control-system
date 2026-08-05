@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Goods Receiving</p>
+            <h1 th:text="${pageTitle}">Create Goods Receipt</h1>
+            <p th:if="${receiptNumber}" th:text="${'Editing ' + receiptNumber}"></p>
+            <p th:unless="${receiptNumber}">
+                Start with an approved purchase order and an active receiving location.
+            </p>
+        </div>
+        <a class="button" th:href="@{/goods-receipts}">Back to Receipts</a>
+    </div>
+
+    <section class="form-panel">
+        <form th:action="${formAction}" th:object="${goodsReceiptForm}" method="post">
+            <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}">
+                <span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span>
+            </div>
+
+            <div class="form-grid">
+                <label>
+                    Approved Purchase Order
+                    <select th:field="*{purchaseOrderId}">
+                        <option value="">Select a purchase order</option>
+                        <option th:each="order : ${purchaseOrders}"
+                                th:value="${order.id}"
+                                th:text="${order.orderNumber + ' - ' + order.supplier.name
+                                    + ' (' + #strings.replace(order.status.name(), '_', ' ') + ')'}">
+                            PO - Supplier
+                        </option>
+                    </select>
+                    <small class="error" th:if="${#fields.hasErrors('purchaseOrderId')}"
+                           th:errors="*{purchaseOrderId}"></small>
+                </label>
+
+                <label>
+                    Receiving Location
+                    <select th:field="*{locationId}">
+                        <option value="">Select a location</option>
+                        <option th:each="location : ${locations}"
+                                th:value="${location.id}"
+                                th:text="${location.displayName}">Warehouse - Location</option>
+                    </select>
+                    <small class="error" th:if="${#fields.hasErrors('locationId')}"
+                           th:errors="*{locationId}"></small>
+                </label>
+
+                <label>
+                    Received Date
+                    <input type="date" th:field="*{receivedDate}">
+                    <small class="error" th:if="${#fields.hasErrors('receivedDate')}"
+                           th:errors="*{receivedDate}"></small>
+                </label>
+
+                <label>
+                    Supplier Delivery Reference
+                    <input type="text" th:field="*{supplierDeliveryReference}"
+                           placeholder="Example: DN-4587">
+                    <small class="error" th:if="${#fields.hasErrors('supplierDeliveryReference')}"
+                           th:errors="*{supplierDeliveryReference}"></small>
+                </label>
+            </div>
+
+            <label>
+                Notes
+                <textarea rows="4" th:field="*{notes}"
+                          placeholder="Delivery condition, missing documents or other observations"></textarea>
+                <small class="error" th:if="${#fields.hasErrors('notes')}"
+                       th:errors="*{notes}"></small>
+            </label>
+
+            <div class="form-actions">
+                <a class="button" th:href="@{/goods-receipts}">Cancel</a>
+                <button class="button primary" type="submit">Save Draft Receipt</button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

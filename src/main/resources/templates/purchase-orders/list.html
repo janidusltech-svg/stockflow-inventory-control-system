@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Purchase Orders')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Tharinya - Supplier and Purchase Order Management</p>
+            <h1>Purchase Orders</h1>
+            <p>Create orders, add product lines, calculate totals and monitor each purchasing status.</p>
+        </div>
+        <div class="header-actions">
+            <a class="button" th:href="@{/suppliers}">Manage Suppliers</a>
+            <a class="button primary" th:href="@{/purchase-orders/new}">Create Purchase Order</a>
+        </div>
+    </div>
+
+    <form class="filter-panel" th:action="@{/purchase-orders}" method="get">
+        <label>
+            Search
+            <input type="search" name="keyword" placeholder="Order number or supplier" th:value="${keyword}">
+        </label>
+        <label>
+            Status
+            <select name="status">
+                <option value="">All statuses</option>
+                <option th:each="statusOption : ${statuses}"
+                        th:value="${statusOption}"
+                        th:text="${statusOption}"
+                        th:selected="${statusOption == selectedStatus}">
+                    DRAFT
+                </option>
+            </select>
+        </label>
+        <label>
+            From Date
+            <input type="date" name="fromDate" th:value="${fromDate}">
+        </label>
+        <label>
+            To Date
+            <input type="date" name="toDate" th:value="${toDate}">
+        </label>
+        <div class="filter-actions">
+            <button class="button" type="submit">Apply Filters</button>
+            <a class="button ghost" th:href="@{/purchase-orders}">Reset</a>
+        </div>
+    </form>
+
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <section class="table-panel">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Supplier</th>
+                    <th>Order Date</th>
+                    <th>Expected Date</th>
+                    <th>Items</th>
+                    <th>Total (LKR)</th>
+                    <th>Status</th>
+                    <th class="actions">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(purchaseOrders)}">
+                    <td colspan="8" class="empty">No purchase orders found.</td>
+                </tr>
+                <tr th:each="order : ${purchaseOrders}">
+                    <td><strong th:text="${order.orderNumber}">PO-2026-0001</strong></td>
+                    <td th:text="${order.supplier.name}">Supplier</td>
+                    <td th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy')}">25 Jul 2026</td>
+                    <td th:text="${order.expectedDate != null
+                        ? #temporals.format(order.expectedDate, 'dd MMM yyyy') : '-'}">-</td>
+                    <td th:text="${order.items.size()}">0</td>
+                    <td th:text="${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                    <td>
+                        <span class="status"
+                              th:classappend="${#strings.toLowerCase(order.status.name())}"
+                              th:text="${order.status}">DRAFT</span>
+                    </td>
+                    <td class="actions">
+                        <a class="button small primary"
+                           th:href="@{/purchase-orders/{id}(id=${order.id})}">Open</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>
