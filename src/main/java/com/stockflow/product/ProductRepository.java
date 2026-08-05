@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+    long countByActiveTrue();
+
     boolean existsBySkuIgnoreCase(String sku);
 
     Optional<Product> findBySkuIgnoreCase(String sku);

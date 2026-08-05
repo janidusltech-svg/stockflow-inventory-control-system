@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Start Stock Count')}"></head>
+<body><nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page narrow"><div class="page-header"><div><p class="eyebrow">Physical Stock Counting</p><h1>Start Stock Count</h1><p>The system takes a snapshot of all recorded balances at the selected location.</p></div><a class="button" th:href="@{/stock-counts}">Back to Counts</a></div>
+    <section class="form-panel"><form th:action="@{/stock-counts}" th:object="${stockCountForm}" method="post"><div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}"><span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span></div><div class="form-grid">
+        <label>Warehouse / Location<select th:field="*{locationId}"><option value="">Select location</option><option th:each="location : ${locations}" th:value="${location.id}" th:text="${location.displayName}"></option></select><small class="error" th:if="${#fields.hasErrors('locationId')}" th:errors="*{locationId}"></small></label>
+        <label>Count Date<input type="date" th:field="*{countDate}"><small class="error" th:if="${#fields.hasErrors('countDate')}" th:errors="*{countDate}"></small></label>
+    </div><label>Notes<textarea rows="4" th:field="*{notes}" placeholder="Purpose or instructions for this count"></textarea><small class="error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></small></label><div class="form-actions"><a class="button" th:href="@{/stock-counts}">Cancel</a><button class="button primary">Create Session</button></div></form></section>
+</main></body></html>

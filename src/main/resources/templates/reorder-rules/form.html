@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body><nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page narrow"><div class="page-header"><div><p class="eyebrow">Reorder Rule Management</p><h1 th:text="${pageTitle}">Create Rule</h1><p>Maximum level must be greater than minimum level.</p></div><a class="button" th:href="@{/reorder-rules}">Back to Rules</a></div>
+    <section class="form-panel"><form th:action="${formAction}" th:object="${reorderRuleForm}" method="post"><div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}"><span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span></div><div class="form-grid">
+        <label>Product<select th:field="*{productId}"><option value="">Select product</option><option th:each="product : ${products}" th:value="${product.id}" th:text="${product.sku + ' - ' + product.name}"></option></select><small class="error" th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}"></small></label>
+        <label>Minimum Level<input type="number" min="0" th:field="*{minimumLevel}"><small class="error" th:if="${#fields.hasErrors('minimumLevel')}" th:errors="*{minimumLevel}"></small></label>
+        <label>Maximum Level<input type="number" min="1" th:field="*{maximumLevel}"><small class="error" th:if="${#fields.hasErrors('maximumLevel')}" th:errors="*{maximumLevel}"></small></label>
+        <label>Suggested Reorder Quantity<input type="number" min="1" th:field="*{reorderQuantity}"><small class="error" th:if="${#fields.hasErrors('reorderQuantity')}" th:errors="*{reorderQuantity}"></small></label>
+        <label class="checkbox-line"><input type="checkbox" th:field="*{active}">Active rule</label>
+    </div><div class="form-actions"><a class="button" th:href="@{/reorder-rules}">Cancel</a><button class="button primary" type="submit">Save Rule</button></div></form></section>
+</main></body></html>
