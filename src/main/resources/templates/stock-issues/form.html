@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page narrow">
+    <div class="page-header"><div><p class="eyebrow">Stock Issue</p><h1 th:text="${pageTitle}">Create Stock Issue</h1><p th:if="${issueNumber}" th:text="${'Editing ' + issueNumber}"></p><p th:unless="${issueNumber}">Select who receives the stock and record the issue date.</p></div><a class="button" th:href="@{/stock-issues}">Back to Issues</a></div>
+    <section class="form-panel">
+        <form th:action="${formAction}" th:object="${stockIssueForm}" method="post">
+            <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}"><span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span></div>
+            <div class="form-grid">
+                <label>Recipient<select th:field="*{recipientId}"><option value="">Select a recipient</option><option th:each="recipient : ${recipients}" th:value="${recipient.id}" th:text="${recipient.code + ' - ' + recipient.name}"></option></select><small class="error" th:if="${#fields.hasErrors('recipientId')}" th:errors="*{recipientId}"></small></label>
+                <label>Issue Date<input type="date" th:field="*{issueDate}"><small class="error" th:if="${#fields.hasErrors('issueDate')}" th:errors="*{issueDate}"></small></label>
+                <label>External Reference<input th:field="*{externalReference}" placeholder="Customer order or internal request"><small class="error" th:if="${#fields.hasErrors('externalReference')}" th:errors="*{externalReference}"></small></label>
+            </div>
+            <label>Notes<textarea rows="4" th:field="*{notes}" placeholder="Purpose of issue or handling instructions"></textarea><small class="error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></small></label>
+            <div class="form-actions"><a class="button" th:href="@{/stock-issues}">Cancel</a><button class="button primary" type="submit">Save Draft Issue</button></div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,70 @@
+/* Function 05: Stock Issue and Return Management */
+.recipient-filter {
+    grid-template-columns: minmax(260px, 2fr) minmax(160px, 1fr) auto;
+}
+
+.issue-filter {
+    grid-template-columns: minmax(260px, 2fr) minmax(160px, 1fr) 150px 150px auto;
+}
+
+.issue-item-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(140px, 1fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.return-item-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    gap: 1rem;
+    align-items: start;
+}
+
+.return-item-grid .wide-field {
+    grid-column: span 2;
+}
+
+.status.partially_returned,
+.status.partially-returned {
+    color: #8a4b08;
+    background: #fff2d8;
+}
+
+.status.returned,
+.status.confirmed {
+    color: #075f4f;
+    background: #daf5ec;
+}
+
+.status.cancelled {
+    color: #7b2734;
+    background: #fde8ec;
+}
+
+@media (max-width: 1050px) {
+    .issue-filter,
+    .recipient-filter {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .issue-filter .filter-actions,
+    .recipient-filter .filter-actions {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 760px) {
+    .issue-item-grid,
+    .return-item-grid,
+    .issue-filter,
+    .recipient-filter {
+        grid-template-columns: 1fr;
+    }
+
+    .return-item-grid .wide-field,
+    .issue-filter .filter-actions,
+    .recipient-filter .filter-actions {
+        grid-column: auto;
+    }
+}

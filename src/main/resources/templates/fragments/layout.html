@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${title} + ' | StockFlow'">StockFlow</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/stock-issue-return.css}">
     <link rel="stylesheet" th:href="@{/css/warehouse-transfer.css}">
 </head>
 <body>
@@ -21,6 +22,10 @@
         <a th:href="@{/suppliers}">Suppliers</a>
         <a th:href="@{/purchase-orders}">Purchase Orders</a>
         <a th:href="@{/goods-receipts}">Receiving</a>
+        <a th:href="@{/recipients}">Recipients</a>
+        <a th:href="@{/stock-issues}">Issues</a>
+        <a th:href="@{/stock-returns}">Returns</a>
+        <a href="#" class="disabled">Warehouses</a>
         <a th:href="@{/warehouses}">Warehouses</a>
         <a th:href="@{/stock-transfers}">Transfers</a>
         <a href="#" class="disabled">Issues</a>

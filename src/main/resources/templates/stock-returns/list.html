@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Stock Returns')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page">
+    <div class="page-header"><div><p class="eyebrow">Function 05</p><h1>Stock Returns</h1><p>Trace returned products and restore only accepted quantities to available stock.</p></div><div class="header-actions"><a class="button" th:href="@{/stock-issues}">View Issues</a><a class="button primary" th:href="@{/stock-returns/new}">Create Stock Return</a></div></div>
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div><div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+    <form class="filter-panel issue-filter" method="get" th:action="@{/stock-returns}">
+        <label>Search<input type="search" name="keyword" th:value="${keyword}" placeholder="Return, issue or recipient"></label>
+        <label>Status<select name="status"><option value="">All statuses</option><option th:each="option : ${statuses}" th:value="${option}" th:text="${option}" th:selected="${selectedStatus == option}"></option></select></label>
+        <label>From<input type="date" name="fromDate" th:value="${fromDate}"></label><label>To<input type="date" name="toDate" th:value="${toDate}"></label>
+        <div class="filter-actions"><a class="button" th:href="@{/stock-returns}">Clear</a><button class="button primary" type="submit">Apply Filters</button></div>
+    </form>
+    <div class="table-panel"><div class="table-scroll"><table>
+        <thead><tr><th>Return</th><th>Original Issue</th><th>Recipient</th><th>Date</th><th>Returned</th><th>Restocked / Rejected</th><th>Status</th><th class="actions">Action</th></tr></thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(stockReturns)}"><td colspan="8" class="empty">No stock returns match the selected filters.</td></tr>
+        <tr th:each="returned : ${stockReturns}">
+            <td><strong th:text="${returned.returnNumber}">RTN</strong></td><td th:text="${returned.stockIssue.issueNumber}">ISS</td><td th:text="${returned.stockIssue.recipient.name}">Recipient</td><td th:text="${#temporals.format(returned.returnDate, 'dd MMM yyyy')}">Date</td><td th:text="${returned.totalReturnedQuantity}">0</td><td><span th:text="${returned.totalRestockedQuantity + ' / ' + returned.totalRejectedQuantity}">0 / 0</span></td><td><span class="status" th:classappend="${#strings.toLowerCase(returned.status.name())}" th:text="${returned.status}">DRAFT</span></td><td class="actions"><a class="button small" th:href="@{/stock-returns/{id}(id=${returned.id})}">View</a></td>
+        </tr>
+        </tbody>
+    </table></div></div>
+</main>
+</body>
+</html>

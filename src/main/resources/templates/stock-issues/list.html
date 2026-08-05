@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Stock Issues')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page">
+    <div class="page-header">
+        <div><p class="eyebrow">Function 05</p><h1>Stock Issues</h1><p>Issue available products to customers or internal departments with traceable stock movements.</p></div>
+        <div class="header-actions"><a class="button" th:href="@{/stock-returns}">View Returns</a><a class="button primary" th:href="@{/stock-issues/new}">Create Stock Issue</a></div>
+    </div>
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+    <form class="filter-panel issue-filter" method="get" th:action="@{/stock-issues}">
+        <label>Search<input type="search" name="keyword" th:value="${keyword}" placeholder="Issue number, recipient or reference"></label>
+        <label>Status<select name="status"><option value="">All statuses</option><option th:each="option : ${statuses}" th:value="${option}" th:text="${#strings.replace(option.name(), '_', ' ')}" th:selected="${selectedStatus == option}"></option></select></label>
+        <label>From<input type="date" name="fromDate" th:value="${fromDate}"></label>
+        <label>To<input type="date" name="toDate" th:value="${toDate}"></label>
+        <div class="filter-actions"><a class="button" th:href="@{/stock-issues}">Clear</a><button class="button primary" type="submit">Apply Filters</button></div>
+    </form>
+    <div class="table-panel"><div class="table-scroll"><table>
+        <thead><tr><th>Issue</th><th>Recipient</th><th>Date</th><th>Issued</th><th>Returned</th><th>Status</th><th class="actions">Action</th></tr></thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(stockIssues)}"><td colspan="7" class="empty">No stock issues match the selected filters.</td></tr>
+        <tr th:each="issue : ${stockIssues}">
+            <td><strong th:text="${issue.issueNumber}">ISS-2026-00001</strong><small th:text="${issue.externalReference != null ? issue.externalReference : 'No external reference'}"></small></td>
+            <td><strong th:text="${issue.recipient.name}">Recipient</strong><small th:text="${#strings.replace(issue.recipient.recipientType.name(), '_', ' ')}"></small></td>
+            <td th:text="${#temporals.format(issue.issueDate, 'dd MMM yyyy')}">Date</td>
+            <td th:text="${issue.totalQuantity}">0</td><td th:text="${issue.totalReturnedQuantity}">0</td>
+            <td><span class="status" th:classappend="${#strings.toLowerCase(issue.status.name())}" th:text="${#strings.replace(issue.status.name(), '_', ' ')}">DRAFT</span></td>
+            <td class="actions"><a class="button small" th:href="@{/stock-issues/{id}(id=${issue.id})}">View</a></td>
+        </tr>
+        </tbody>
+    </table></div></div>
+</main>
+</body>
+</html>
