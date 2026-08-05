@@ -13,7 +13,7 @@
         </div>
         <div class="header-actions">
             <a class="button" th:href="@{/purchase-orders}">View Purchase Orders</a>
-            <a class="button primary" th:href="@{/suppliers/new}">Add Supplier</a>
+            <a class="button primary" th:if="${canManagePurchasing}" th:href="@{/suppliers/new}">Add Supplier</a>
         </div>
     </div>
 
@@ -36,12 +36,12 @@
                     <th>Phone</th>
                     <th>Email</th>
                     <th>Status</th>
-                    <th class="actions">Actions</th>
+                    <th class="actions" th:if="${canManagePurchasing}">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:if="${#lists.isEmpty(suppliers)}">
-                    <td colspan="7" class="empty">No suppliers found.</td>
+                    <td th:colspan="${canManagePurchasing ? 7 : 6}" class="empty">No suppliers found.</td>
                 </tr>
                 <tr th:each="supplier : ${suppliers}">
                     <td th:text="${supplier.supplierCode}">SUP-001</td>
@@ -56,7 +56,7 @@
                         <span class="status active" th:if="${supplier.active}">Active</span>
                         <span class="status inactive" th:unless="${supplier.active}">Inactive</span>
                     </td>
-                    <td class="actions">
+                    <td class="actions" th:if="${canManagePurchasing}">
                         <a class="button small" th:href="@{/suppliers/{id}/edit(id=${supplier.id})}">Edit</a>
                         <form th:if="${supplier.active}"
                               th:action="@{/suppliers/{id}/deactivate(id=${supplier.id})}"

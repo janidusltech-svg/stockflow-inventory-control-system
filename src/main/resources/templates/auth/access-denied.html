@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Access Denied')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page narrow">
+    <section class="access-denied-card">
+        <span class="access-denied-code">403</span>
+        <p class="eyebrow">Role-restricted function</p>
+        <h1>You do not have access to this page.</h1>
+        <p>
+            Your StockFlow account is active, but its assigned role does not permit this
+            function. No information was changed.
+        </p>
+        <div class="header-actions">
+            <a class="button primary" th:href="@{/dashboard}">Return to dashboard</a>
+            <form th:action="@{/logout}" method="post">
+                <button class="button" type="submit">Sign out</button>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

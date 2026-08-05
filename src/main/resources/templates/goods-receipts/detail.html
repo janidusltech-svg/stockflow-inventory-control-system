@@ -21,7 +21,7 @@
         </div>
         <div class="header-actions">
             <a class="button" th:href="@{/goods-receipts}">Back to Receipts</a>
-            <a class="button" th:if="${goodsReceipt.editable}"
+            <a class="button" th:if="${goodsReceipt.editable and canManageReceiving}"
                th:href="@{/goods-receipts/{id}/edit(id=${goodsReceipt.id})}">Edit Header</a>
         </div>
     </div>
@@ -68,12 +68,12 @@
                         <th>Accepted</th>
                         <th>Rejected</th>
                         <th>Batch / Expiry</th>
-                        <th class="actions" th:if="${goodsReceipt.editable}">Action</th>
+                        <th class="actions" th:if="${goodsReceipt.editable and canManageReceiving}">Action</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:if="${#lists.isEmpty(goodsReceipt.items)}">
-                        <td th:colspan="${goodsReceipt.editable ? 7 : 6}" class="empty">
+                        <td th:colspan="${goodsReceipt.editable and canManageReceiving ? 7 : 6}" class="empty">
                             No delivered products have been recorded.
                         </td>
                     </tr>
@@ -98,7 +98,7 @@
                             <small th:if="${item.expiryDate}"
                                    th:text="${'Expires ' + #temporals.format(item.expiryDate, 'dd MMM yyyy')}"></small>
                         </td>
-                        <td class="actions" th:if="${goodsReceipt.editable}">
+                        <td class="actions" th:if="${goodsReceipt.editable and canManageReceiving}">
                             <form th:action="@{/goods-receipts/{receiptId}/items/{itemId}/remove(
                                       receiptId=${goodsReceipt.id}, itemId=${item.id})}" method="post">
                                 <button class="button small danger" type="submit">Remove</button>
@@ -111,7 +111,7 @@
         </div>
     </section>
 
-    <section class="form-panel compact" th:if="${goodsReceipt.editable}">
+    <section class="form-panel compact" th:if="${goodsReceipt.editable and canManageReceiving}">
         <div class="section-heading">
             <div>
                 <h2>Add Delivered Product</h2>
@@ -198,7 +198,7 @@
             <p th:if="${goodsReceipt.confirmedAt}"
                th:text="${'Confirmed ' + #temporals.format(goodsReceipt.confirmedAt, 'dd MMM yyyy HH:mm')}"></p>
         </div>
-        <div class="workflow-actions" th:if="${goodsReceipt.editable}">
+        <div class="workflow-actions" th:if="${goodsReceipt.editable and canManageReceiving}">
             <form th:action="@{/goods-receipts/{id}/confirm(id=${goodsReceipt.id})}" method="post">
                 <button class="button primary" type="submit">Confirm Receipt &amp; Update Stock</button>
             </form>

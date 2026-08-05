@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Secure sign in to the StockFlow inventory-control workspace.">
+    <title>Sign In | StockFlow</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+    <link rel="stylesheet" th:href="@{/css/auth.css}" href="/css/auth.css">
+</head>
+<body class="auth-page">
+<header class="auth-header">
+    <a class="auth-brand" th:href="@{/}" href="/">
+        <span class="brand-mark">SF</span>
+        <span><strong>StockFlow</strong><small>Lanka Fresh Distributors</small></span>
+    </a>
+    <a class="back-home" th:href="@{/}" href="/">Back to website</a>
+</header>
+
+<main class="auth-layout">
+    <section class="auth-story" aria-labelledby="auth-story-title">
+        <p class="auth-eyebrow">Authorized staff workspace</p>
+        <h1 id="auth-story-title">One secure entry point for every stock responsibility.</h1>
+        <p>
+            Each staff member signs in with an assigned role. StockFlow then displays only
+            the functions required for that responsibility.
+        </p>
+        <div class="auth-flow" aria-label="Secure access process">
+            <span><b>01</b> Verify account</span>
+            <i></i>
+            <span><b>02</b> Apply role access</span>
+            <i></i>
+            <span><b>03</b> Open workspace</span>
+        </div>
+        <ul class="security-points">
+            <li>Passwords are stored using BCrypt encryption.</li>
+            <li>Unauthorized pages are blocked on the server.</li>
+            <li>Stock-changing actions remain role controlled.</li>
+        </ul>
+    </section>
+
+    <section class="login-card" aria-labelledby="login-title">
+        <div class="login-card-heading">
+            <span class="login-lock" aria-hidden="true">&#128274;</span>
+            <div>
+                <p>StockFlow workspace</p>
+                <h2 id="login-title">Sign in to continue</h2>
+            </div>
+        </div>
+
+        <div class="auth-alert error" th:if="${param.error}">
+            The username or password is incorrect, or the account is inactive.
+        </div>
+        <div class="auth-alert success" th:if="${param.logout}">
+            You have signed out safely.
+        </div>
+
+        <form class="login-form" th:action="@{/login}" method="post">
+            <label for="username">
+                Username
+                <input id="username" name="username" type="text" required autofocus
+                       autocomplete="username" placeholder="Enter your username">
+            </label>
+            <label for="password">
+                Password
+                <input id="password" name="password" type="password" required
+                       autocomplete="current-password" placeholder="Enter your password">
+            </label>
+            <button class="auth-submit" type="submit">
+                Access workspace <span aria-hidden="true">&rarr;</span>
+            </button>
+        </form>
+
+        <p class="login-support">
+            Access problems? Contact the IT and Systems Officer.
+        </p>
+    </section>
+</main>
+</body>
+</html>

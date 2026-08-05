@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page narrow">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Role-Based Access</p>
+            <h1 th:text="${pageTitle}">User Account</h1>
+            <p>Assign only the access required for this staff member’s responsibility.</p>
+        </div>
+        <a class="button" th:href="@{/user-accounts}">Back to Accounts</a>
+    </header>
+
+    <form class="form-panel" th:action="${formAction}" th:object="${userAccountForm}" method="post">
+        <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}">
+            <span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span>
+        </div>
+
+        <div class="form-grid">
+            <label>
+                Full Name
+                <input th:field="*{fullName}" maxlength="120" required placeholder="Staff member's full name">
+                <small class="field-error" th:errors="*{fullName}"></small>
+            </label>
+            <label>
+                Username
+                <input th:field="*{username}" maxlength="50" required placeholder="Example: store.supervisor">
+                <small class="field-error" th:errors="*{username}"></small>
+            </label>
+            <label>
+                Email Address
+                <input th:field="*{email}" type="email" maxlength="120" required placeholder="name@company.lk">
+                <small class="field-error" th:errors="*{email}"></small>
+            </label>
+            <label>
+                Assigned Role
+                <select th:field="*{role}" required>
+                    <option value="">Select a role</option>
+                    <option th:each="role : ${roles}" th:value="${role}" th:text="${role.displayName}"></option>
+                </select>
+                <small class="field-error" th:errors="*{role}"></small>
+            </label>
+            <label th:if="${creating}" class="wide-field">
+                Initial Password
+                <input th:field="*{password}" type="password" minlength="8" maxlength="72"
+                       required autocomplete="new-password" placeholder="Minimum 8 characters">
+                <small>The password is encrypted before it is saved.</small>
+            </label>
+            <label class="checkbox-label wide-field">
+                <input th:field="*{active}" type="checkbox">
+                <span>Account is active and can sign in</span>
+            </label>
+        </div>
+
+        <section class="role-reference">
+            <h2>Available roles</h2>
+            <div th:each="role : ${roles}">
+                <strong th:text="${role.displayName}">Role</strong>
+                <p th:text="${role.description}">Description</p>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <a class="button" th:href="@{/user-accounts}">Cancel</a>
+            <button class="button primary" type="submit"
+                    th:text="${creating} ? 'Create Account' : 'Save Changes'">Save</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

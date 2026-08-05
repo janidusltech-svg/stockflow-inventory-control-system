@@ -7,43 +7,66 @@
 <main class="page">
     <section class="hero">
         <p class="eyebrow">SE2030 Inventory Control System</p>
-        <h1>StockFlow Dashboard</h1>
+        <h1>Welcome, <span th:text="${currentUsername}">user</span>.</h1>
         <p>
-            A web-based inventory control system for product records, purchasing,
-            receiving, warehouses, issuing, returns, auditing and reorder alerts.
+            Your dashboard shows only the StockFlow functions authorized for your assigned role.
         </p>
     </section>
 
     <section class="module-grid">
-        <a class="module-card active" th:href="@{/products}">
+        <a class="module-card active"
+           th:if="${canViewProducts}"
+           th:href="@{/products}">
             <span>01</span>
             <h2>Product Catalogue</h2>
-            <p>Manage product master records used by every stock workflow.</p>
+            <p>Access product master records used by every stock workflow.</p>
         </a>
-        <a class="module-card active" th:href="@{/purchase-orders}">
+        <a class="module-card active"
+           th:if="${canViewPurchasing}"
+           th:href="@{/purchase-orders}">
             <span>02</span>
             <h2>Suppliers &amp; Orders</h2>
-            <p>Maintain suppliers, create purchase orders and monitor purchasing status.</p>
+            <p>Access supplier records, purchase orders and purchasing status.</p>
         </a>
-        <a class="module-card active" th:href="@{/goods-receipts}">
+        <a class="module-card active"
+           th:if="${canViewReceiving}"
+           th:href="@{/goods-receipts}">
             <span>03</span>
             <h2>Goods Receiving &amp; Batches</h2>
-            <p>Record deliveries, rejected quantities, batches and confirmed stock.</p>
+            <p>Access deliveries, rejected quantities, batches and confirmed stock.</p>
         </a>
-        <a class="module-card active" th:href="@{/stock-transfers}">
+        <a class="module-card active"
+           th:if="${canManageWarehouses}"
+           th:href="@{/stock-transfers}">
             <span>04</span>
             <h2>Warehouses &amp; Transfers</h2>
             <p>Maintain locations and move validated stock between them.</p>
         </a>
-        <a class="module-card active" th:href="@{/stock-issues}">
+        <a class="module-card active"
+           th:if="${canViewIssuesAndReturns}"
+           th:href="@{/stock-issues}">
             <span>05</span>
             <h2>Issues &amp; Returns</h2>
-            <p>Track outgoing stock and returned products.</p>
+            <p>Access outgoing stock records and returned-product status.</p>
         </a>
-        <a class="module-card active" th:href="@{/inventory-control}">
+        <a class="module-card active" th:if="${canManageInventoryControl}"
+           th:href="@{/inventory-control}">
             <span>06</span>
             <h2>Inventory Control</h2>
             <p>Audits, reorder alerts, adjustments and reports.</p>
+        </a>
+        <a class="module-card active"
+           th:if="${canViewStockOnly}"
+           th:href="@{/inventory-control/stock}">
+            <span>VIEW</span>
+            <h2>Current Stock</h2>
+            <p>View authorized product availability without changing confirmed quantities.</p>
+        </a>
+        <a class="module-card active" th:if="${canManageUsers}"
+           th:href="@{/user-accounts}">
+            <span>IT</span>
+            <h2>User &amp; Role Management</h2>
+            <p>Create staff accounts, assign roles, reset passwords and control access.</p>
         </a>
     </section>
 </main>
