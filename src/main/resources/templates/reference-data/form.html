@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page narrow">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Reference Data Management</p>
+            <h1 th:text="${pageTitle}">Reference Data</h1>
+            <p th:text="${'Maintain the ' + #strings.toLowerCase(referenceKind) + ' used by product records.'}"></p>
+        </div>
+        <a class="button" th:href="@{/reference-data}">Back to Reference Data</a>
+    </header>
+
+    <form class="form-panel reference-form" th:action="${formAction}"
+          th:object="${referenceDataForm}" method="post">
+        <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}">
+            <span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span>
+        </div>
+
+        <div class="form-grid">
+            <label th:if="${showCode}">
+                Code
+                <input th:field="*{code}" maxlength="30" required
+                       placeholder="Example: FOOD">
+                <small>Saved in uppercase. Use letters, numbers, hyphens or underscores.</small>
+                <small class="error" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></small>
+            </label>
+            <label>
+                Name
+                <input th:field="*{name}" maxlength="80" required
+                       th:placeholder="${referenceKind + ' name'}">
+                <small class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+            </label>
+            <label class="wide-field" th:if="${showDescription}">
+                Description
+                <textarea th:field="*{description}" maxlength="255" rows="4"
+                          placeholder="Short description of this category"></textarea>
+                <small class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
+            </label>
+            <label class="checkbox-line wide-field">
+                <input type="checkbox" th:field="*{active}">
+                Active and available in new-product dropdowns
+            </label>
+        </div>
+
+        <aside class="reference-form-note">
+            Existing products keep their current reference value if this record is later
+            deactivated. StockFlow does not permanently delete reference records.
+        </aside>
+
+        <div class="form-actions">
+            <a class="button ghost" th:href="@{/reference-data}">Cancel</a>
+            <button class="button primary" type="submit"
+                    th:text="${'Save ' + referenceKind}">Save</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reference Data')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Common Catalogue Setup</p>
+            <h1>Categories, Brands &amp; Measurement Units</h1>
+            <p>Maintain the active reference values displayed in Product Catalogue dropdowns.</p>
+        </div>
+        <a class="button" th:href="@{/products}">Back to Products</a>
+    </header>
+
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+
+    <aside class="reference-policy">
+        <strong>Data protection rule</strong>
+        <p>
+            Reference records are never permanently deleted through StockFlow. Deactivate an
+            unused value to remove it from new-product dropdowns while preserving every existing
+            product link and audit record.
+        </p>
+    </aside>
+
+    <nav class="reference-jump" aria-label="Reference data sections">
+        <a href="#categories">Categories</a>
+        <a href="#brands">Brands</a>
+        <a href="#units">Measurement Units</a>
+    </nav>
+
+    <section class="reference-section" id="categories">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">01</p>
+                <h2>Product Categories</h2>
+                <p>Groups products for searching, reporting and catalogue organization.</p>
+            </div>
+            <a class="button primary" th:href="@{/reference-data/categories/new}">Add Category</a>
+        </div>
+        <div class="table-panel">
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Code</th><th>Category</th><th>Products Using It</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(categories)}"><td colspan="5" class="empty">No categories are available.</td></tr>
+                    <tr th:each="category : ${categories}">
+                        <td><span class="reference-code" th:text="${category.code}">FOOD</span></td>
+                        <td><strong th:text="${category.name}">Food</strong><small th:if="${category.description}" th:text="${category.description}"></small></td>
+                        <td><span class="usage-count" th:text="${categoryUsage[category.id]}">0</span></td>
+                        <td><span class="status" th:classappend="${category.active} ? ' active' : ' inactive'" th:text="${category.active} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span></td>
+                        <td class="reference-actions">
+                            <a class="button small" th:href="@{/reference-data/categories/{id}/edit(id=${category.id})}">Edit</a>
+                            <form th:action="@{/reference-data/categories/{id}/status(id=${category.id})}" method="post">
+                                <input type="hidden" name="active" th:value="${!category.active}">
+                                <button class="button small" th:classappend="${category.active} ? ' danger' : ' primary'" type="submit" th:text="${category.active} ? 'Deactivate' : 'Activate'">Change</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="reference-section" id="brands">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">02</p>
+                <h2>Brands</h2>
+                <p>Identifies the manufacturer or commercial label of a product.</p>
+            </div>
+            <a class="button primary" th:href="@{/reference-data/brands/new}">Add Brand</a>
+        </div>
+        <div class="table-panel">
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Brand</th><th>Products Using It</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(brands)}"><td colspan="4" class="empty">No brands are available.</td></tr>
+                    <tr th:each="brand : ${brands}">
+                        <td><strong th:text="${brand.name}">Lanka Fresh</strong></td>
+                        <td><span class="usage-count" th:text="${brandUsage[brand.id]}">0</span></td>
+                        <td><span class="status" th:classappend="${brand.active} ? ' active' : ' inactive'" th:text="${brand.active} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span></td>
+                        <td class="reference-actions">
+                            <a class="button small" th:href="@{/reference-data/brands/{id}/edit(id=${brand.id})}">Edit</a>
+                            <form th:action="@{/reference-data/brands/{id}/status(id=${brand.id})}" method="post">
+                                <input type="hidden" name="active" th:value="${!brand.active}">
+                                <button class="button small" th:classappend="${brand.active} ? ' danger' : ' primary'" type="submit" th:text="${brand.active} ? 'Deactivate' : 'Activate'">Change</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="reference-section" id="units">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">03</p>
+                <h2>Measurement Units</h2>
+                <p>Defines how inventory quantities are counted, such as pack, box or kilogram.</p>
+            </div>
+            <a class="button primary" th:href="@{/reference-data/units/new}">Add Measurement Unit</a>
+        </div>
+        <div class="table-panel">
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Code</th><th>Measurement Unit</th><th>Products Using It</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(units)}"><td colspan="5" class="empty">No measurement units are available.</td></tr>
+                    <tr th:each="unit : ${units}">
+                        <td><span class="reference-code" th:text="${unit.code}">PACK</span></td>
+                        <td><strong th:text="${unit.name}">Pack</strong></td>
+                        <td><span class="usage-count" th:text="${unitUsage[unit.id]}">0</span></td>
+                        <td><span class="status" th:classappend="${unit.active} ? ' active' : ' inactive'" th:text="${unit.active} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span></td>
+                        <td class="reference-actions">
+                            <a class="button small" th:href="@{/reference-data/units/{id}/edit(id=${unit.id})}">Edit</a>
+                            <form th:action="@{/reference-data/units/{id}/status(id=${unit.id})}" method="post">
+                                <input type="hidden" name="active" th:value="${!unit.active}">
+                                <button class="button small" th:classappend="${unit.active} ? ' danger' : ' primary'" type="submit" th:text="${unit.active} ? 'Deactivate' : 'Activate'">Change</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

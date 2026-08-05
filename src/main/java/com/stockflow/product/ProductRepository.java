@@ -19,6 +19,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByBarcode(String barcode);
 
+    long countByCategoryId(Long categoryId);
+
+    long countByBrandId(Long brandId);
+
+    long countByUnitId(Long unitId);
+
     @Query("""
             SELECT p
             FROM Product p

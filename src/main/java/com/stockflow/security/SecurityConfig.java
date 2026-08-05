@@ -50,6 +50,8 @@ public class SecurityConfig {
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico")
                         .permitAll()
                         .requestMatchers("/user-accounts/**").hasRole(IT)
+                        .requestMatchers("/reference-data/**")
+                        .hasAnyRole(OPERATIONS, STORE)
                         .requestMatchers("/dashboard", "/access-denied").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/products/new", "/products/*/edit")

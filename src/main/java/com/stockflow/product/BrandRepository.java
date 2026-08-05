@@ -7,4 +7,10 @@ import java.util.List;
 public interface BrandRepository extends JpaRepository<Brand, Long> {
 
     List<Brand> findAllByActiveTrueOrderByNameAsc();
+
+    List<Brand> findAllByOrderByNameAsc();
+
+    boolean existsByNameIgnoreCase(String name);
+
+    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
 }

@@ -21,6 +21,8 @@
     <div class="nav-links">
         <a th:if="${canViewProducts}"
            th:href="@{/products}">Products</a>
+        <a th:if="${canManageProducts}"
+           th:href="@{/reference-data}">Reference Data</a>
         <a th:if="${canViewPurchasing}"
            th:href="@{/purchase-orders}">Purchasing</a>
         <a th:if="${canViewReceiving}"
