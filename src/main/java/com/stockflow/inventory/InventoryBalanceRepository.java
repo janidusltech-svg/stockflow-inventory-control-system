@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 public interface InventoryBalanceRepository extends JpaRepository<InventoryBalance, Long> {
 
@@ -57,6 +58,60 @@ public interface InventoryBalanceRepository extends JpaRepository<InventoryBalan
             order by product.name, warehouse.name, location.name, batch.batchNumber
             """)
     List<InventoryBalance> findAllAvailableWithDetails();
+
+    @Query("""
+            select balance
+            from InventoryBalance balance
+            join fetch balance.product product
+            join fetch product.category
+            left join fetch product.brand
+            join fetch product.unit
+            join fetch balance.location location
+            join fetch location.warehouse
+            left join fetch balance.batch batch
+            order by product.name, location.warehouse.name, location.name, batch.batchNumber
+            """)
+    List<InventoryBalance> findAllWithDetails();
+
+    @Query("""
+            select balance
+            from InventoryBalance balance
+            join fetch balance.product product
+            join fetch product.category
+            left join fetch product.brand
+            join fetch product.unit
+            join fetch balance.location location
+            join fetch location.warehouse
+            left join fetch balance.batch batch
+            where location.id = :locationId
+            order by product.name, batch.batchNumber
+            """)
+    List<InventoryBalance> findAllByLocationIdWithDetails(
+            @Param("locationId") Long locationId
+    );
+
+    @Query("""
+            select balance
+            from InventoryBalance balance
+            join fetch balance.product product
+            join fetch product.category
+            left join fetch product.brand
+            join fetch product.unit
+            join fetch balance.location location
+            join fetch location.warehouse
+            join fetch balance.batch batch
+            where balance.quantityAvailable > 0
+              and batch.expiryDate is not null
+              and batch.expiryDate between :fromDate and :toDate
+            order by batch.expiryDate, product.name
+            """)
+    List<InventoryBalance> findExpiringWithDetails(
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate
+    );
+
+    @Query("select coalesce(sum(balance.quantityAvailable), 0) from InventoryBalance balance")
+    Long sumAvailableQuantity();
 
     @Query("""
             select balance

@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Stock Movement Report')}"></head>
+<body><nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page"><div class="page-header"><div><p class="eyebrow">Central Inventory Control</p><h1>Stock Movement Report</h1><p>Trace receiving, transfers, issues, returns and approved adjustments.</p></div><a class="button" th:href="@{/inventory-control}">Back to Dashboard</a></div>
+    <form class="filter-panel movement-filter" method="get" th:action="@{/inventory-control/movements}"><label>Search<input name="keyword" th:value="${keyword}" placeholder="Reference, SKU, product or location"></label><label>Movement Type<select name="movementType"><option value="">All types</option><option th:each="type : ${movementTypes}" th:value="${type}" th:selected="${type == selectedMovementType}" th:text="${#strings.replace(type.name(), '_', ' ')}"></option></select></label><div class="filter-actions"><a class="button" th:href="@{/inventory-control/movements}">Clear</a><button class="button primary" type="submit">Apply Filters</button></div></form>
+    <div class="table-panel"><div class="table-scroll"><table><thead><tr><th>Date &amp; Time</th><th>Type</th><th>Reference</th><th>Product</th><th>Location</th><th>Batch</th><th>Change</th></tr></thead><tbody>
+    <tr th:if="${#lists.isEmpty(movements)}"><td colspan="7" class="empty">No stock movements found.</td></tr>
+    <tr th:each="movement : ${movements}"><td th:text="${#temporals.format(movement.createdAt, 'dd MMM yyyy HH:mm')}">Date</td><td th:text="${#strings.replace(movement.movementType.name(), '_', ' ')}">Type</td><td th:text="${movement.referenceNumber}">Ref</td><td th:text="${movement.product.sku + ' - ' + movement.product.name}">Product</td><td th:text="${movement.location.displayName}">Location</td><td th:text="${movement.batch != null ? movement.batch.batchNumber : '-'}">-</td><td><strong th:classappend="${movement.quantityChange >= 0 ? 'positive-number' : 'negative-number'}" th:text="${movement.quantityChange > 0 ? '+' + movement.quantityChange : movement.quantityChange}">0</strong></td></tr>
+    </tbody></table></div></div>
+</main></body></html>

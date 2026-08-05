@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Stock Counts')}"></head>
+<body><nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page"><div class="page-header"><div><p class="eyebrow">Function 06 · Inventory Auditing</p><h1>Physical Stock Counts</h1><p>Create count sessions and compare physical quantities with system stock.</p></div><div class="header-actions"><a class="button" th:href="@{/inventory-control}">Dashboard</a><a class="button primary" th:href="@{/stock-counts/new}">Start Stock Count</a></div></div>
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div><div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+    <form class="filter-panel compact-filter" method="get" th:action="@{/stock-counts}"><label>Status<select name="status"><option value="">All statuses</option><option th:each="status : ${statuses}" th:value="${status}" th:selected="${status == selectedStatus}" th:text="${status}"></option></select></label><div class="filter-actions"><a class="button" th:href="@{/stock-counts}">Clear</a><button class="button primary">Apply Filter</button></div></form>
+    <div class="table-panel"><div class="table-scroll"><table><thead><tr><th>Count Number</th><th>Date</th><th>Location</th><th>Progress</th><th>Variances</th><th>Status</th><th class="actions">Action</th></tr></thead><tbody>
+    <tr th:if="${#lists.isEmpty(stockCounts)}"><td colspan="7" class="empty">No stock-count sessions found.</td></tr>
+    <tr th:each="stockCount : ${stockCounts}"><td><strong th:text="${stockCount.countNumber}">CNT</strong></td><td th:text="${#temporals.format(stockCount.countDate, 'dd MMM yyyy')}">Date</td><td th:text="${stockCount.location.displayName}">Location</td><td th:text="${stockCount.countedItemCount + ' / ' + stockCount.items.size()}">0 / 0</td><td th:text="${stockCount.varianceItemCount}">0</td><td><span class="status" th:classappend="${#strings.toLowerCase(stockCount.status.name())}" th:text="${stockCount.status}">DRAFT</span></td><td class="actions"><a class="button small" th:href="@{/stock-counts/{id}(id=${stockCount.id})}">Open</a></td></tr>
+    </tbody></table></div></div>
+</main></body></html>

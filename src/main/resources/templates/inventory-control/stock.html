@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Current Stock')}"></head>
+<body><nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page"><div class="page-header"><div><p class="eyebrow">Central Inventory Control</p><h1>Current Stock</h1><p>Validated quantities by product, warehouse, location and batch.</p></div><a class="button" th:href="@{/inventory-control}">Back to Dashboard</a></div>
+    <form class="toolbar" method="get" th:action="@{/inventory-control/stock}"><input type="search" name="keyword" th:value="${keyword}" placeholder="Search product, warehouse, location or batch"><button class="button primary" type="submit">Search</button><a class="button" th:href="@{/inventory-control/stock}">Clear</a></form>
+    <div class="table-panel"><div class="table-scroll"><table><thead><tr><th>Product</th><th>Warehouse</th><th>Location</th><th>Batch</th><th>Expiry</th><th>Available</th></tr></thead><tbody>
+    <tr th:if="${#lists.isEmpty(balances)}"><td colspan="6" class="empty">No inventory balances found.</td></tr>
+    <tr th:each="balance : ${balances}"><td><strong th:text="${balance.product.sku + ' - ' + balance.product.name}">Product</strong><small th:text="${balance.product.unit.name}">Unit</small></td><td th:text="${balance.location.warehouse.name}">Warehouse</td><td th:text="${balance.location.code + ' / ' + balance.location.name}">Location</td><td th:text="${balance.batch != null ? balance.batch.batchNumber : 'Not batch tracked'}">Batch</td><td th:text="${balance.batch != null and balance.batch.expiryDate != null ? #temporals.format(balance.batch.expiryDate, 'dd MMM yyyy') : '-'}">-</td><td><strong th:text="${balance.quantityAvailable}">0</strong></td></tr>
+    </tbody></table></div></div>
+</main></body></html>

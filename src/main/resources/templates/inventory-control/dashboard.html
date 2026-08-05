@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Inventory Control Dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Function 06 · Central Inventory Control</p>
+            <h1>Inventory Control Dashboard</h1>
+            <p>One management view for stock, audits, adjustments, reorder alerts and expiry risks.</p>
+        </div>
+        <div class="header-actions">
+            <a class="button" th:href="@{/inventory-control/stock}">Current Stock</a>
+            <a class="button primary" th:href="@{/stock-counts/new}">Start Stock Count</a>
+        </div>
+    </div>
+
+    <section class="control-metrics">
+        <a class="metric-card" th:href="@{/products}"><span>Active Products</span><strong th:text="${summary.activeProducts}">0</strong></a>
+        <a class="metric-card" th:href="@{/inventory-control/stock}"><span>Total Stock Units</span><strong th:text="${summary.totalStockUnits}">0</strong></a>
+        <a class="metric-card warning" th:href="@{/reorder-rules}"><span>Low Stock</span><strong th:text="${summary.lowStockProducts}">0</strong></a>
+        <a class="metric-card danger" th:href="@{/reorder-rules}"><span>Out of Stock</span><strong th:text="${summary.outOfStockProducts}">0</strong></a>
+        <a class="metric-card warning" href="#expiry"><span>Expiring in 30 Days</span><strong th:text="${summary.expiringBatches}">0</strong></a>
+        <a class="metric-card" th:href="@{/stock-adjustments(status='PENDING')}"><span>Pending Adjustments</span><strong th:text="${summary.pendingAdjustments}">0</strong></a>
+        <a class="metric-card" th:href="@{/stock-counts}"><span>Open Stock Counts</span><strong th:text="${summary.openStockCounts}">0</strong></a>
+    </section>
+
+    <section class="control-actions">
+        <a th:href="@{/stock-counts}"><strong>Physical Stock Counts</strong><span>Record and compare physical quantities.</span></a>
+        <a th:href="@{/stock-adjustments}"><strong>Stock Adjustments</strong><span>Review and apply approved corrections.</span></a>
+        <a th:href="@{/reorder-rules}"><strong>Reorder Rules</strong><span>Maintain minimum and maximum stock levels.</span></a>
+        <a th:href="@{/inventory-control/movements}"><strong>Movement Report</strong><span>Trace every confirmed stock change.</span></a>
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading"><div><h2>Priority Reorder Alerts</h2><p>Products at or below their minimum levels.</p></div><a class="button small" th:href="@{/reorder-rules}">Manage Rules</a></div>
+        <div class="table-panel"><div class="table-scroll"><table>
+            <thead><tr><th>Product</th><th>Current</th><th>Minimum</th><th>Maximum</th><th>Suggested Order</th><th>Status</th></tr></thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(priorityAlerts)}"><td colspan="6" class="empty">No low-stock or out-of-stock alerts.</td></tr>
+            <tr th:each="alert : ${priorityAlerts}">
+                <td><strong th:text="${alert.rule.product.sku + ' - ' + alert.rule.product.name}">Product</strong></td>
+                <td th:text="${alert.currentQuantity}">0</td><td th:text="${alert.rule.minimumLevel}">0</td><td th:text="${alert.rule.maximumLevel}">0</td>
+                <td th:text="${alert.rule.reorderQuantity}">0</td>
+                <td><span class="status" th:classappend="${#strings.toLowerCase(alert.levelStatus)}" th:text="${#strings.replace(alert.levelStatus, '_', ' ')}">LOW STOCK</span></td>
+            </tr>
+            </tbody>
+        </table></div></div>
+    </section>
+
+    <section class="content-section" id="expiry">
+        <div class="section-heading"><div><h2>Expiry Alerts</h2><p>Available batches expiring within the next 30 days.</p></div></div>
+        <div class="table-panel"><div class="table-scroll"><table>
+            <thead><tr><th>Product</th><th>Batch</th><th>Expiry Date</th><th>Location</th><th>Available</th></tr></thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(expiringBatches)}"><td colspan="5" class="empty">No batches expire within 30 days.</td></tr>
+            <tr th:each="balance : ${expiringBatches}">
+                <td th:text="${balance.product.sku + ' - ' + balance.product.name}">Product</td>
+                <td th:text="${balance.batch.batchNumber}">Batch</td><td th:text="${#temporals.format(balance.batch.expiryDate, 'dd MMM yyyy')}">Date</td>
+                <td th:text="${balance.location.displayName}">Location</td><td th:text="${balance.quantityAvailable}">0</td>
+            </tr>
+            </tbody>
+        </table></div></div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading"><div><h2>Recent Stock Movements</h2><p>Latest confirmed inventory transactions.</p></div><a class="button small" th:href="@{/inventory-control/movements}">View Report</a></div>
+        <div class="table-panel"><div class="table-scroll"><table>
+            <thead><tr><th>Date &amp; Time</th><th>Type</th><th>Reference</th><th>Product</th><th>Location</th><th>Change</th></tr></thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(recentMovements)}"><td colspan="6" class="empty">No stock movements recorded.</td></tr>
+            <tr th:each="movement : ${recentMovements}">
+                <td th:text="${#temporals.format(movement.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
+                <td th:text="${#strings.replace(movement.movementType.name(), '_', ' ')}">TYPE</td><td th:text="${movement.referenceNumber}">REF</td>
+                <td th:text="${movement.product.sku + ' - ' + movement.product.name}">Product</td><td th:text="${movement.location.displayName}">Location</td>
+                <td><strong th:classappend="${movement.quantityChange >= 0 ? 'positive-number' : 'negative-number'}" th:text="${movement.quantityChange > 0 ? '+' + movement.quantityChange : movement.quantityChange}">0</strong></td>
+            </tr>
+            </tbody>
+        </table></div></div>
+    </section>
+</main>
+</body>
+</html>

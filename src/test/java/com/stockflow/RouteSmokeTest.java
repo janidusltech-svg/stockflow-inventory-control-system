@@ -28,7 +28,13 @@ class RouteSmokeTest {
             "/stock-transfers",
             "/recipients",
             "/stock-issues",
-            "/stock-returns"
+            "/stock-returns",
+            "/inventory-control",
+            "/inventory-control/stock",
+            "/inventory-control/movements",
+            "/reorder-rules",
+            "/stock-counts",
+            "/stock-adjustments"
     })
     void mainPagesRenderWithoutServerErrors(String route) throws Exception {
         mockMvc.perform(get(route))

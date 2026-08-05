@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body><nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page narrow"><div class="page-header"><div><p class="eyebrow">Controlled Stock Correction</p><h1 th:text="${pageTitle}">Create Adjustment</h1><p>Use a positive number to add stock or a negative number to reduce stock.</p></div><a class="button" th:href="@{/stock-adjustments}">Back to Adjustments</a></div>
+    <section class="form-panel"><form th:action="${formAction}" th:object="${stockAdjustmentForm}" method="post"><div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}"><span th:each="error : ${#fields.globalErrors()}" th:text="${error}"></span></div>
+        <label>Inventory Balance<select th:field="*{inventoryBalanceId}"><option value="">Select product and location</option><option th:each="balance : ${balances}" th:value="${balance.id}" th:text="${balance.product.sku + ' - ' + balance.product.name + ' | ' + balance.location.displayName + ' | Batch: ' + (balance.batch != null ? balance.batch.batchNumber : 'N/A') + ' | Current: ' + balance.quantityAvailable}"></option></select><small class="error" th:if="${#fields.hasErrors('inventoryBalanceId')}" th:errors="*{inventoryBalanceId}"></small></label>
+        <div class="form-grid"><label>Quantity Change<input type="number" th:field="*{quantityChange}" placeholder="Example: -3 or 5"><small class="error" th:if="${#fields.hasErrors('quantityChange')}" th:errors="*{quantityChange}"></small></label><label>Reason<input th:field="*{reason}" maxlength="150" placeholder="Example: Damaged stock correction"><small class="error" th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}"></small></label></div>
+        <label>Notes<textarea rows="4" th:field="*{notes}" placeholder="Supporting explanation"></textarea><small class="error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></small></label><div class="form-actions"><a class="button" th:href="@{/stock-adjustments}">Cancel</a><button class="button primary">Save Draft</button></div>
+    </form></section>
+</main></body></html>

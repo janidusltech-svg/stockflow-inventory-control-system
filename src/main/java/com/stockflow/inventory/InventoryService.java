@@ -128,6 +128,36 @@ public class InventoryService {
         );
     }
 
+    public void adjust(Product product,
+                       StorageLocation location,
+                       Batch batch,
+                       int quantityChange,
+                       String adjustmentNumber) {
+        if (quantityChange == 0) {
+            throw new IllegalArgumentException("Adjustment quantity cannot be zero");
+        }
+
+        InventoryBalance balance = quantityChange > 0
+                ? findOrCreateBalance(product, location, batch)
+                : findExistingBalance(product, location, batch);
+
+        if (quantityChange > 0) {
+            balance.addQuantity(quantityChange);
+        } else {
+            balance.removeQuantity(Math.abs(quantityChange));
+        }
+
+        inventoryBalanceRepository.save(balance);
+        saveMovement(
+                StockMovementType.ADJUSTMENT,
+                product,
+                location,
+                batch,
+                quantityChange,
+                adjustmentNumber
+        );
+    }
+
     private InventoryBalance findExistingBalance(Product product,
                                                  StorageLocation location,
                                                  Batch batch) {
