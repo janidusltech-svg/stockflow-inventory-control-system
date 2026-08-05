@@ -1,5 +1,6 @@
 package com.stockflow;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -20,6 +23,7 @@ class RouteSmokeTest {
     @ParameterizedTest(name = "GET {0} renders successfully")
     @ValueSource(strings = {
             "/",
+            "/dashboard",
             "/products",
             "/suppliers",
             "/purchase-orders",
@@ -39,5 +43,17 @@ class RouteSmokeTest {
     void mainPagesRenderWithoutServerErrors(String route) throws Exception {
         mockMvc.perform(get(route))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void landingPageContainsWelcomeAndWarehouseExperiences() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("id=\"site-loader\"")))
+                .andExpect(content().string(containsString("Welcome to StockFlow")))
+                .andExpect(content().string(containsString("class=\"hero-sticky\"")))
+                .andExpect(content().string(containsString("id=\"hero-worker-cart\"")))
+                .andExpect(content().string(containsString("id=\"hero-progress-path\"")))
+                .andExpect(content().string(containsString("Product movement preview")));
     }
 }
