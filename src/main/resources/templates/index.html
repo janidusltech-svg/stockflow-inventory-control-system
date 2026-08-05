@@ -22,7 +22,6 @@
         </a>
         <a class="module-card active" th:href="@{/purchase-orders}">
             <span>02</span>
-            <h2>Suppliers & Orders</h2>
             <h2>Suppliers &amp; Orders</h2>
             <p>Maintain suppliers, create purchase orders and monitor purchasing status.</p>
         </a>
@@ -31,18 +30,12 @@
             <h2>Goods Receiving &amp; Batches</h2>
             <p>Record deliveries, rejected quantities, batches and confirmed stock.</p>
         </a>
-        <div class="module-card">
-            <span>04</span>
-            <h2>Warehouses</h2>
-            <p>Manage locations and stock transfers.</p>
-        </div>
-        <a class="module-card active" th:href="@{/stock-issues}">
         <a class="module-card active" th:href="@{/stock-transfers}">
             <span>04</span>
             <h2>Warehouses &amp; Transfers</h2>
             <p>Maintain locations and move validated stock between them.</p>
         </a>
-        <div class="module-card">
+        <a class="module-card active" th:href="@{/stock-issues}">
             <span>05</span>
             <h2>Issues &amp; Returns</h2>
             <p>Track outgoing stock and returned products.</p>

@@ -84,6 +84,50 @@ public class InventoryService {
         );
     }
 
+    public void issue(Product product,
+                      StorageLocation location,
+                      Batch batch,
+                      int quantity,
+                      String issueNumber) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Issue quantity must be greater than zero");
+        }
+
+        InventoryBalance balance = findExistingBalance(product, location, batch);
+        balance.removeQuantity(quantity);
+        inventoryBalanceRepository.save(balance);
+        saveMovement(
+                StockMovementType.STOCK_ISSUE,
+                product,
+                location,
+                batch,
+                -quantity,
+                issueNumber
+        );
+    }
+
+    public void returnToStock(Product product,
+                              StorageLocation location,
+                              Batch batch,
+                              int quantity,
+                              String returnNumber) {
+        if (quantity <= 0) {
+            return;
+        }
+
+        InventoryBalance balance = findOrCreateBalance(product, location, batch);
+        balance.addQuantity(quantity);
+        inventoryBalanceRepository.save(balance);
+        saveMovement(
+                StockMovementType.STOCK_RETURN,
+                product,
+                location,
+                batch,
+                quantity,
+                returnNumber
+        );
+    }
+
     private InventoryBalance findExistingBalance(Product product,
                                                  StorageLocation location,
                                                  Batch batch) {
