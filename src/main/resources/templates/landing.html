@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Follow stock from purchase order to audit with StockFlow, the connected inventory workspace for Lanka Fresh Distributors.">
+    <meta name="theme-color" content="#062d3a">
+    <title>StockFlow | Follow every item. Control every movement.</title>
+    <script>document.documentElement.classList.add("has-js");</script>
+    <link rel="stylesheet" th:href="@{/css/landing.css}" href="/css/landing.css">
+    <script th:src="@{/js/landing.js}" src="/js/landing.js" defer></script>
+</head>
+<body class="loading">
+<div class="site-loader" id="site-loader" role="status" aria-live="polite" aria-label="StockFlow is loading">
+    <div class="loader-grid" aria-hidden="true"></div>
+    <div class="loader-brand">
+        <span class="brand-cube loader-cube" aria-hidden="true"><span></span><span></span><span></span></span>
+        <strong>StockFlow</strong>
+    </div>
+    <div class="loader-message">
+        <p>Welcome to StockFlow</p>
+        <span>Preparing the inventory workspace</span>
+    </div>
+    <div class="loader-road" aria-hidden="true">
+        <span class="loader-road-line"></span>
+        <div class="loader-lorry">
+            <svg viewBox="0 0 210 86">
+                <rect class="loader-trailer" x="7" y="8" width="128" height="55" rx="7"></rect>
+                <path class="loader-cab" d="M135 27h37l25 24v12h-62z"></path>
+                <path class="loader-window" d="M149 32h19l16 17h-35z"></path>
+                <circle class="loader-wheel" cx="47" cy="68" r="12"></circle>
+                <circle class="loader-wheel" cx="164" cy="68" r="12"></circle>
+                <circle class="loader-hub" cx="47" cy="68" r="4"></circle>
+                <circle class="loader-hub" cx="164" cy="68" r="4"></circle>
+                <text x="71" y="41" text-anchor="middle">STOCKFLOW</text>
+            </svg>
+        </div>
+    </div>
+    <div class="loader-progress" aria-hidden="true"><span></span></div>
+</div>
+
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="landing-header" id="top">
+    <div class="landing-shell header-inner">
+        <a class="landing-brand" href="#top" aria-label="StockFlow home">
+            <span class="brand-cube" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </span>
+            <span class="brand-copy">
+                <strong>StockFlow</strong>
+                <small>Lanka Fresh Distributors</small>
+            </span>
+        </a>
+
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="landing-navigation">
+            <span></span><span></span><span></span>
+            <span class="sr-only">Toggle navigation</span>
+        </button>
+
+        <nav class="landing-nav" id="landing-navigation" aria-label="Landing navigation">
+            <a href="#journey">Stock journey</a>
+            <a href="#control">Control model</a>
+            <a href="#outcomes">Outcomes</a>
+            <a class="nav-access" th:href="@{/login}" href="/login">
+                Access system
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"></path></svg>
+            </a>
+        </nav>
+    </div>
+</header>
+
+<main id="main-content">
+    <section class="hero-section" aria-labelledby="hero-title">
+        <div class="hero-sticky">
+        <div class="hero-grid-lines" aria-hidden="true"></div>
+        <div class="warehouse-illustration" aria-hidden="true">
+            <svg class="warehouse-sketch" viewBox="-250 0 2100 900" preserveAspectRatio="xMidYMid slice">
+                <defs>
+                    <linearGradient id="warehouse-floor" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#0b5661" stop-opacity=".08"></stop>
+                        <stop offset="1" stop-color="#6ce1d3" stop-opacity=".16"></stop>
+                    </linearGradient>
+                    <filter id="warehouse-glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="6"></feGaussianBlur>
+                    </filter>
+                    <radialGradient id="worker-zone" cx="50%" cy="50%" r="50%">
+                        <stop offset="0" stop-color="#70e4d6" stop-opacity=".28"></stop>
+                        <stop offset=".58" stop-color="#70e4d6" stop-opacity=".09"></stop>
+                        <stop offset="1" stop-color="#70e4d6" stop-opacity="0"></stop>
+                    </radialGradient>
+                    <symbol id="milk-package" viewBox="0 0 28 42">
+                        <path d="M5 8 10 2h8l5 6v31H5z"></path>
+                        <path d="M10 2v7h13M8 17h12M9 22h10"></path>
+                    </symbol>
+                    <symbol id="household-pack" viewBox="0 0 34 34">
+                        <rect x="3" y="5" width="28" height="26" rx="3"></rect>
+                        <path d="M8 12h18M8 18h12M8 24h16"></path>
+                    </symbol>
+                </defs>
+
+                <path class="warehouse-floor" d="M380 388h840l300 512H80z"></path>
+                <path class="aisle-line" d="M650 390 510 900M950 390l140 510M800 390v510"></path>
+                <path class="ceiling-line" d="M0 94h1600M235 0l310 390M1365 0l-310 390M800 0v390"></path>
+
+                <g class="warehouse-rack rack-left">
+                    <path d="M34 126h358v565H34zM64 126v565M181 126v565M298 126v565M382 126v565M34 246h358M34 367h358M34 488h358M34 609h358"></path>
+                    <g class="shelf-products">
+                        <use href="#milk-package" x="82" y="190" width="28" height="42"></use><use href="#milk-package" x="115" y="190" width="28" height="42"></use><use href="#milk-package" x="148" y="190" width="28" height="42"></use>
+                        <use href="#household-pack" x="205" y="194" width="34" height="34"></use><use href="#household-pack" x="246" y="194" width="34" height="34"></use>
+                        <use href="#household-pack" x="72" y="316" width="34" height="34"></use><use href="#household-pack" x="113" y="316" width="34" height="34"></use>
+                        <use href="#milk-package" x="219" y="309" width="28" height="42"></use><use href="#milk-package" x="252" y="309" width="28" height="42"></use><use href="#milk-package" x="285" y="309" width="28" height="42"></use>
+                        <use href="#milk-package" x="77" y="552" width="28" height="42"></use><use href="#milk-package" x="110" y="552" width="28" height="42"></use>
+                        <use href="#household-pack" x="203" y="557" width="34" height="34"></use><use href="#household-pack" x="244" y="557" width="34" height="34"></use><use href="#household-pack" x="285" y="557" width="34" height="34"></use>
+                    </g>
+                    <text x="56" y="161">RACK A • RECEIVING</text>
+                </g>
+
+                <g class="warehouse-rack rack-right">
+                    <path d="M1208 126h358v565h-358zM1238 126v565M1355 126v565M1472 126v565M1556 126v565M1208 246h358M1208 367h358M1208 488h358M1208 609h358"></path>
+                    <g class="shelf-products">
+                        <use href="#household-pack" x="1255" y="194" width="34" height="34"></use><use href="#household-pack" x="1296" y="194" width="34" height="34"></use>
+                        <use href="#milk-package" x="1390" y="190" width="28" height="42"></use><use href="#milk-package" x="1423" y="190" width="28" height="42"></use><use href="#milk-package" x="1456" y="190" width="28" height="42"></use>
+                        <use href="#milk-package" x="1260" y="309" width="28" height="42"></use><use href="#milk-package" x="1293" y="309" width="28" height="42"></use>
+                        <use href="#household-pack" x="1391" y="316" width="34" height="34"></use><use href="#household-pack" x="1432" y="316" width="34" height="34"></use><use href="#household-pack" x="1473" y="316" width="34" height="34"></use>
+                        <use href="#household-pack" x="1255" y="557" width="34" height="34"></use><use href="#household-pack" x="1296" y="557" width="34" height="34"></use><use href="#household-pack" x="1337" y="557" width="34" height="34"></use>
+                        <use href="#milk-package" x="1432" y="552" width="28" height="42"></use><use href="#milk-package" x="1465" y="552" width="28" height="42"></use>
+                    </g>
+                    <text x="1230" y="161">RACK B • AVAILABLE STOCK</text>
+                </g>
+
+                <g class="warehouse-door">
+                    <path d="M655 190h290v200H655zM685 225h230v165M800 225v165"></path>
+                    <text x="800" y="214" text-anchor="middle">CONTROLLED GOODS ENTRY</text>
+                </g>
+
+                <path class="hero-movement-zone" d="M208 724 C520 650 1080 650 1390 724"></path>
+                <path class="hero-progress-path" id="hero-progress-path" d="M208 724 C520 650 1080 650 1390 724"></path>
+                <path class="hero-data-path" d="M208 724 C520 650 1080 650 1390 724"></path>
+                <circle class="hero-data-dot" cx="0" cy="0" r="5"></circle>
+
+                <g class="scene-stop active" data-hero-stop="0" transform="translate(260 732)"><circle r="16"></circle><text y="4" text-anchor="middle">1</text><text class="stop-label" y="34" text-anchor="middle">RECEIVE</text></g>
+                <g class="scene-stop" data-hero-stop="1" transform="translate(620 668)"><circle r="16"></circle><text y="4" text-anchor="middle">2</text><text class="stop-label" y="34" text-anchor="middle">SCAN</text></g>
+                <g class="scene-stop" data-hero-stop="2" transform="translate(980 668)"><circle r="16"></circle><text y="4" text-anchor="middle">3</text><text class="stop-label" y="34" text-anchor="middle">STORE</text></g>
+                <g class="scene-stop" data-hero-stop="3" transform="translate(1340 732)"><circle r="16"></circle><text y="4" text-anchor="middle">4</text><text class="stop-label" y="34" text-anchor="middle">UPDATE</text></g>
+
+                <g id="hero-worker-cart">
+                    <g transform="translate(126 0)">
+                        <ellipse class="movement-spotlight" cx="118" cy="782" rx="150" ry="72"></ellipse>
+                        <ellipse class="cart-shadow" cx="118" cy="812" rx="94" ry="13"></ellipse>
+                        <g class="warehouse-worker">
+                            <circle class="worker-head" cx="50" cy="710" r="17"></circle>
+                            <path class="worker-cap" d="M32 707q18-24 38 0z"></path>
+                            <path class="worker-vest" d="M36 731h31l10 58H28z"></path>
+                            <path class="worker-limb" d="m35 783-15 37M65 783l17 37M63 744l38 25M36 744l-14 36"></path>
+                            <path class="worker-highlight" d="M44 735v50M29 758h45"></path>
+                        </g>
+                        <g class="stock-trolley">
+                            <path d="M94 759h18l17 47h111M111 759l12-23"></path>
+                            <path class="trolley-deck" d="M119 773h111l-9 32h-92z"></path>
+                            <circle class="trolley-wheel" cx="143" cy="814" r="9"></circle>
+                            <circle class="trolley-wheel" cx="209" cy="814" r="9"></circle>
+                            <use class="moving-product" href="#milk-package" x="143" y="728" width="34" height="50"></use>
+                            <use class="moving-product second-product" href="#milk-package" x="179" y="728" width="34" height="50"></use>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+        </div>
+
+        <div class="landing-shell hero-center">
+            <div class="hero-copy reveal">
+                <p class="hero-label"><span></span> Web-based warehouse inventory control</p>
+                <h1 id="hero-title">Inventory under control.<br><em>From receiving to issue.</em></h1>
+                <p class="hero-intro">
+                    Track every product, batch, warehouse location and stock movement in one
+                    connected MySQL-backed system for Lanka Fresh Distributors.
+                </p>
+
+                <div class="hero-actions">
+                    <a class="button button-primary" href="#journey">Follow the stock journey<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v13m-5-5 5 5 5-5"></path></svg></a>
+                    <a class="button button-secondary" th:href="@{/login}" href="/login">Enter workspace<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"></path></svg></a>
+                </div>
+
+                <div class="hero-facts" role="group" aria-label="StockFlow facts">
+                    <div><strong data-count="6">6</strong><span>Major functions</span></div>
+                    <div><strong data-count="5">5</strong><span>Authorized roles</span></div>
+                    <div><strong data-count="1">1</strong><span>MySQL database</span></div>
+                </div>
+            </div>
+
+            <div class="hero-flow-panel reveal" role="group" aria-label="Product movement preview">
+                <div class="flow-panel-heading"><span>Product movement preview</span><strong id="hero-flow-status" aria-live="polite">Supplier delivery received</strong></div>
+                <ol>
+                    <li class="active" data-hero-flow="0"><i>01</i><span><strong>Receive</strong><small>Verify delivery</small></span></li>
+                    <li data-hero-flow="1"><i>02</i><span><strong>Scan</strong><small>Capture batch details</small></span></li>
+                    <li data-hero-flow="2"><i>03</i><span><strong>Store</strong><small>Assign location</small></span></li>
+                    <li data-hero-flow="3"><i>04</i><span><strong>Update</strong><small>Save available stock</small></span></li>
+                </ol>
+            </div>
+        </div>
+
+        <a class="scroll-cue" href="#outcomes" aria-label="Scroll to explore StockFlow">
+            <span></span>
+            Explore the inventory journey
+        </a>
+        <div class="hero-motion-note" aria-hidden="true">
+            <span><i></i></span>
+            <strong>Scroll to move stock through the warehouse</strong>
+        </div>
+        </div>
+    </section>
+
+    <section class="outcome-ribbon" id="outcomes" aria-label="StockFlow outcomes">
+        <div class="landing-shell outcome-grid">
+            <article class="reveal"><span>01</span><div><strong>One source of truth</strong><p>Connected records replace paper trails and disconnected spreadsheets.</p></div></article>
+            <article class="reveal"><span>02</span><div><strong>Controlled changes</strong><p>Only confirmed transactions alter available inventory quantities.</p></div></article>
+            <article class="reveal"><span>03</span><div><strong>Explainable decisions</strong><p>Movement history, audits and alerts show what changed and why.</p></div></article>
+        </div>
+    </section>
+
+    <section class="journey-section" id="journey" aria-labelledby="journey-title">
+        <div class="journey-ambient" aria-hidden="true">
+            <div class="ambient-rack ambient-rack-left">
+                <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="ambient-rack ambient-rack-right">
+                <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="ambient-data-lane lane-left"><i></i><i></i><i></i></div>
+            <div class="ambient-data-lane lane-right"><i></i><i></i><i></i></div>
+            <div class="ambient-package ambient-package-one"><b>MILK</b><span>SKU</span></div>
+            <div class="ambient-package ambient-package-two"><b>BATCH</b><span>EXP</span></div>
+            <div class="ambient-package ambient-package-three"><b>STOCK</b><span>LOC</span></div>
+            <div class="ambient-package ambient-package-four"><b>ISSUE</b><span>QTY</span></div>
+            <div class="ambient-scan-beam"></div>
+        </div>
+
+        <div class="landing-shell journey-introduction reveal">
+            <p class="section-label">Follow the stock</p>
+            <h2 id="journey-title">One product. Six connected responsibilities.</h2>
+            <p>
+                Scroll through the journey of Milk Powder 400g. The lorry follows the same
+                information flow used by StockFlow—from catalogue setup to management control.
+            </p>
+        </div>
+
+        <div class="landing-shell journey-layout">
+            <div class="journey-stage-wrap" aria-hidden="true">
+                <div class="journey-stage">
+                    <div class="stage-topbar">
+                        <div><span class="pulse-dot"></span><strong>Product journey</strong></div>
+                        <span class="stage-progress-label">STEP <b id="journey-current-number">01</b> / 06</span>
+                    </div>
+
+                    <div class="journey-canvas" id="journey-canvas">
+                        <div class="canvas-grid"></div>
+                        <svg class="journey-road" viewBox="0 0 520 720" preserveAspectRatio="none">
+                            <defs>
+                                <filter id="roadGlow" x="-40%" y="-40%" width="180%" height="180%">
+                                    <feGaussianBlur stdDeviation="5" result="blur"></feGaussianBlur>
+                                    <feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+                                </filter>
+                            </defs>
+                            <path class="road-shadow" d="M104 60 C414 104 114 184 386 256 C110 332 414 413 138 492 C426 561 172 619 390 668"></path>
+                            <path class="road-base" id="journey-road-path" d="M104 60 C414 104 114 184 386 256 C110 332 414 413 138 492 C426 561 172 619 390 668"></path>
+                            <path class="road-progress" id="journey-road-progress" d="M104 60 C414 104 114 184 386 256 C110 332 414 413 138 492 C426 561 172 619 390 668" filter="url(#roadGlow)"></path>
+                        </svg>
+
+                        <div class="journey-stops" id="journey-stops"></div>
+
+                        <div class="journey-truck" id="journey-truck">
+                            <div class="truck-shadow"></div>
+                            <svg viewBox="0 0 70 116" aria-hidden="true">
+                                <rect class="truck-trailer" x="10" y="4" width="50" height="66" rx="8"></rect>
+                                <path class="truck-roof" d="M15 8h40v22H15z"></path>
+                                <path class="truck-cargo-line" d="M21 39h28M21 48h28M21 57h28"></path>
+                                <path class="truck-cab" d="M15 72h40l7 14v20a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V86z"></path>
+                                <path class="truck-window" d="M18 78h34l4 11H14z"></path>
+                                <circle class="truck-light" cx="17" cy="103" r="3"></circle>
+                                <circle class="truck-light" cx="53" cy="103" r="3"></circle>
+                                <rect class="truck-wheel" x="4" y="18" width="6" height="18" rx="3"></rect>
+                                <rect class="truck-wheel" x="60" y="18" width="6" height="18" rx="3"></rect>
+                                <rect class="truck-wheel" x="4" y="82" width="6" height="18" rx="3"></rect>
+                                <rect class="truck-wheel" x="60" y="82" width="6" height="18" rx="3"></rect>
+                                <text x="35" y="23" text-anchor="middle">LFD</text>
+                            </svg>
+                        </div>
+
+                        <div class="journey-product-card">
+                            <span class="product-box-icon"><i></i></span>
+                            <div><small>TRAVELLING RECORD</small><strong>Milk Powder 400g</strong><span id="journey-status">Catalogue record prepared</span></div>
+                        </div>
+
+                        <div class="journey-data-card">
+                            <span class="data-signal"><i></i><i></i><i></i></span>
+                            <div><small>CURRENT OUTPUT</small><strong id="journey-output">Product master record</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="journey-chapters">
+                <article class="journey-chapter active" data-step="1" data-status="Catalogue record prepared" data-output="Product master record">
+                    <div class="chapter-marker"><span>01</span><i></i></div>
+                    <div class="chapter-card">
+                        <div class="chapter-top"><p>Product Catalogue</p><span>Store Supervisor</span></div>
+                        <h3>The product receives its identity.</h3>
+                        <p>Milk Powder 400g is registered with its SKU, category, brand, unit and batch-tracking requirement.</p>
+                        <dl><div><dt>Input</dt><dd>Product details</dd></div><div><dt>Action</dt><dd>Validate and save</dd></div><div><dt>Output</dt><dd>Shared product record</dd></div></dl>
+                    </div>
+                </article>
+
+                <article class="journey-chapter" data-step="2" data-status="Purchase order approved" data-output="Approved supplier order">
+                    <div class="chapter-marker"><span>02</span><i></i></div>
+                    <div class="chapter-card">
+                        <div class="chapter-top"><p>Suppliers &amp; Purchase Orders</p><span>Finance Executive</span></div>
+                        <h3>The replenishment journey begins.</h3>
+                        <p>A supplier is selected, required quantities and prices are added, and the purchase order moves to approval.</p>
+                        <dl><div><dt>Input</dt><dd>Supplier and items</dd></div><div><dt>Action</dt><dd>Create and approve PO</dd></div><div><dt>Output</dt><dd>Expected delivery</dd></div></dl>
+                    </div>
+                </article>
+
+                <article class="journey-chapter" data-step="3" data-status="Delivery and batch confirmed" data-output="Available warehouse stock">
+                    <div class="chapter-marker"><span>03</span><i></i></div>
+                    <div class="chapter-card">
+                        <div class="chapter-top"><p>Goods Receiving &amp; Batches</p><span>Store Supervisor</span></div>
+                        <h3>The physical goods enter inventory.</h3>
+                        <p>The approved order is checked against delivery quantities while batch, expiry and rejected-item details are recorded.</p>
+                        <dl><div><dt>Input</dt><dd>Approved PO and delivery</dd></div><div><dt>Action</dt><dd>Verify and confirm receipt</dd></div><div><dt>Output</dt><dd>Batch-based stock</dd></div></dl>
+                    </div>
+                </article>
+
+                <article class="journey-chapter" data-step="4" data-status="Stock moved to destination" data-output="Location-based balances">
+                    <div class="chapter-marker"><span>04</span><i></i></div>
+                    <div class="chapter-card">
+                        <div class="chapter-top"><p>Warehouses &amp; Transfers</p><span>Store Supervisor</span></div>
+                        <h3>The stock reaches the right location.</h3>
+                        <p>A validated transfer checks source availability, dispatches stock and confirms it at the destination location.</p>
+                        <dl><div><dt>Input</dt><dd>Source, destination and stock</dd></div><div><dt>Action</dt><dd>Approve, dispatch, receive</dd></div><div><dt>Output</dt><dd>Updated location balances</dd></div></dl>
+                    </div>
+                </article>
+
+                <article class="journey-chapter" data-step="5" data-status="Issue or return recorded" data-output="Traceable outbound movement">
+                    <div class="chapter-marker"><span>05</span><i></i></div>
+                    <div class="chapter-card">
+                        <div class="chapter-top"><p>Stock Issues &amp; Returns</p><span>Store Supervisor</span></div>
+                        <h3>The product leaves—or safely returns.</h3>
+                        <p>Availability is checked before issue. Returned items are assessed before acceptable quantities re-enter stock.</p>
+                        <dl><div><dt>Input</dt><dd>Recipient and quantities</dd></div><div><dt>Action</dt><dd>Confirm issue or return</dd></div><div><dt>Output</dt><dd>Accountable movement</dd></div></dl>
+                    </div>
+                </article>
+
+                <article class="journey-chapter" data-step="6" data-status="Inventory reviewed and controlled" data-output="Audit and reorder decisions">
+                    <div class="chapter-marker"><span>06</span><i></i></div>
+                    <div class="chapter-card featured">
+                        <div class="chapter-top"><p>Inventory Control</p><span>Operations Manager</span></div>
+                        <h3>Management closes the information loop.</h3>
+                        <p>Current balances, physical counts, approved adjustments, reorder alerts and movement history become management decisions.</p>
+                        <dl><div><dt>Input</dt><dd>All confirmed movements</dd></div><div><dt>Action</dt><dd>Count, review and approve</dd></div><div><dt>Output</dt><dd>Reliable inventory control</dd></div></dl>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="control-section" id="control" aria-labelledby="control-title">
+        <div class="control-glow" aria-hidden="true"></div>
+        <div class="landing-shell control-layout">
+            <div class="control-copy reveal">
+                <p class="section-label light">Designed around responsibility</p>
+                <h2 id="control-title">The right work reaches the right user.</h2>
+                <p>
+                    StockFlow separates operational duties while management receives the
+                    connected information needed for approvals, audits and decisions.
+                </p>
+                <div class="control-proof">
+                    <span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 10 4 4 8-8"></path></svg> Role-focused modules</span>
+                    <span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 10 4 4 8-8"></path></svg> Validated transactions</span>
+                    <span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 10 4 4 8-8"></path></svg> Traceable decisions</span>
+                </div>
+            </div>
+
+            <div class="role-orbit reveal" role="img" aria-label="StockFlow user roles connected to the system">
+                <div class="orbit-system"><span>SF</span><strong>StockFlow</strong><small>One connected workspace</small></div>
+                <div class="orbit-line orbit-line-one"></div><div class="orbit-line orbit-line-two"></div><div class="orbit-line orbit-line-three"></div><div class="orbit-line orbit-line-four"></div><div class="orbit-line orbit-line-five"></div>
+                <div class="role-chip role-one"><i>OM</i><div><strong>Operations</strong><small>Control &amp; approvals</small></div></div>
+                <div class="role-chip role-two"><i>SS</i><div><strong>Store</strong><small>Daily stock work</small></div></div>
+                <div class="role-chip role-three"><i>FE</i><div><strong>Finance</strong><small>Suppliers &amp; orders</small></div></div>
+                <div class="role-chip role-four"><i>CS</i><div><strong>Customer Service</strong><small>Availability &amp; returns</small></div></div>
+                <div class="role-chip role-five"><i>IT</i><div><strong>Systems</strong><small>Access &amp; support</small></div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-section">
+        <div class="final-road" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="landing-shell final-card reveal">
+            <div class="final-copy">
+                <p class="section-label">The journey continues inside</p>
+                <h2>Move from overview to operation.</h2>
+                <p>Enter the StockFlow workspace to manage the six connected inventory functions.</p>
+            </div>
+            <a class="button button-final" th:href="@{/login}" href="/login">
+                Access StockFlow
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"></path></svg>
+            </a>
+        </div>
+    </section>
+</main>
+
+<footer class="landing-footer">
+    <div class="landing-shell footer-inner">
+        <div class="footer-brand"><span class="console-logo">SF</span><div><strong>StockFlow</strong><small>Web-Based Inventory Control System</small></div></div>
+        <p>Lanka Fresh Distributors (Pvt) Ltd · SE2030 Software Engineering Project</p>
+        <a href="#top">Back to top <span>↑</span></a>
+    </div>
+</footer>
+<script>
+    window.setTimeout(function () {
+        var loader = document.getElementById("site-loader");
+        if (loader) loader.classList.add("is-finished");
+        if (document.body) document.body.classList.remove("loading");
+    }, 5000);
+</script>
+</body>
+</html>

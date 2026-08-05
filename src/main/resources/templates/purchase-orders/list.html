@@ -12,8 +12,8 @@
             <p>Create orders, add product lines, calculate totals and monitor each purchasing status.</p>
         </div>
         <div class="header-actions">
-            <a class="button" th:href="@{/suppliers}">Manage Suppliers</a>
-            <a class="button primary" th:href="@{/purchase-orders/new}">Create Purchase Order</a>
+            <a class="button" th:href="@{/suppliers}" th:text="${canManagePurchasing} ? 'Manage Suppliers' : 'View Suppliers'">Suppliers</a>
+            <a class="button primary" th:if="${canManagePurchasing}" th:href="@{/purchase-orders/new}">Create Purchase Order</a>
         </div>
     </div>
 

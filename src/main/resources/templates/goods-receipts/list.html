@@ -11,7 +11,7 @@
             <h1>Goods Receiving &amp; Batches</h1>
             <p>Record supplier deliveries, rejected quantities, batches and confirmed stock.</p>
         </div>
-        <a class="button primary" th:href="@{/goods-receipts/new}">Create Goods Receipt</a>
+        <a class="button primary" th:if="${canManageReceiving}" th:href="@{/goods-receipts/new}">Create Goods Receipt</a>
     </div>
 
     <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>

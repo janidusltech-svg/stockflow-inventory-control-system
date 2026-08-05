@@ -11,7 +11,7 @@
             <h1>Products</h1>
             <p>Maintain the product master records used by all StockFlow modules.</p>
         </div>
-        <a class="button primary" th:href="@{/products/new}">Add Product</a>
+        <a class="button primary" th:if="${canManageProducts}" th:href="@{/products/new}">Add Product</a>
     </div>
 
     <form class="toolbar" th:action="@{/products}" method="get">
@@ -39,12 +39,12 @@
                 <th>Unit</th>
                 <th>Batch</th>
                 <th>Status</th>
-                <th class="actions">Actions</th>
+                <th class="actions" th:if="${canManageProducts}">Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${#lists.isEmpty(products)}">
-                <td colspan="8" class="empty">No products found.</td>
+                <td th:colspan="${canManageProducts ? 8 : 7}" class="empty">No products found.</td>
             </tr>
             <tr th:each="product : ${products}">
                 <td th:text="${product.sku}">SKU</td>
@@ -71,7 +71,7 @@
                     <span class="status inactive"
                           th:unless="${product.active}">Inactive</span>
                 </td>
-                <td class="actions">
+                <td class="actions" th:if="${canManageProducts}">
                     <a class="button small"
                        th:href="@{/products/{id}/edit(id=${product.id})}">
                         Edit

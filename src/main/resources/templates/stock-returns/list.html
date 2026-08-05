@@ -4,7 +4,7 @@
 <body>
 <nav th:replace="~{fragments/layout :: nav}"></nav>
 <main class="page">
-    <div class="page-header"><div><p class="eyebrow">Function 05</p><h1>Stock Returns</h1><p>Trace returned products and restore only accepted quantities to available stock.</p></div><div class="header-actions"><a class="button" th:href="@{/stock-issues}">View Issues</a><a class="button primary" th:href="@{/stock-returns/new}">Create Stock Return</a></div></div>
+    <div class="page-header"><div><p class="eyebrow">Function 05</p><h1>Stock Returns</h1><p>Trace returned products and restore only accepted quantities to available stock.</p></div><div class="header-actions"><a class="button" th:href="@{/stock-issues}">View Issues</a><a class="button primary" th:if="${canManageIssuesAndReturns}" th:href="@{/stock-returns/new}">Create Stock Return</a></div></div>
     <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div><div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
     <form class="filter-panel issue-filter" method="get" th:action="@{/stock-returns}">
         <label>Search<input type="search" name="keyword" th:value="${keyword}" placeholder="Return, issue or recipient"></label>

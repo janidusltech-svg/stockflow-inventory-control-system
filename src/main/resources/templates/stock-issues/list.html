@@ -6,7 +6,7 @@
 <main class="page">
     <div class="page-header">
         <div><p class="eyebrow">Function 05</p><h1>Stock Issues</h1><p>Issue available products to customers or internal departments with traceable stock movements.</p></div>
-        <div class="header-actions"><a class="button" th:href="@{/stock-returns}">View Returns</a><a class="button primary" th:href="@{/stock-issues/new}">Create Stock Issue</a></div>
+        <div class="header-actions"><a class="button" th:href="@{/stock-returns}">View Returns</a><a class="button primary" th:if="${canManageIssuesAndReturns}" th:href="@{/stock-issues/new}">Create Stock Issue</a></div>
     </div>
     <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
     <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>

@@ -25,48 +25,64 @@ StockFlow is a web-based inventory control system for Lanka Fresh Distributors (
 
 ## Current Build Status
 
-The first project foundation includes:
+The integrated build includes all six major functions, a public landing page, a secured
+staff workspace, BCrypt password storage, role-based navigation and server-side access
+control. User and role management is maintained as a common function by the IT and
+Systems Officer.
 
-- Spring Boot application setup
-- MySQL connection configuration
-- Shared dashboard UI
-- Product Catalogue CRUD module
-- Product validation
-- Duplicate SKU protection
-- Search and filtering
-- Product deactivate function
+## Authorized Roles
+
+| Role | Main access |
+|---|---|
+| Operations Manager | Inventory control, approvals, audits, reorder rules and reports |
+| Store Supervisor | Products, receiving, warehouses, transfers, issues and returns |
+| Finance Executive | Suppliers, purchase orders and authorized inventory views |
+| Customer Service Coordinator | Product availability, issues and return-status views |
+| IT and Systems Officer | User accounts, password resets and role assignments |
 
 ## Local Setup
 
-1. Create a MySQL database:
+1. Start MySQL 8 and create the database if it does not already exist:
 
 ```sql
 CREATE DATABASE stockflow_db;
 ```
 
-2. Update database credentials in:
+2. Update the local database credentials in:
 
 ```text
 src/main/resources/application.properties
 ```
 
-3. Open the project folder in IntelliJ IDEA:
+3. For the first local run, set the local MySQL and development bootstrap passwords in PowerShell:
+
+```powershell
+$env:STOCKFLOW_DB_PASSWORD="Your-Local-MySQL-Password"
+$env:STOCKFLOW_BOOTSTRAP_PASSWORD="Choose-A-Strong-Password"
+```
+
+4. Open the project folder in IntelliJ IDEA:
 
 ```text
 stockflow
 ```
 
-4. Run:
+5. Reload Maven so the Spring Security dependency is downloaded, then run:
 
 ```text
 StockflowApplication
 ```
 
-5. Open:
+6. Open the public website:
 
 ```text
 http://localhost:8080
 ```
+
+Select **Access system**, or open `http://localhost:8080/login`. On the first run,
+StockFlow creates one local demonstration account for each role: `operations`, `store`,
+`finance`, `service` and `itadmin`. They initially use the bootstrap password supplied
+above. Use the IT account to create permanent staff accounts and reset passwords.
 
 ## GitHub Contribution Rule
 
@@ -81,4 +97,5 @@ feature/goods-receiving-dishan
 feature/warehouse-transfer-tesara
 feature/stock-issue-return-raveesha
 feature/inventory-control-janidu
+feature/auth-role-access-janidu
 ```

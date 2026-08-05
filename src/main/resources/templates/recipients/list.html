@@ -12,7 +12,7 @@
         </div>
         <div class="header-actions">
             <a class="button" th:href="@{/stock-issues}">View Stock Issues</a>
-            <a class="button primary" th:href="@{/recipients/new}">Add Recipient</a>
+            <a class="button primary" th:if="${canManageIssuesAndReturns}" th:href="@{/recipients/new}">Add Recipient</a>
         </div>
     </div>
 
@@ -38,16 +38,16 @@
     </form>
 
     <div class="table-panel"><div class="table-scroll"><table>
-        <thead><tr><th>Code</th><th>Recipient</th><th>Type</th><th>Contact</th><th>Status</th><th class="actions">Actions</th></tr></thead>
+        <thead><tr><th>Code</th><th>Recipient</th><th>Type</th><th>Contact</th><th>Status</th><th class="actions" th:if="${canManageIssuesAndReturns}">Actions</th></tr></thead>
         <tbody>
-        <tr th:if="${#lists.isEmpty(recipients)}"><td colspan="6" class="empty">No recipients found.</td></tr>
+        <tr th:if="${#lists.isEmpty(recipients)}"><td th:colspan="${canManageIssuesAndReturns ? 6 : 5}" class="empty">No recipients found.</td></tr>
         <tr th:each="recipient : ${recipients}">
             <td><strong th:text="${recipient.code}">REC-001</strong></td>
             <td><strong th:text="${recipient.name}">Name</strong><small th:if="${recipient.address}" th:text="${recipient.address}"></small></td>
             <td th:text="${#strings.replace(recipient.recipientType.name(), '_', ' ')}">CUSTOMER</td>
             <td><span th:text="${recipient.contactName != null ? recipient.contactName : '-'}"></span><small th:text="${recipient.phone != null ? recipient.phone : (recipient.email != null ? recipient.email : 'No contact details')}"></small></td>
             <td><span class="status active" th:if="${recipient.active}">ACTIVE</span><span class="status inactive" th:unless="${recipient.active}">INACTIVE</span></td>
-            <td class="actions">
+            <td class="actions" th:if="${canManageIssuesAndReturns}">
                 <a class="button small" th:href="@{/recipients/{id}/edit(id=${recipient.id})}">Edit</a>
                 <form th:if="${recipient.active}" th:action="@{/recipients/{id}/deactivate(id=${recipient.id})}" method="post"><button class="button small danger" type="submit">Deactivate</button></form>
                 <form th:unless="${recipient.active}" th:action="@{/recipients/{id}/activate(id=${recipient.id})}" method="post"><button class="button small primary" type="submit">Activate</button></form>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('User Accounts')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">IT and Systems Administration</p>
+            <h1>User Accounts</h1>
+            <p>Create staff access, assign one official role and deactivate accounts safely.</p>
+        </div>
+        <a class="button primary" th:href="@{/user-accounts/new}">Create Account</a>
+    </header>
+
+    <div class="alert success-alert" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <section class="table-panel">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>Staff Account</th>
+                    <th>Assigned Role</th>
+                    <th>Status</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="account : ${accounts}">
+                    <td>
+                        <strong th:text="${account.fullName}">Full name</strong>
+                        <small th:text="${account.username + ' · ' + account.email}">username</small>
+                    </td>
+                    <td>
+                        <span class="role-badge" th:text="${account.role.displayName}">Role</span>
+                        <small th:text="${account.role.description}">Role description</small>
+                    </td>
+                    <td>
+                        <span class="status" th:classappend="${account.active} ? ' confirmed' : ' cancelled'"
+                              th:text="${account.active} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span>
+                    </td>
+                    <td th:text="${#temporals.format(account.updatedAt, 'dd MMM yyyy HH:mm')}">Date</td>
+                    <td class="account-actions">
+                        <a class="button small" th:href="@{/user-accounts/{id}/edit(id=${account.id})}">Edit</a>
+                        <form th:action="@{/user-accounts/{id}/status(id=${account.id})}" method="post">
+                            <input type="hidden" name="active" th:value="${!account.active}">
+                            <button class="button small" th:classappend="${account.active} ? ' danger' : ' primary'"
+                                    type="submit" th:text="${account.active} ? 'Deactivate' : 'Activate'">Change</button>
+                        </form>
+                        <form class="password-reset" th:action="@{/user-accounts/{id}/reset-password(id=${account.id})}" method="post">
+                            <label>
+                                <span class="sr-only">New password</span>
+                                <input type="password" name="newPassword" minlength="8" maxlength="72"
+                                       required placeholder="New password" autocomplete="new-password">
+                            </label>
+                            <button class="button small" type="submit">Reset</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(accounts)}">
+                    <td colspan="5" class="empty-state">No user accounts are available.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

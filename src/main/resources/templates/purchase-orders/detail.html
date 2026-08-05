@@ -22,7 +22,7 @@
         <div class="header-actions">
             <a class="button" th:href="@{/purchase-orders}">Back to Orders</a>
             <a class="button"
-               th:if="${purchaseOrder.editable}"
+               th:if="${purchaseOrder.editable and canManagePurchasing}"
                th:href="@{/purchase-orders/{id}/edit(id=${purchaseOrder.id})}">Edit Header</a>
         </div>
     </div>
@@ -70,12 +70,12 @@
                         <th>Remaining</th>
                         <th>Unit Price (LKR)</th>
                         <th>Line Total (LKR)</th>
-                        <th class="actions" th:if="${purchaseOrder.editable}">Action</th>
+                        <th class="actions" th:if="${purchaseOrder.editable and canManagePurchasing}">Action</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:if="${#lists.isEmpty(purchaseOrder.items)}">
-                        <td th:colspan="${purchaseOrder.editable ? 8 : 7}" class="empty">
+                        <td th:colspan="${purchaseOrder.editable and canManagePurchasing ? 8 : 7}" class="empty">
                             No products have been added to this order.
                         </td>
                     </tr>
@@ -92,7 +92,7 @@
                         <td>
                             <strong th:text="${#numbers.formatDecimal(item.lineTotal, 1, 'COMMA', 2, 'POINT')}">0.00</strong>
                         </td>
-                        <td class="actions" th:if="${purchaseOrder.editable}">
+                        <td class="actions" th:if="${purchaseOrder.editable and canManagePurchasing}">
                             <form th:action="@{/purchase-orders/{orderId}/items/{itemId}/remove(
                                       orderId=${purchaseOrder.id}, itemId=${item.id})}"
                                   method="post">
@@ -108,7 +108,7 @@
                             <strong th:text="${'LKR ' + #numbers.formatDecimal(
                                 purchaseOrder.totalAmount, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</strong>
                         </td>
-                        <td th:if="${purchaseOrder.editable}"></td>
+                        <td th:if="${purchaseOrder.editable and canManagePurchasing}"></td>
                     </tr>
                     </tfoot>
                 </table>
@@ -116,7 +116,7 @@
         </div>
     </section>
 
-    <section class="form-panel compact" th:if="${purchaseOrder.editable}">
+    <section class="form-panel compact" th:if="${purchaseOrder.editable and canManagePurchasing}">
         <div class="section-heading">
             <div>
                 <h2>Add Product Line</h2>
@@ -174,12 +174,12 @@
         </div>
         <div class="workflow-actions">
             <a class="button primary"
-               th:if="${purchaseOrder.status.name() == 'APPROVED'
-                    || purchaseOrder.status.name() == 'PARTIALLY_RECEIVED'}"
+               th:if="${canManageReceiving and (purchaseOrder.status.name() == 'APPROVED'
+                    or purchaseOrder.status.name() == 'PARTIALLY_RECEIVED')}"
                th:href="@{/goods-receipts/new(purchaseOrderId=${purchaseOrder.id})}">
                 Receive Goods
             </a>
-            <form th:if="${purchaseOrder.status.name() == 'DRAFT'}"
+            <form th:if="${canManagePurchasing and purchaseOrder.status.name() == 'DRAFT'}"
                   th:action="@{/purchase-orders/{id}/status(id=${purchaseOrder.id})}"
                   method="post">
                 <input type="hidden" name="status" value="APPROVED">
@@ -193,8 +193,8 @@
                        : 'Partially received - more stock is pending'}">
                 Receiving status
             </span>
-            <form th:if="${purchaseOrder.status.name() == 'DRAFT'
-                          || purchaseOrder.status.name() == 'APPROVED'}"
+            <form th:if="${canManagePurchasing and (purchaseOrder.status.name() == 'DRAFT'
+                          or purchaseOrder.status.name() == 'APPROVED')}"
                   th:action="@{/purchase-orders/{id}/status(id=${purchaseOrder.id})}"
                   method="post">
                 <input type="hidden" name="status" value="CANCELLED">
@@ -205,4 +205,3 @@
 </main>
 </body>
 </html>
-

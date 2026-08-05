@@ -19,16 +19,32 @@
         </span>
     </a>
     <div class="nav-links">
-        <a th:href="@{/products}">Products</a>
-        <a th:href="@{/suppliers}">Suppliers</a>
-        <a th:href="@{/purchase-orders}">Purchase Orders</a>
-        <a th:href="@{/goods-receipts}">Receiving</a>
-        <a th:href="@{/recipients}">Recipients</a>
-        <a th:href="@{/stock-issues}">Issues</a>
-        <a th:href="@{/stock-returns}">Returns</a>
-        <a th:href="@{/warehouses}">Warehouses</a>
-        <a th:href="@{/stock-transfers}">Transfers</a>
-        <a th:href="@{/inventory-control}">Control Dashboard</a>
+        <a th:if="${canViewProducts}"
+           th:href="@{/products}">Products</a>
+        <a th:if="${canViewPurchasing}"
+           th:href="@{/purchase-orders}">Purchasing</a>
+        <a th:if="${canViewReceiving}"
+           th:href="@{/goods-receipts}">Receiving</a>
+        <a th:if="${canManageWarehouses}"
+           th:href="@{/warehouses}">Warehouses</a>
+        <a th:if="${canManageWarehouses}"
+           th:href="@{/stock-transfers}">Transfers</a>
+        <a th:if="${canViewIssuesAndReturns}"
+           th:href="@{/stock-issues}">Issues &amp; Returns</a>
+        <a th:if="${canManageInventoryControl}"
+           th:href="@{/inventory-control}">Inventory Control</a>
+        <a th:if="${canManageUsers}"
+           th:href="@{/user-accounts}">User Accounts</a>
+    </div>
+    <div class="nav-account" th:if="${authenticatedUser}">
+        <span class="account-avatar" aria-hidden="true">U</span>
+        <div class="account-copy">
+            <strong th:text="${currentUsername}">username</strong>
+            <small th:text="${currentRoleLabel}">Authorized user</small>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button class="sign-out-button" type="submit" title="Sign out">Sign out</button>
+        </form>
     </div>
 </nav>
 </body>
