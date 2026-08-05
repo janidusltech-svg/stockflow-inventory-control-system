@@ -2,7 +2,9 @@ package com.stockflow.inventory;
 
 import com.stockflow.product.Product;
 import com.stockflow.warehouse.StorageLocation;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -11,12 +13,14 @@ import java.util.Optional;
 
 public interface InventoryBalanceRepository extends JpaRepository<InventoryBalance, Long> {
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<InventoryBalance> findByProductAndLocationAndBatch(
             Product product,
             StorageLocation location,
             Batch batch
     );
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<InventoryBalance> findByProductAndLocationAndBatchIsNull(
             Product product,
             StorageLocation location
@@ -35,6 +39,24 @@ public interface InventoryBalanceRepository extends JpaRepository<InventoryBalan
             where balance.id = :id
             """)
     Optional<InventoryBalance> findByIdWithDetails(@Param("id") Long id);
+
+    @Query("""
+            select balance
+            from InventoryBalance balance
+            join fetch balance.product product
+            join fetch product.category
+            left join fetch product.brand
+            join fetch product.unit
+            join fetch balance.location location
+            join fetch location.warehouse warehouse
+            left join fetch balance.batch batch
+            where balance.quantityAvailable > 0
+              and product.active = true
+              and location.active = true
+              and warehouse.active = true
+            order by product.name, warehouse.name, location.name, batch.batchNumber
+            """)
+    List<InventoryBalance> findAllAvailableWithDetails();
 
     @Query("""
             select balance
