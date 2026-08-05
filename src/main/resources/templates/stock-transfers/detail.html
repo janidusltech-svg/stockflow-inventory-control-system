@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Transfer Details')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Stock Transfer</p>
+            <div class="title-line">
+                <h1 th:text="${stockTransfer.transferNumber}">TRF-2026-0001</h1>
+                <span class="status large"
+                      th:classappend="${#strings.toLowerCase(stockTransfer.status.name())}"
+                      th:text="${#strings.replace(stockTransfer.status.name(), '_', ' ')}">DRAFT</span>
+            </div>
+            <p th:text="${#temporals.format(stockTransfer.transferDate, 'dd MMM yyyy')}">Date</p>
+        </div>
+        <div class="header-actions">
+            <a class="button" th:href="@{/stock-transfers}">Back to Transfers</a>
+            <a class="button" th:if="${stockTransfer.editable}"
+               th:href="@{/stock-transfers/{id}/edit(id=${stockTransfer.id})}">Edit Header</a>
+        </div>
+    </header>
+
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <section class="summary-grid transfer-summary">
+        <article class="summary-card">
+            <span>Source</span>
+            <strong th:text="${stockTransfer.sourceLocation.displayName}">Source</strong>
+        </article>
+        <article class="summary-card">
+            <span>Destination</span>
+            <strong th:text="${stockTransfer.destinationLocation.displayName}">Destination</strong>
+        </article>
+        <article class="summary-card">
+            <span>Products / batches</span>
+            <strong th:text="${stockTransfer.items.size()}">0</strong>
+        </article>
+        <article class="summary-card">
+            <span>Total quantity</span>
+            <strong th:text="${stockTransfer.totalQuantity}">0</strong>
+        </article>
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <div>
+                <h2>Transfer Items</h2>
+                <p>Batch identity is preserved when stock moves to the destination.</p>
+            </div>
+        </div>
+        <div class="table-panel table-scroll">
+            <table>
+                <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Product</th>
+                    <th>Batch</th>
+                    <th>Quantity</th>
+                    <th th:if="${stockTransfer.editable}" class="actions">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${stockTransfer.items}">
+                    <td th:text="${item.product.sku}">SKU</td>
+                    <td>
+                        <strong th:text="${item.product.name}">Product</strong>
+                        <small th:text="${item.product.unit.code}">Unit</small>
+                    </td>
+                    <td th:text="${item.batchLabel}">Batch</td>
+                    <td th:text="${item.quantity}">1</td>
+                    <td th:if="${stockTransfer.editable}" class="actions">
+                        <form th:action="@{/stock-transfers/{transferId}/items/{itemId}/remove(
+                                transferId=${stockTransfer.id}, itemId=${item.id})}"
+                              method="post">
+                            <button class="button small danger" type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(stockTransfer.items)}">
+                    <td th:colspan="${stockTransfer.editable ? 5 : 4}" class="empty">
+                        No stock items have been added.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="form-panel compact"
+             th:if="${stockTransfer.editable}"
+             th:object="${stockTransferItemForm}">
+        <h2>Add Available Source Stock</h2>
+        <p>Select an existing stock balance. The quantity cannot exceed its availability.</p>
+
+        <div class="alert error-alert"
+             th:if="${#fields.hasGlobalErrors()}"
+             th:each="error : ${#fields.globalErrors()}"
+             th:text="${error}"></div>
+
+        <form class="inline-form-grid transfer-item-grid"
+              th:action="@{/stock-transfers/{id}/items(id=${stockTransfer.id})}"
+              method="post">
+            <label>
+                Available Product / Batch
+                <select th:field="*{inventoryBalanceId}">
+                    <option value="">Select source stock</option>
+                    <option th:each="balance : ${availableBalances}"
+                            th:value="${balance.id}"
+                            th:text="${balance.stockLabel}">Product stock</option>
+                </select>
+                <small class="error" th:errors="*{inventoryBalanceId}"></small>
+            </label>
+            <label>
+                Quantity
+                <input type="number" min="1" th:field="*{quantity}" placeholder="1">
+                <small class="error" th:errors="*{quantity}"></small>
+            </label>
+            <button class="button primary" type="submit">Add Item</button>
+        </form>
+
+        <p class="empty" th:if="${#lists.isEmpty(availableBalances)}">
+            No available stock exists at the source location. Confirm a goods receipt first.
+        </p>
+    </section>
+
+    <section class="workflow-panel">
+        <div>
+            <h2>Workflow Action</h2>
+            <p th:if="${stockTransfer.status.name() == 'DRAFT'}">
+                Add items, then approve after checking source availability.
+            </p>
+            <p th:if="${stockTransfer.status.name() == 'APPROVED'}">
+                Dispatch will deduct the confirmed quantity from the source location.
+            </p>
+            <p th:if="${stockTransfer.status.name() == 'DISPATCHED'}">
+                Receive after the destination confirms physical arrival.
+            </p>
+            <p th:if="${stockTransfer.status.name() == 'RECEIVED'}">
+                Transfer complete. Destination balances and movement history are updated.
+            </p>
+            <p th:if="${stockTransfer.status.name() == 'CANCELLED'}">
+                This transfer was cancelled before dispatch.
+            </p>
+        </div>
+        <div class="workflow-actions">
+            <form th:if="${stockTransfer.canApprove()}"
+                  th:action="@{/stock-transfers/{id}/approve(id=${stockTransfer.id})}"
+                  method="post">
+                <button class="button primary" type="submit">Approve</button>
+            </form>
+            <form th:if="${stockTransfer.canDispatch()}"
+                  th:action="@{/stock-transfers/{id}/dispatch(id=${stockTransfer.id})}"
+                  method="post"
+                  onsubmit="return confirm('Dispatch and deduct stock from the source?');">
+                <button class="button primary" type="submit">Dispatch</button>
+            </form>
+            <form th:if="${stockTransfer.canReceive()}"
+                  th:action="@{/stock-transfers/{id}/receive(id=${stockTransfer.id})}"
+                  method="post"
+                  onsubmit="return confirm('Confirm arrival at the destination?');">
+                <button class="button primary" type="submit">Receive at Destination</button>
+            </form>
+            <form th:if="${stockTransfer.canCancel()}"
+                  th:action="@{/stock-transfers/{id}/cancel(id=${stockTransfer.id})}"
+                  method="post"
+                  onsubmit="return confirm('Cancel this transfer?');">
+                <button class="button danger" type="submit">Cancel</button>
+            </form>
+            <form th:if="${stockTransfer.editable}"
+                  th:action="@{/stock-transfers/{id}/delete(id=${stockTransfer.id})}"
+                  method="post"
+                  onsubmit="return confirm('Delete this draft transfer?');">
+                <button class="button danger" type="submit">Delete Draft</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="content-section" th:if="${stockTransfer.notes != null}">
+        <h2>Notes</h2>
+        <div class="form-panel compact" th:text="${stockTransfer.notes}">Notes</div>
+    </section>
+</main>
+</body>
+</html>

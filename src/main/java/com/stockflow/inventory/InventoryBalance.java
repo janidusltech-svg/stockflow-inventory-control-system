@@ -96,11 +96,30 @@ public class InventoryBalance {
         quantityAvailable += quantity;
     }
 
+    public void removeQuantity(int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Stock quantity must be greater than zero");
+        }
+        if (quantityAvailable < quantity) {
+            throw new IllegalArgumentException("Insufficient stock at the source location");
+        }
+        quantityAvailable -= quantity;
+    }
+
     public Long getVersion() {
         return version;
     }
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getStockLabel() {
+        String label = product.getSku() + " - " + product.getName()
+                + " | Available: " + quantityAvailable + " " + product.getUnit().getCode();
+        if (batch != null) {
+            label += " | Batch: " + batch.getBatchNumber();
+        }
+        return label;
     }
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pageTitle})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="page narrow">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Warehouse Master</p>
+            <h1 th:text="${pageTitle}">Add Warehouse</h1>
+            <p>Use a short unique code and a clear warehouse name.</p>
+        </div>
+        <a class="button" th:href="@{/warehouses}">Back</a>
+    </header>
+
+    <form class="form-panel"
+          th:action="${formAction}"
+          th:object="${warehouseForm}"
+          method="post">
+        <div class="alert error-alert" th:if="${#fields.hasGlobalErrors()}"
+             th:each="error : ${#fields.globalErrors()}" th:text="${error}"></div>
+
+        <div class="form-grid">
+            <label>
+                Warehouse Code
+                <input type="text" th:field="*{code}" placeholder="WH-NORTH">
+                <small class="error" th:errors="*{code}"></small>
+            </label>
+            <label>
+                Warehouse Name
+                <input type="text" th:field="*{name}" placeholder="Northern Distribution Warehouse">
+                <small class="error" th:errors="*{name}"></small>
+            </label>
+            <label class="wide-field">
+                Address
+                <textarea rows="3" th:field="*{address}"
+                          placeholder="Warehouse address"></textarea>
+                <small class="error" th:errors="*{address}"></small>
+            </label>
+            <label class="checkbox-line">
+                <input type="checkbox" th:field="*{active}">
+                Active warehouse
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <a class="button" th:href="@{/warehouses}">Cancel</a>
+            <button class="button primary" type="submit">Save Warehouse</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>
