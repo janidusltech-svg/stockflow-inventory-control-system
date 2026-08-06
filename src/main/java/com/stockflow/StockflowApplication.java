@@ -10,3 +10,5 @@ public class StockflowApplication {
         SpringApplication.run(StockflowApplication.class, args);
     }
 }
+
+// link to open http://127.0.0.1:8080

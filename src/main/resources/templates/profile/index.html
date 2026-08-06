@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My Profile')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Personal account</p>
+            <h1>My Profile</h1>
+            <p>Review your assigned role, maintain your contact details and securely change your password.</p>
+        </div>
+    </div>
+
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <section class="profile-summary-card">
+        <span class="profile-avatar" th:text="${#strings.toUpperCase(#strings.substring(account.username, 0, 1))}">U</span>
+        <div>
+            <p class="eyebrow">Signed-in account</p>
+            <h2 th:text="${account.fullName}">Full name</h2>
+            <p><strong th:text="${account.username}">username</strong> · <span th:text="${account.role.displayName}">Role</span></p>
+        </div>
+        <span class="status"
+              th:classappend="${account.active} ? ' active' : ' inactive'"
+              th:text="${account.active ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
+    </section>
+
+    <div class="profile-grid">
+        <form class="form-panel" th:action="@{/profile}" th:object="${profileForm}" method="post">
+            <p class="eyebrow">Profile details</p>
+            <h2>Contact information</h2>
+            <p>Your username and role are controlled by the IT and Systems Officer.</p>
+            <div class="form-grid profile-form-grid">
+                <label>
+                    Username
+                    <input type="text" th:value="${account.username}" disabled>
+                    <small>Username changes require an IT account administrator.</small>
+                </label>
+                <label>
+                    Assigned role
+                    <input type="text" th:value="${account.role.displayName}" disabled>
+                    <small>Role permissions are enforced by Spring Security.</small>
+                </label>
+                <label>
+                    Full name
+                    <input type="text" th:field="*{fullName}" maxlength="120" required>
+                    <small class="error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></small>
+                </label>
+                <label>
+                    Email address
+                    <input type="email" th:field="*{email}" maxlength="120" required>
+                    <small class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+                </label>
+            </div>
+            <div class="form-actions">
+                <button class="button primary" type="submit">Save profile</button>
+            </div>
+        </form>
+
+        <form class="form-panel" th:action="@{/profile/password}" th:object="${passwordForm}"
+              method="post" data-confirm="true">
+            <p class="eyebrow">Security</p>
+            <h2>Change password</h2>
+            <p>Use a password between 8 and 72 characters that is different from your current password.</p>
+            <div class="form-grid single-column">
+                <label>
+                    Current password
+                    <input type="password" th:field="*{currentPassword}" autocomplete="current-password" required>
+                    <small class="error" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></small>
+                </label>
+                <label>
+                    New password
+                    <input type="password" th:field="*{newPassword}" autocomplete="new-password"
+                           minlength="8" maxlength="72" required>
+                    <small class="error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></small>
+                </label>
+                <label>
+                    Confirm new password
+                    <input type="password" th:field="*{confirmPassword}" autocomplete="new-password" required>
+                    <small class="error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></small>
+                </label>
+            </div>
+            <div class="form-actions">
+                <button class="button primary" type="submit">Change password</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

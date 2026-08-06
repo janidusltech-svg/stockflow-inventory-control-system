@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Notifications')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Role-aware activity centre</p>
+            <h1>Notifications</h1>
+            <p>Current alerts and tasks generated from the StockFlow functions available to your role.</p>
+        </div>
+        <form th:if="${!#lists.isEmpty(notifications)}" th:action="@{/notifications/read-all}" method="post">
+            <button class="button" type="submit">Mark all as read</button>
+        </form>
+    </div>
+
+    <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <section class="notification-list" th:if="${!#lists.isEmpty(notifications)}">
+        <article class="notification-card"
+                 th:each="notification : ${notifications}"
+                 th:classappend="${notification.readFlag} ? ' is-read' : ' is-unread'">
+            <span class="notification-type"
+                  th:classappend="${#strings.toLowerCase(notification.type.name())}"
+                  th:text="${#strings.replace(notification.type.name(), '_', ' ')}">WARNING</span>
+            <div class="notification-content">
+                <div class="notification-title-row">
+                    <h2 th:text="${notification.title}">Notification title</h2>
+                    <span class="unread-dot" th:if="${!notification.readFlag}" aria-label="Unread"></span>
+                </div>
+                <p th:text="${notification.message}">Notification details</p>
+                <small th:text="${#temporals.format(notification.updatedAt, 'dd MMM yyyy, HH:mm')}">Date</small>
+            </div>
+            <div class="notification-actions">
+                <a class="button small primary" th:href="${notification.targetUrl}">Open record</a>
+                <form th:if="${!notification.readFlag}"
+                      th:action="@{/notifications/{id}/read(id=${notification.id})}" method="post">
+                    <button class="button small" type="submit">Mark read</button>
+                </form>
+            </div>
+        </article>
+    </section>
+
+    <section class="empty-state-card" th:if="${#lists.isEmpty(notifications)}">
+        <span class="empty-state-icon">✓</span>
+        <h2>No current notifications</h2>
+        <p>There are no outstanding alerts or workflow tasks for your role.</p>
+        <a class="button primary" th:href="@{/dashboard}">Return to dashboard</a>
+    </section>
+</main>
+</body>
+</html>

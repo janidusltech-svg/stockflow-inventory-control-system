@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,6 +52,10 @@ class RouteSmokeTest {
             "/inventory-control",
             "/inventory-control/stock",
             "/inventory-control/movements",
+            "/notifications",
+            "/reports",
+            "/profile",
+            "/search?q=milk",
             "/reorder-rules",
             "/stock-counts",
             "/stock-adjustments"
@@ -79,6 +84,8 @@ class RouteSmokeTest {
                 .andExpect(content().string(containsString("class=\"topbar app-sidebar\"")))
                 .andExpect(content().string(containsString("class=\"dashboard-status-grid\"")))
                 .andExpect(content().string(containsString("class=\"workflow-overview\"")))
+                .andExpect(content().string(containsString("Reports &amp; Analytics")))
+                .andExpect(content().string(containsString("Global Search")))
                 .andExpect(content().string(containsString("id=\"confirm-dialog\"")))
                 .andExpect(content().string(containsString("/js/app.js")));
     }
@@ -114,6 +121,24 @@ class RouteSmokeTest {
                 .andExpect(status().isOk());
         mockMvc.perform(get("/purchase-orders").session(session))
                 .andExpect(status().isForbidden());
+        mockMvc.perform(get("/profile").session(session))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/search?q=milk").session(session))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/reports").session(session))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void phaseThreeNotificationCountAndCsvExportAreAvailable() throws Exception {
+        mockMvc.perform(get("/notifications/count").session(operationsSession))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("count")));
+
+        mockMvc.perform(get("/reports/export/stock.csv").session(operationsSession))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Disposition", containsString("stockflow_stock_")))
+                .andExpect(content().string(containsString("SKU")));
     }
 
     @Test

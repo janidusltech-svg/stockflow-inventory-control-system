@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reports and Analytics')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Real-data management information</p>
+            <h1>Reports &amp; Analytics</h1>
+            <p>Review current operational indicators and export authorized records directly from StockFlow.</p>
+        </div>
+    </div>
+
+    <section class="analytics-summary-grid">
+        <div class="summary-card"><span>Active products</span><strong th:text="${reportSummary.activeProducts}">0</strong></div>
+        <div class="summary-card"><span>Available stock units</span><strong th:text="${reportSummary.stockUnits}">0</strong></div>
+        <div class="summary-card"><span>Suppliers</span><strong th:text="${reportSummary.suppliers}">0</strong></div>
+        <div class="summary-card"><span>Purchase orders</span><strong th:text="${reportSummary.purchaseOrders}">0</strong></div>
+        <div class="summary-card"><span>Goods receipts</span><strong th:text="${reportSummary.goodsReceipts}">0</strong></div>
+        <div class="summary-card"><span>Stock movements</span><strong th:text="${reportSummary.movements}">0</strong></div>
+    </section>
+
+    <section class="analytics-grid">
+        <article class="analytics-card">
+            <div class="analytics-card-heading">
+                <div><p class="eyebrow">Inventory distribution</p><h2>Stock by warehouse</h2></div>
+                <span>Available units</span>
+            </div>
+            <div class="bar-chart" th:if="${!#lists.isEmpty(stockByWarehouse)}">
+                <div class="bar-row" th:each="bar : ${stockByWarehouse}">
+                    <div class="bar-label"><span th:text="${bar.label}">Warehouse</span><strong th:text="${bar.value}">0</strong></div>
+                    <div class="bar-track"><span class="bar-fill" th:style="|--bar-value: ${bar.percentage}%|"></span></div>
+                </div>
+            </div>
+            <p class="chart-empty" th:if="${#lists.isEmpty(stockByWarehouse)}">No warehouse stock has been recorded yet.</p>
+        </article>
+
+        <article class="analytics-card">
+            <div class="analytics-card-heading">
+                <div><p class="eyebrow">Last 30 days</p><h2>Movement activity</h2></div>
+                <span>Transactions</span>
+            </div>
+            <div class="bar-chart" th:if="${!#lists.isEmpty(movementActivity)}">
+                <div class="bar-row" th:each="bar : ${movementActivity}">
+                    <div class="bar-label"><span th:text="${bar.label}">Movement</span><strong th:text="${bar.value}">0</strong></div>
+                    <div class="bar-track"><span class="bar-fill secondary" th:style="|--bar-value: ${bar.percentage}%|"></span></div>
+                </div>
+            </div>
+            <p class="chart-empty" th:if="${#lists.isEmpty(movementActivity)}">No confirmed stock movements were recorded in the last 30 days.</p>
+        </article>
+
+        <article class="analytics-card">
+            <div class="analytics-card-heading">
+                <div><p class="eyebrow">Reorder position</p><h2>Inventory health</h2></div>
+                <span>Products</span>
+            </div>
+            <div class="bar-chart">
+                <div class="bar-row" th:each="bar : ${inventoryHealth}">
+                    <div class="bar-label"><span th:text="${bar.label}">Status</span><strong th:text="${bar.value}">0</strong></div>
+                    <div class="bar-track"><span class="bar-fill health" th:style="|--bar-value: ${bar.percentage}%|"></span></div>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="report-export-section">
+        <div class="dashboard-section-heading">
+            <div><p class="eyebrow">Downloadable evidence</p><h2>CSV reports</h2></div>
+            <p>Exports use current MySQL records and open directly in Excel.</p>
+        </div>
+        <div class="report-card-grid">
+            <a class="report-card" th:href="@{/reports/export/stock.csv}">
+                <span>CSV</span><h3>Current Stock Report</h3><p>Products, warehouses, locations, batches and available quantities.</p>
+            </a>
+            <a class="report-card" th:href="@{/reports/export/movements.csv}">
+                <span>CSV</span><h3>Stock Movement Report</h3><p>Confirmed stock changes with references, products, locations and quantities.</p>
+            </a>
+            <a class="report-card" th:if="${canManagePurchasing}" th:href="@{/reports/export/purchase-orders.csv}">
+                <span>CSV</span><h3>Purchase Order Report</h3><p>Supplier, dates, status and calculated purchase-order value.</p>
+            </a>
+            <a class="report-card" th:if="${canViewReceiving}" th:href="@{/reports/export/goods-receipts.csv}">
+                <span>CSV</span><h3>Goods Receiving Report</h3><p>Delivered, accepted and rejected quantities by receipt and supplier.</p>
+            </a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

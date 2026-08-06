@@ -140,6 +140,14 @@ public class SecurityModelAdvice {
         return hasAnyRole(authentication, UserRole.IT_SYSTEMS_OFFICER);
     }
 
+    @ModelAttribute("canViewReports")
+    public boolean canViewReports(Authentication authentication) {
+        return hasAnyRole(authentication,
+                UserRole.OPERATIONS_MANAGER,
+                UserRole.STORE_SUPERVISOR,
+                UserRole.FINANCE_EXECUTIVE);
+    }
+
     private boolean hasAnyRole(Authentication authentication, UserRole... allowedRoles) {
         UserRole currentRole = currentRole(authentication);
         return currentRole != null && Arrays.asList(allowedRoles).contains(currentRole);

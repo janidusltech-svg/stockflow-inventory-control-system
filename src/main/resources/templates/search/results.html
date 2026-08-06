@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Global Search')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Permission-aware record finder</p>
+            <h1>Global Search</h1>
+            <p>Search the products, transactions and records authorized for your current role.</p>
+        </div>
+    </div>
+
+    <form class="global-search-panel" th:action="@{/search}" method="get">
+        <label for="search-page-input">Search StockFlow</label>
+        <div class="global-search-row">
+            <input id="search-page-input" name="q" type="search" minlength="2"
+                   th:value="${query}" placeholder="Enter a code, name, reference, email or status..." autofocus>
+            <button class="button primary" type="submit">Search</button>
+        </div>
+        <small>Tip: press Ctrl + K from any secured page to focus the sidebar search.</small>
+    </form>
+
+    <div class="alert error-alert" th:if="${queryTooShort}">Enter at least two characters to search.</div>
+
+    <section th:if="${searched and !queryTooShort}">
+        <div class="search-result-summary">
+            <h2>Results for “<span th:text="${query}">query</span>”</h2>
+            <span th:text="${#lists.size(results) + ' result(s)'}">0 results</span>
+        </div>
+        <div class="search-results" th:if="${!#lists.isEmpty(results)}">
+            <a class="search-result-card" th:each="result : ${results}" th:href="${result.targetUrl}">
+                <span class="search-result-category" th:text="${result.category}">Category</span>
+                <div>
+                    <h3 th:text="${result.title}">Result title</h3>
+                    <p th:text="${result.subtitle}">Result details</p>
+                </div>
+                <span class="status" th:text="${result.status}">Status</span>
+                <span class="search-result-arrow" aria-hidden="true">→</span>
+            </a>
+        </div>
+        <div class="empty-state-card" th:if="${#lists.isEmpty(results)}">
+            <span class="empty-state-icon">?</span>
+            <h2>No matching authorized records</h2>
+            <p>Try a product SKU, supplier code, order number, receipt number or customer name.</p>
+        </div>
+    </section>
+
+    <section class="empty-state-card" th:if="${!searched}">
+        <span class="empty-state-icon">⌕</span>
+        <h2>Search across your StockFlow workspace</h2>
+        <p>Results automatically exclude functions your assigned role cannot access.</p>
+    </section>
+</main>
+</body>
+</html>

@@ -39,12 +39,25 @@
             <span class="view-mode" th:if="${currentPageReadOnly}">View only</span>
         </div>
 
+        <form class="sidebar-search" th:if="${authenticatedUser}" th:action="@{/search}" method="get">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 4 4"></path></svg>
+            <label class="sr-only" for="global-search-input">Search StockFlow</label>
+            <input id="global-search-input" name="q" type="search" minlength="2"
+                   placeholder="Search records..." autocomplete="off">
+        </form>
+
         <div class="nav-section-label">Workspace</div>
         <div class="nav-links">
             <a th:href="@{/dashboard}"
                th:classappend="${currentPath == '/dashboard'} ? ' active'">
                 <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"></path></svg>
                 <span>Dashboard</span>
+            </a>
+            <a th:href="@{/notifications}"
+               th:classappend="${#strings.startsWith(currentPath, '/notifications')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"></path><path d="M10 21h4"></path></svg>
+                <span>Notifications</span>
+                <span class="notification-count" data-notification-count hidden>0</span>
             </a>
             <a th:if="${canViewProducts}" th:href="@{/products}"
                th:classappend="${#strings.startsWith(currentPath, '/products')} ? ' active'">
@@ -91,6 +104,11 @@
                 <svg viewBox="0 0 24 24"><path d="M4 6h16v14H4V6Zm3-3h10v3H7V3Z"></path><path d="M8 11h8M8 15h5"></path></svg>
                 <span>Stock Visibility</span>
             </a>
+            <a th:if="${canViewReports}" th:href="@{/reports}"
+               th:classappend="${#strings.startsWith(currentPath, '/reports')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M5 3h14v18H5V3Z"></path><path d="M8 16v-3m4 3V8m4 8v-5"></path></svg>
+                <span>Reports &amp; Analytics</span>
+            </a>
             <a th:if="${canManageUsers}" th:href="@{/user-accounts}"
                th:classappend="${#strings.startsWith(currentPath, '/user-accounts')} ? ' active'">
                 <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0H5Z"></path><path d="M19 8v6m-3-3h6"></path></svg>
@@ -99,12 +117,14 @@
         </div>
 
         <div class="nav-account" th:if="${authenticatedUser}">
-            <span class="account-avatar" aria-hidden="true"
-                  th:text="${#strings.toUpperCase(#strings.substring(currentUsername, 0, 1))}">U</span>
-            <div class="account-copy">
-                <strong th:text="${currentUsername}">username</strong>
-                <small th:text="${currentRoleLabel}">Authorized user</small>
-            </div>
+            <a class="account-profile-link" th:href="@{/profile}" title="Open my profile">
+                <span class="account-avatar" aria-hidden="true"
+                      th:text="${#strings.toUpperCase(#strings.substring(currentUsername, 0, 1))}">U</span>
+                <span class="account-copy">
+                    <strong th:text="${currentUsername}">username</strong>
+                    <small th:text="${currentRoleLabel}">Authorized user</small>
+                </span>
+            </a>
             <form th:action="@{/logout}" method="post">
                 <button class="sign-out-button" type="submit" title="Sign out" aria-label="Sign out">
                     <svg viewBox="0 0 24 24"><path d="M10 4H5v16h5M14 8l4 4-4 4m4-4H9"></path></svg>
