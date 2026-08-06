@@ -442,7 +442,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!toggle) return;
         if (reducedMotion) { toggle.remove(); return; }
 
-        const PIXELS_PER_SECOND = 130;
+        const PIXELS_PER_SECOND = 270;
         const label = toggle.querySelector("span");
         let playing = false;
         let rafId = 0;
