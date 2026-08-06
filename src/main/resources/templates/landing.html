@@ -6,11 +6,23 @@
     <meta name="description" content="Follow stock from purchase order to audit with StockFlow, the connected inventory workspace for Lanka Fresh Distributors.">
     <meta name="theme-color" content="#062d3a">
     <title>StockFlow | Follow every item. Control every movement.</title>
-    <script>document.documentElement.classList.add("has-js");</script>
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem("stockflow-theme");
+                var wantsDark = stored ? stored === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+                if (wantsDark) document.documentElement.setAttribute("data-theme", "dark");
+            } catch (e) {}
+            document.documentElement.classList.add("has-js");
+        })();
+    </script>
     <link rel="stylesheet" th:href="@{/css/landing.css}" href="/css/landing.css">
     <script th:src="@{/js/landing.js}" src="/js/landing.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+    <script th:src="@{/js/scene3d.js}" src="/js/scene3d.js" defer></script>
 </head>
 <body class="loading">
+<div class="grain-overlay" aria-hidden="true"></div>
 <div class="site-loader" id="site-loader" role="status" aria-live="polite" aria-label="StockFlow is loading">
     <div class="loader-grid" aria-hidden="true"></div>
     <div class="loader-brand">
@@ -53,6 +65,11 @@
             </span>
         </a>
 
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark theme">
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"></path></svg>
+        </button>
+
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="landing-navigation">
             <span></span><span></span><span></span>
             <span class="sr-only">Toggle navigation</span>
@@ -61,8 +78,9 @@
         <nav class="landing-nav" id="landing-navigation" aria-label="Landing navigation">
             <a href="#journey">Stock journey</a>
             <a href="#control">Control model</a>
+            <a href="#impact">Why it matters</a>
             <a href="#outcomes">Outcomes</a>
-            <a class="nav-access" th:href="@{/login}" href="/login">
+            <a class="nav-access magnetic" th:href="@{/login}" href="/login">
                 Access system
                 <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"></path></svg>
             </a>
@@ -73,7 +91,79 @@
 <main id="main-content">
     <section class="hero-section" aria-labelledby="hero-title">
         <div class="hero-sticky">
+        <div class="hero-stage-bg" aria-hidden="true">
+            <div class="stage-bg stage-bg-0"></div>
+            <div class="stage-bg stage-bg-1"></div>
+            <div class="stage-bg stage-bg-2"></div>
+            <div class="stage-bg stage-bg-3"></div>
+        </div>
         <div class="hero-grid-lines" aria-hidden="true"></div>
+        <div class="stage-scan-beam" aria-hidden="true"></div>
+
+        <div class="stage-scene stage-scene-store" aria-hidden="true">
+            <svg class="stage-scene-svg" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice">
+                <g class="store-rack-structure">
+                    <path d="M170 210h860M170 400h860M170 590h860"></path>
+                    <path d="M170 210v380M430 210v380M690 210v380M950 210v380M1030 210v380"></path>
+                </g>
+                <g class="store-boxes">
+                    <rect x="210" y="150" width="90" height="60" rx="6"></rect>
+                    <rect x="330" y="150" width="90" height="60" rx="6"></rect>
+                    <rect x="720" y="150" width="90" height="60" rx="6"></rect>
+                    <rect x="860" y="150" width="90" height="60" rx="6"></rect>
+                    <rect x="240" y="340" width="110" height="60" rx="6"></rect>
+                    <rect x="500" y="340" width="110" height="60" rx="6"></rect>
+                    <rect x="760" y="340" width="110" height="60" rx="6"></rect>
+                    <rect x="220" y="530" width="100" height="60" rx="6"></rect>
+                    <rect x="480" y="530" width="100" height="60" rx="6"></rect>
+                    <rect x="740" y="530" width="100" height="60" rx="6"></rect>
+                </g>
+                <g class="store-confirm-badge" transform="translate(600 255)">
+                    <circle r="46"></circle>
+                    <path d="m-16 0 12 12 22-24"></path>
+                </g>
+            </svg>
+        </div>
+
+        <div class="stage-scene stage-scene-update" aria-hidden="true">
+            <svg class="stage-scene-svg" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice">
+                <g class="update-network-lines">
+                    <path d="M600 350 220 180M600 350 980 180M600 350 220 520M600 350 980 520M600 350 600 130M600 350 600 570"></path>
+                </g>
+                <g class="update-network-nodes">
+                    <circle cx="220" cy="180" r="16"></circle>
+                    <circle cx="980" cy="180" r="16"></circle>
+                    <circle cx="220" cy="520" r="16"></circle>
+                    <circle cx="980" cy="520" r="16"></circle>
+                    <circle cx="600" cy="130" r="16"></circle>
+                    <circle cx="600" cy="570" r="16"></circle>
+                </g>
+                <g class="update-db-core" transform="translate(600 350)">
+                    <ellipse cx="0" cy="-46" rx="70" ry="24"></ellipse>
+                    <path d="M-70 -46v70c0 13.3 31.3 24 70 24s70-10.7 70-24v-70"></path>
+                    <path d="M-70 -6c0 13.3 31.3 24 70 24s70-10.7 70-24"></path>
+                </g>
+            </svg>
+        </div>
+
+        <div class="hero-stage-icon" aria-hidden="true">
+            <div class="stage-icon stage-icon-0">
+                <svg class="stage-icon-svg" viewBox="0 0 64 64"><path d="M10 40h44l-6 16H16z"></path><path d="M32 6v22m0 0-9-9m9 9 9-9"></path></svg>
+                <span>Receiving</span>
+            </div>
+            <div class="stage-icon stage-icon-1">
+                <svg class="stage-icon-svg" viewBox="0 0 64 64"><rect x="10" y="16" width="3" height="32"></rect><rect x="17" y="16" width="6" height="32"></rect><rect x="27" y="16" width="3" height="32"></rect><rect x="34" y="16" width="5" height="32"></rect><rect x="43" y="16" width="3" height="32"></rect><rect x="49" y="16" width="6" height="32"></rect><line class="scan-beam-line" x1="6" y1="32" x2="60" y2="32"></line></svg>
+                <span>Scanning</span>
+            </div>
+            <div class="stage-icon stage-icon-2">
+                <svg class="stage-icon-svg" viewBox="0 0 64 64"><path d="M8 20h48M8 44h48"></path><rect x="18" y="24" width="17" height="17" rx="2"></rect><circle cx="47" cy="17" r="11"></circle><path d="m42.5 17 3 3 6.5-6.5"></path></svg>
+                <span>Storing</span>
+            </div>
+            <div class="stage-icon stage-icon-3">
+                <svg class="stage-icon-svg" viewBox="0 0 64 64"><ellipse cx="26" cy="14" rx="17" ry="6"></ellipse><path d="M9 14v20c0 3.3 7.6 6 17 6s17-2.7 17-6V14"></path><path d="M9 24c0 3.3 7.6 6 17 6s17-2.7 17-6"></path><g class="db-sync-arc"><path d="M46 42a10 10 0 1 1-2.8-6.9"></path><path d="M46 30v6h-6"></path></g></svg>
+                <span>Updating</span>
+            </div>
+        </div>
         <div class="warehouse-illustration" aria-hidden="true">
             <svg class="warehouse-sketch" viewBox="-250 0 2100 900" preserveAspectRatio="xMidYMid slice">
                 <defs>
@@ -139,10 +229,10 @@
                 <path class="hero-data-path" d="M208 724 C520 650 1080 650 1390 724"></path>
                 <circle class="hero-data-dot" cx="0" cy="0" r="5"></circle>
 
-                <g class="scene-stop active" data-hero-stop="0" transform="translate(260 732)"><circle r="16"></circle><text y="4" text-anchor="middle">1</text><text class="stop-label" y="34" text-anchor="middle">RECEIVE</text></g>
-                <g class="scene-stop" data-hero-stop="1" transform="translate(620 668)"><circle r="16"></circle><text y="4" text-anchor="middle">2</text><text class="stop-label" y="34" text-anchor="middle">SCAN</text></g>
-                <g class="scene-stop" data-hero-stop="2" transform="translate(980 668)"><circle r="16"></circle><text y="4" text-anchor="middle">3</text><text class="stop-label" y="34" text-anchor="middle">STORE</text></g>
-                <g class="scene-stop" data-hero-stop="3" transform="translate(1340 732)"><circle r="16"></circle><text y="4" text-anchor="middle">4</text><text class="stop-label" y="34" text-anchor="middle">UPDATE</text></g>
+                <g class="scene-stop active" data-hero-stop="0" transform="translate(260 732)"><circle class="stop-ping" r="16"></circle><circle r="16"></circle><text y="4" text-anchor="middle">1</text><text class="stop-label" y="34" text-anchor="middle">RECEIVE</text></g>
+                <g class="scene-stop" data-hero-stop="1" transform="translate(620 668)"><circle class="stop-ping" r="16"></circle><circle r="16"></circle><text y="4" text-anchor="middle">2</text><text class="stop-label" y="34" text-anchor="middle">SCAN</text></g>
+                <g class="scene-stop" data-hero-stop="2" transform="translate(980 668)"><circle class="stop-ping" r="16"></circle><circle r="16"></circle><text y="4" text-anchor="middle">3</text><text class="stop-label" y="34" text-anchor="middle">STORE</text></g>
+                <g class="scene-stop" data-hero-stop="3" transform="translate(1340 732)"><circle class="stop-ping" r="16"></circle><circle r="16"></circle><text y="4" text-anchor="middle">4</text><text class="stop-label" y="34" text-anchor="middle">UPDATE</text></g>
 
                 <g id="hero-worker-cart">
                     <g transform="translate(126 0)">
@@ -170,7 +260,7 @@
 
         <div class="landing-shell hero-center">
             <div class="hero-copy reveal">
-                <p class="hero-label"><span></span> Web-based warehouse inventory control</p>
+                <p class="hero-label"><span></span> Web-based inventory control, built for <strong id="hero-role-cycle" class="hero-role-cycle">Store Supervisors</strong></p>
                 <h1 id="hero-title">Inventory under control.<br><em>From receiving to issue.</em></h1>
                 <p class="hero-intro">
                     Track every product, batch, warehouse location and stock movement in one
@@ -178,7 +268,7 @@
                 </p>
 
                 <div class="hero-actions">
-                    <a class="button button-primary" href="#journey">Follow the stock journey<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v13m-5-5 5 5 5-5"></path></svg></a>
+                    <a class="button button-primary magnetic" href="#journey">Follow the stock journey<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v13m-5-5 5 5 5-5"></path></svg></a>
                     <a class="button button-secondary" th:href="@{/login}" href="/login">Enter workspace<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"></path></svg></a>
                 </div>
 
@@ -189,14 +279,27 @@
                 </div>
             </div>
 
-            <div class="hero-flow-panel reveal" role="group" aria-label="Product movement preview">
+            <div class="hero-flow-panel reveal" role="group" aria-label="Product movement preview and live inventory pulse">
                 <div class="flow-panel-heading"><span>Product movement preview</span><strong id="hero-flow-status" aria-live="polite">Supplier delivery received</strong></div>
+                <div class="flow-update-toast" id="hero-update-toast" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m4 10 4 4 8-8"></path></svg> Stock updated in MySQL</div>
                 <ol>
                     <li class="active" data-hero-flow="0"><i>01</i><span><strong>Receive</strong><small>Verify delivery</small></span></li>
                     <li data-hero-flow="1"><i>02</i><span><strong>Scan</strong><small>Capture batch details</small></span></li>
                     <li data-hero-flow="2"><i>03</i><span><strong>Store</strong><small>Assign location</small></span></li>
                     <li data-hero-flow="3"><i>04</i><span><strong>Update</strong><small>Save available stock</small></span></li>
                 </ol>
+                <div class="flow-panel-pulse">
+                    <div class="live-panel-head">
+                        <span class="live-dot" aria-hidden="true"></span>
+                        <strong>Live inventory pulse</strong>
+                        <small>Preview data</small>
+                    </div>
+                    <ul>
+                        <li><span>Items tracked</span><strong data-live-metric="items" data-live-base="2438">2,438</strong></li>
+                        <li><span>Low-stock alerts</span><strong data-live-metric="alerts" data-live-base="3">3</strong></li>
+                        <li><span>Pending purchase orders</span><strong data-live-metric="pos" data-live-base="7">7</strong></li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -213,9 +316,9 @@
 
     <section class="outcome-ribbon" id="outcomes" aria-label="StockFlow outcomes">
         <div class="landing-shell outcome-grid">
-            <article class="reveal"><span>01</span><div><strong>One source of truth</strong><p>Connected records replace paper trails and disconnected spreadsheets.</p></div></article>
-            <article class="reveal"><span>02</span><div><strong>Controlled changes</strong><p>Only confirmed transactions alter available inventory quantities.</p></div></article>
-            <article class="reveal"><span>03</span><div><strong>Explainable decisions</strong><p>Movement history, audits and alerts show what changed and why.</p></div></article>
+            <article class="reveal spotlight-card"><span>01</span><div><strong>One source of truth</strong><p>Connected records replace paper trails and disconnected spreadsheets.</p></div></article>
+            <article class="reveal spotlight-card"><span>02</span><div><strong>Controlled changes</strong><p>Only confirmed transactions alter available inventory quantities.</p></div></article>
+            <article class="reveal spotlight-card"><span>03</span><div><strong>Explainable decisions</strong><p>Movement history, audits and alerts show what changed and why.</p></div></article>
         </div>
     </section>
 
@@ -364,6 +467,35 @@
         </div>
     </section>
 
+    <section class="scene3d-section" id="closer-look" aria-labelledby="scene3d-title">
+        <div class="landing-shell scene3d-layout">
+            <div class="scene3d-copy reveal">
+                <p class="section-label light">A closer look</p>
+                <h2 id="scene3d-title">Every crate has a record behind it.</h2>
+                <p>This isn't decoration — each crate below is a tracked batch. Drag the pallet to turn it, and click a crate to see the record StockFlow keeps on it.</p>
+            </div>
+            <div class="scene3d-stage reveal">
+                <canvas id="scene3d-canvas" aria-label="Interactive 3D pallet of tracked inventory batches. Click a crate to inspect its record." role="img"></canvas>
+                <div class="scene3d-fallback" id="scene3d-fallback">
+                    <div class="fallback-crate" aria-hidden="true"><span></span><span></span><span></span></div>
+                    <p>3D preview unavailable — this view needs a WebGL-capable browser and an internet connection.</p>
+                </div>
+                <span class="scene3d-hint" id="scene3d-hint">Drag to rotate &middot; Click a crate to inspect</span>
+                <div class="scene3d-infocard" id="scene3d-infocard">
+                    <button class="infocard-close" id="scene3d-infocard-close" type="button" aria-label="Close batch record">&times;</button>
+                    <p class="infocard-eyebrow">Batch record</p>
+                    <strong class="infocard-name" id="infocard-name">&nbsp;</strong>
+                    <dl>
+                        <div><dt>SKU</dt><dd id="infocard-sku">&nbsp;</dd></div>
+                        <div><dt>Batch</dt><dd id="infocard-batch">&nbsp;</dd></div>
+                        <div><dt>Quantity</dt><dd id="infocard-qty">&nbsp;</dd></div>
+                        <div><dt>Location</dt><dd id="infocard-location">&nbsp;</dd></div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="control-section" id="control" aria-labelledby="control-title">
         <div class="control-glow" aria-hidden="true"></div>
         <div class="landing-shell control-layout">
@@ -393,6 +525,62 @@
         </div>
     </section>
 
+    <section class="proof-section" id="impact" aria-labelledby="proof-title">
+        <div class="landing-shell proof-layout">
+            <div class="proof-intro reveal">
+                <p class="section-label">Why it matters</p>
+                <h2 id="proof-title">Built around real warehouse friction points.</h2>
+                <p>Every module answers a problem inventory teams face daily, not a feature checklist.</p>
+            </div>
+            <div class="proof-grid">
+                <article class="proof-card reveal spotlight-card">
+                    <p>&ldquo;Before, we counted stock by walking the racks with a clipboard and hoped the spreadsheet still matched reality by the time we finished.&rdquo;</p>
+                    <div class="proof-role"><i>SS</i><div><strong>Store Supervisor</strong><small>Physical counts &amp; batch tracking</small></div></div>
+                </article>
+                <article class="proof-card reveal spotlight-card">
+                    <p>&ldquo;A purchase order used to live in three places at once: email, a notebook, and someone's memory. Now approval and delivery matching happen in the same record.&rdquo;</p>
+                    <div class="proof-role"><i>FE</i><div><strong>Finance Executive</strong><small>Suppliers &amp; purchase orders</small></div></div>
+                </article>
+                <article class="proof-card reveal spotlight-card">
+                    <p>&ldquo;Reorder decisions used to wait until someone noticed an empty shelf. Now low-stock alerts surface before it turns into a stockout.&rdquo;</p>
+                    <div class="proof-role"><i>OM</i><div><strong>Operations Manager</strong><small>Inventory control &amp; audits</small></div></div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq-section" id="faq" aria-labelledby="faq-title">
+        <div class="landing-shell faq-layout">
+            <div class="faq-intro reveal">
+                <p class="section-label">Before you enter</p>
+                <h2 id="faq-title">Common questions.</h2>
+                <p>A quick look at how StockFlow behaves in practice.</p>
+            </div>
+            <div class="faq-list reveal">
+                <details class="faq-item" name="faq-group">
+                    <summary>Can multiple warehouse locations be managed at once?<span class="faq-icon" aria-hidden="true"></span></summary>
+                    <div class="faq-answer"><p>Yes. Every batch and stock balance is tied to a specific warehouse location, and transfers move stock between locations through a validated dispatch-and-receive step.</p></div>
+                </details>
+                <details class="faq-item" name="faq-group">
+                    <summary>What happens if a delivery doesn't match the purchase order?<span class="faq-icon" aria-hidden="true"></span></summary>
+                    <div class="faq-answer"><p>Goods receiving checks delivered quantities against the approved order line by line. Mismatches and rejected items are recorded before stock is confirmed into inventory.</p></div>
+                </details>
+                <details class="faq-item" name="faq-group">
+                    <summary>Who can see and change inventory records?<span class="faq-icon" aria-hidden="true"></span></summary>
+                    <div class="faq-answer"><p>Access follows five defined roles: Operations, Store, Finance, Customer Service and Systems, so each user only reaches the modules relevant to their responsibilities.</p></div>
+                </details>
+                <details class="faq-item" name="faq-group">
+                    <summary>How is stock data stored?<span class="faq-icon" aria-hidden="true"></span></summary>
+                    <div class="faq-answer"><p>StockFlow runs on a single connected MySQL database, keeping product, batch, location and movement records consistent across every module.</p></div>
+                </details>
+                <details class="faq-item" name="faq-group">
+                    <summary>Can a stock movement be undone if it was recorded by mistake?<span class="faq-icon" aria-hidden="true"></span></summary>
+                    <div class="faq-answer"><p>Confirmed movements aren't silently edited. Corrections go through adjustments and returns, which keep the original record and the correction both visible in the movement history.</p></div>
+                </details>
+            </div>
+        </div>
+    </section>
+
     <section class="final-section">
         <div class="final-road" aria-hidden="true"><span></span><span></span><span></span></div>
         <div class="landing-shell final-card reveal">
@@ -401,7 +589,7 @@
                 <h2>Move from overview to operation.</h2>
                 <p>Enter the StockFlow workspace to manage the six connected inventory functions.</p>
             </div>
-            <a class="button button-final" th:href="@{/login}" href="/login">
+            <a class="button button-final magnetic" th:href="@{/login}" href="/login">
                 Access StockFlow
                 <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"></path></svg>
             </a>
@@ -416,6 +604,12 @@
         <a href="#top">Back to top <span>↑</span></a>
     </div>
 </footer>
+
+<button class="autoplay-toggle" id="autoplay-toggle" type="button" aria-pressed="false" aria-label="Autoplay a tour of the whole page">
+    <svg class="autoplay-icon autoplay-icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+    <svg class="autoplay-icon autoplay-icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"></path></svg>
+    <span>Autoplay tour</span>
+</button>
 <script>
     window.setTimeout(function () {
         var loader = document.getElementById("site-loader");
