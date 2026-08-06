@@ -148,6 +148,13 @@ public class SecurityModelAdvice {
                 UserRole.FINANCE_EXECUTIVE);
     }
 
+    @ModelAttribute("canViewAuditTrail")
+    public boolean canViewAuditTrail(Authentication authentication) {
+        return hasAnyRole(authentication,
+                UserRole.OPERATIONS_MANAGER,
+                UserRole.IT_SYSTEMS_OFFICER);
+    }
+
     private boolean hasAnyRole(Authentication authentication, UserRole... allowedRoles) {
         UserRole currentRole = currentRole(authentication);
         return currentRole != null && Arrays.asList(allowedRoles).contains(currentRole);

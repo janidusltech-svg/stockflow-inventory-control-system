@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Audit Trail')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Controlled system activity</p>
+            <h1>Audit Trail</h1>
+            <p>Review who changed StockFlow data, what action was requested, where it occurred and whether it completed.</p>
+        </div>
+        <a class="button primary"
+           th:href="@{/audit-trail/export.csv(keyword=${keyword},module=${selectedModule},action=${selectedAction},outcome=${selectedOutcome})}">
+            Export filtered CSV
+        </a>
+    </div>
+
+    <section class="audit-summary-grid" aria-label="Audit summary">
+        <div class="summary-card"><span>Total recorded events</span><strong th:text="${auditSummary.totalEvents}">0</strong></div>
+        <div class="summary-card success-summary"><span>Successful changes</span><strong th:text="${auditSummary.successfulEvents}">0</strong></div>
+        <div class="summary-card danger-summary"><span>Unsuccessful requests</span><strong th:text="${auditSummary.failedEvents}">0</strong></div>
+        <div class="summary-card"><span>Events in last 24 hours</span><strong th:text="${auditSummary.eventsLastTwentyFourHours}">0</strong></div>
+    </section>
+
+    <section class="analytics-grid audit-chart-grid">
+        <article class="analytics-card audit-chart-card">
+            <div class="analytics-card-heading">
+                <div><p class="eyebrow">Last 30 days</p><h2>Activity by module</h2></div>
+                <span>Events</span>
+            </div>
+            <div class="bar-chart" th:if="${!#lists.isEmpty(moduleActivity)}">
+                <div class="bar-row" th:each="bar : ${moduleActivity}">
+                    <div class="bar-label"><span th:text="${bar.label}">Module</span><strong th:text="${bar.value}">0</strong></div>
+                    <div class="bar-track"><span class="bar-fill" th:style="|--bar-value: ${bar.percentage}%|"></span></div>
+                </div>
+            </div>
+            <p class="chart-empty" th:if="${#lists.isEmpty(moduleActivity)}">No data-changing activity has been recorded yet.</p>
+        </article>
+
+        <article class="analytics-card audit-chart-card">
+            <div class="analytics-card-heading">
+                <div><p class="eyebrow">Last 30 days</p><h2>Activity by action</h2></div>
+                <span>Events</span>
+            </div>
+            <div class="bar-chart" th:if="${!#lists.isEmpty(actionActivity)}">
+                <div class="bar-row" th:each="bar : ${actionActivity}">
+                    <div class="bar-label"><span th:text="${bar.label}">Action</span><strong th:text="${bar.value}">0</strong></div>
+                    <div class="bar-track"><span class="bar-fill secondary" th:style="|--bar-value: ${bar.percentage}%|"></span></div>
+                </div>
+            </div>
+            <p class="chart-empty" th:if="${#lists.isEmpty(actionActivity)}">Actions will appear after users create or update records.</p>
+        </article>
+    </section>
+
+    <section class="audit-record-section">
+        <div class="dashboard-section-heading">
+            <div><p class="eyebrow">Traceable evidence</p><h2>Recorded events</h2></div>
+            <p th:text="${auditPage.totalElements + ' matching event(s)'}">0 matching events</p>
+        </div>
+
+        <form class="audit-filter-panel" th:action="@{/audit-trail}" method="get">
+            <label>
+                Search
+                <input type="search" name="keyword" th:value="${keyword}"
+                       placeholder="Username, role, reference or path">
+            </label>
+            <label>
+                Module
+                <select name="module">
+                    <option value="">All modules</option>
+                    <option th:each="moduleName : ${modules}" th:value="${moduleName}"
+                            th:text="${moduleName}" th:selected="${moduleName == selectedModule}">Module</option>
+                </select>
+            </label>
+            <label>
+                Action
+                <select name="action">
+                    <option value="">All actions</option>
+                    <option th:each="actionName : ${actions}" th:value="${actionName}"
+                            th:text="${#strings.capitalizeWords(#strings.toLowerCase(#strings.replace(actionName, '_', ' ')))}"
+                            th:selected="${actionName == selectedAction}">Action</option>
+                </select>
+            </label>
+            <label>
+                Outcome
+                <select name="outcome">
+                    <option value="">All outcomes</option>
+                    <option th:each="outcomeOption : ${outcomes}" th:value="${outcomeOption}"
+                            th:text="${outcomeOption}" th:selected="${outcomeOption == selectedOutcome}">Outcome</option>
+                </select>
+            </label>
+            <div class="audit-filter-actions">
+                <button class="button primary" type="submit">Apply filters</button>
+                <a class="button" th:href="@{/audit-trail}">Clear</a>
+            </div>
+        </form>
+
+        <div class="table-card" th:if="${!auditPage.empty}">
+            <div class="table-scroll">
+                <table class="audit-table">
+                    <thead>
+                    <tr>
+                        <th>Date &amp; time</th>
+                        <th>User</th>
+                        <th>Module</th>
+                        <th>Action</th>
+                        <th>Reference</th>
+                        <th>Outcome</th>
+                        <th>Request</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="event : ${auditPage.content}">
+                        <td>
+                            <strong th:text="${#temporals.format(event.occurredAt, 'dd MMM yyyy')}">Date</strong>
+                            <small th:text="${#temporals.format(event.occurredAt, 'HH:mm:ss')}">Time</small>
+                        </td>
+                        <td>
+                            <strong th:text="${event.username}">username</strong>
+                            <small th:text="${#strings.capitalizeWords(#strings.toLowerCase(#strings.replace(event.roleName, '_', ' ')))}">Role</small>
+                        </td>
+                        <td th:text="${event.module}">Module</td>
+                        <td th:text="${#strings.capitalizeWords(#strings.toLowerCase(#strings.replace(event.action, '_', ' ')))}">Action</td>
+                        <td th:text="${event.referenceValue ?: '—'}">Reference</td>
+                        <td><span class="audit-outcome" th:classappend="${event.outcome.name() == 'SUCCESS'} ? ' success' : ' failure'"
+                                  th:text="${event.outcome}">SUCCESS</span></td>
+                        <td>
+                            <code th:text="${event.httpMethod + ' ' + event.requestPath}">POST /route</code>
+                            <small th:text="${'HTTP ' + event.responseStatus}">HTTP 302</small>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="empty-state-card" th:if="${auditPage.empty}">
+            <span class="empty-state-icon">✓</span>
+            <h2>No matching audit events</h2>
+            <p>Clear the filters or complete a data-changing action to create the first audit record.</p>
+        </div>
+
+        <nav class="server-pagination" th:if="${auditPage.totalPages > 1}" aria-label="Audit pages">
+            <a class="button small" th:if="${auditPage.hasPrevious()}"
+               th:href="@{/audit-trail(keyword=${keyword},module=${selectedModule},action=${selectedAction},outcome=${selectedOutcome},page=${auditPage.number - 1})}">Previous</a>
+            <span>Page <strong th:text="${auditPage.number + 1}">1</strong> of <strong th:text="${auditPage.totalPages}">1</strong></span>
+            <a class="button small" th:if="${auditPage.hasNext()}"
+               th:href="@{/audit-trail(keyword=${keyword},module=${selectedModule},action=${selectedAction},outcome=${selectedOutcome},page=${auditPage.number + 1})}">Next</a>
+        </nav>
+    </section>
+</main>
+</body>
+</html>

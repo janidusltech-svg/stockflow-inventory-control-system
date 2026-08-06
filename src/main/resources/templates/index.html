@@ -108,6 +108,11 @@
             <h2>Reports &amp; Analytics</h2>
             <p>Explore real inventory charts and download authorized CSV reports.</p>
         </a>
+        <a class="module-card active" th:if="${canViewAuditTrail}" th:href="@{/audit-trail}">
+            <span>LOG</span>
+            <h2>Audit Trail</h2>
+            <p>Trace data-changing actions by user, module, result and time.</p>
+        </a>
         <a class="module-card active" th:href="@{/search}">
             <span>FIND</span>
             <h2>Global Search</h2>

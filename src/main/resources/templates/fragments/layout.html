@@ -109,6 +109,11 @@
                 <svg viewBox="0 0 24 24"><path d="M5 3h14v18H5V3Z"></path><path d="M8 16v-3m4 3V8m4 8v-5"></path></svg>
                 <span>Reports &amp; Analytics</span>
             </a>
+            <a th:if="${canViewAuditTrail}" th:href="@{/audit-trail}"
+               th:classappend="${#strings.startsWith(currentPath, '/audit-trail')} ? ' active'">
+                <svg viewBox="0 0 24 24"><path d="M6 3h12v18H6V3Z"></path><path d="M9 8h6M9 12h6M9 16h4"></path><path d="m15 16 2 2 4-5"></path></svg>
+                <span>Audit Trail</span>
+            </a>
             <a th:if="${canManageUsers}" th:href="@{/user-accounts}"
                th:classappend="${#strings.startsWith(currentPath, '/user-accounts')} ? ' active'">
                 <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0H5Z"></path><path d="M19 8v6m-3-3h6"></path></svg>

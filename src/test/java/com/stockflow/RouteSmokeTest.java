@@ -54,6 +54,7 @@ class RouteSmokeTest {
             "/inventory-control/movements",
             "/notifications",
             "/reports",
+            "/audit-trail",
             "/profile",
             "/search?q=milk",
             "/reorder-rules",
@@ -142,6 +143,32 @@ class RouteSmokeTest {
     }
 
     @Test
+    void phaseFourRecordsAConfirmedProfileChangeAndExportsTheAuditTrail() throws Exception {
+        MvcResult profilePage = mockMvc.perform(get("/profile").session(operationsSession))
+                .andExpect(status().isOk())
+                .andReturn();
+        CsrfToken csrfToken = csrfToken(profilePage);
+
+        mockMvc.perform(post("/profile")
+                        .session(operationsSession)
+                        .param("fullName", "Operations Manager")
+                        .param("email", "operations.audit@stockflow.test")
+                        .param(csrfToken.getParameterName(), csrfToken.getToken()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/profile"));
+
+        mockMvc.perform(get("/audit-trail").session(operationsSession))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Audit Trail")))
+                .andExpect(content().string(containsString("Update Profile")));
+
+        mockMvc.perform(get("/audit-trail/export.csv").session(operationsSession))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Disposition", containsString("stockflow_audit_trail_")))
+                .andExpect(content().string(containsString("Username")));
+    }
+
+    @Test
     void financeCanViewPurchasingButCannotOpenWarehouseManagement() throws Exception {
         MockHttpSession session = login("finance");
 
@@ -150,6 +177,8 @@ class RouteSmokeTest {
         mockMvc.perform(get("/warehouses").session(session))
                 .andExpect(status().isForbidden());
         mockMvc.perform(get("/reference-data").session(session))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/audit-trail").session(session))
                 .andExpect(status().isForbidden());
     }
 
@@ -169,6 +198,8 @@ class RouteSmokeTest {
 
         mockMvc.perform(get("/user-accounts").session(session))
                 .andExpect(status().isOk());
+        mockMvc.perform(get("/audit-trail").session(session))
+                .andExpect(status().isOk());
         mockMvc.perform(get("/products").session(session))
                 .andExpect(status().isForbidden());
     }
@@ -183,14 +214,7 @@ class RouteSmokeTest {
             session = new MockHttpSession();
         }
 
-        CsrfToken csrfToken = (CsrfToken) loginPage.getRequest()
-                .getAttribute(CsrfToken.class.getName());
-        if (csrfToken == null) {
-            csrfToken = (CsrfToken) loginPage.getRequest().getAttribute("_csrf");
-        }
-        if (csrfToken == null) {
-            throw new IllegalStateException("The login page did not expose a CSRF token");
-        }
+        CsrfToken csrfToken = csrfToken(loginPage);
 
         MvcResult result = mockMvc.perform(post("/login")
                         .session(session)
@@ -206,5 +230,16 @@ class RouteSmokeTest {
             return mockSession;
         }
         return session;
+    }
+
+    private CsrfToken csrfToken(MvcResult page) {
+        CsrfToken csrfToken = (CsrfToken) page.getRequest().getAttribute(CsrfToken.class.getName());
+        if (csrfToken == null) {
+            csrfToken = (CsrfToken) page.getRequest().getAttribute("_csrf");
+        }
+        if (csrfToken == null) {
+            throw new IllegalStateException("The page did not expose a CSRF token");
+        }
+        return csrfToken;
     }
 }

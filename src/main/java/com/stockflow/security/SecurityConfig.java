@@ -52,6 +52,8 @@ public class SecurityConfig {
                         .requestMatchers("/user-accounts/**").hasRole(IT)
                         .requestMatchers("/notifications/**", "/profile/**", "/search/**")
                         .authenticated()
+                        .requestMatchers("/audit-trail/**")
+                        .hasAnyRole(OPERATIONS, IT)
                         .requestMatchers("/reports/export/stock.csv", "/reports/export/movements.csv")
                         .hasAnyRole(OPERATIONS, STORE, FINANCE, CUSTOMER_SERVICE)
                         .requestMatchers("/reports/export/purchase-orders.csv")
