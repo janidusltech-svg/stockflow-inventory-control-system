@@ -13,6 +13,8 @@
 
     ready(() => {
         initialiseSidebar();
+        initialiseNotifications();
+        initialiseGlobalSearch();
         initialisePageContext();
         initialiseAlerts();
         initialiseConfirmations();
@@ -50,6 +52,42 @@
         document.addEventListener("keydown", (event) => {
             if (event.key === "Escape") {
                 close();
+            }
+        });
+    }
+
+    function initialiseNotifications() {
+        const badge = document.querySelector("[data-notification-count]");
+        if (!badge) {
+            return;
+        }
+        fetch("/notifications/count", {
+            headers: { "Accept": "application/json" },
+            credentials: "same-origin"
+        })
+            .then((response) => response.ok ? response.json() : Promise.reject())
+            .then((data) => {
+                const count = Number(data.count || 0);
+                badge.textContent = count > 99 ? "99+" : String(count);
+                badge.hidden = count <= 0;
+                badge.setAttribute("aria-label", `${count} unread notifications`);
+            })
+            .catch(() => {
+                badge.hidden = true;
+            });
+    }
+
+    function initialiseGlobalSearch() {
+        const input = document.querySelector("#global-search-input");
+        if (!input) {
+            return;
+        }
+        document.addEventListener("keydown", (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+                event.preventDefault();
+                document.body.classList.add("sidebar-open");
+                input.focus();
+                input.select();
             }
         });
     }

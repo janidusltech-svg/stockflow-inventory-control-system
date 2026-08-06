@@ -98,6 +98,26 @@
             <h2>User &amp; Role Management</h2>
             <p>Create staff accounts, assign roles, reset passwords and control access.</p>
         </a>
+        <a class="module-card active" th:href="@{/notifications}">
+            <span>ALERT</span>
+            <h2>Notifications</h2>
+            <p>Review current alerts and workflow tasks generated for your assigned role.</p>
+        </a>
+        <a class="module-card active" th:if="${canViewReports}" th:href="@{/reports}">
+            <span>DATA</span>
+            <h2>Reports &amp; Analytics</h2>
+            <p>Explore real inventory charts and download authorized CSV reports.</p>
+        </a>
+        <a class="module-card active" th:href="@{/search}">
+            <span>FIND</span>
+            <h2>Global Search</h2>
+            <p>Find codes, names and references across every function available to you.</p>
+        </a>
+        <a class="module-card active" th:href="@{/profile}">
+            <span>ME</span>
+            <h2>My Profile</h2>
+            <p>Maintain your contact information and securely change your own password.</p>
+        </a>
     </section>
 
     <section class="workflow-overview" aria-labelledby="workflow-overview-title">

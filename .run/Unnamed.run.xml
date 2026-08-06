@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+    <envs>
+      <env name="STOCKFLOW_DB_PASSWORD" value="Janidu2005" />
+    </envs>
+    <module name="stockflow" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
