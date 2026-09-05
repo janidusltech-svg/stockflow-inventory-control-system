@@ -450,6 +450,19 @@ body.loading { overflow:hidden; }
 .reveal { opacity:0; transform:translateY(20px); transition:opacity .65s ease,transform .65s ease; }.reveal.visible { opacity:1; transform:translateY(0); }
 a:focus-visible,button:focus-visible { outline:3px solid rgba(11,145,133,.35); outline-offset:3px; }
 
+/* Laptop-width fix: on big desktop/2K monitors the sticky hero is tall enough that the
+   background illustration's "slice" scaling crops in tight and the worker+trolley never
+   reaches under the centered flow panel. On typical laptop screens the sticky hero is
+   shorter, so the same illustration shows proportionally more width and the trolley's
+   scroll position at the Receive stage can land under the panel's left edge. Narrowing
+   the panel (and switching its 4-step row to a 2x2 grid) here keeps its left edge clear
+   of the trolley without touching the scroll-linked JS that drives its movement. */
+@media (min-width:1081px) and (max-width:1919px) {
+    .hero-flow-panel { width:min(620px,100%); padding:16px 18px; }
+    .hero-flow-panel ol { grid-template-columns:1fr 1fr; }
+    .hero-flow-panel li:nth-child(2)::after { display:none; }
+}
+
 @media (max-width:1080px) {
     .hero-section { height:220svh; min-height:1700px; }.hero-sticky { padding-top:108px; }.hero-copy h1 { font-size:clamp(48px,6vw,64px); }.warehouse-illustration { top:62px; }.warehouse-rack { opacity:.78; }.hero-motion-note { right:20px; }
     .ambient-rack { width:190px; }.ambient-rack-left { left:-105px; }.ambient-rack-right { right:-105px; }.ambient-package-one,.ambient-package-three { left:1.5%; }.ambient-package-two,.ambient-package-four { right:1.5%; }
