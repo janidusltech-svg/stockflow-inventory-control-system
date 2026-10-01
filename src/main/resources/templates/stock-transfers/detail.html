@@ -167,13 +167,13 @@
             <form th:if="${stockTransfer.canCancel()}"
                   th:action="@{/stock-transfers/{id}/cancel(id=${stockTransfer.id})}"
                   method="post"
-                  onsubmit="return confirm('Cancel this transfer?');">
+                  data-confirm-message="Cancel this transfer?">
                 <button class="button danger" type="submit">Cancel</button>
             </form>
             <form th:if="${stockTransfer.editable}"
                   th:action="@{/stock-transfers/{id}/delete(id=${stockTransfer.id})}"
                   method="post"
-                  onsubmit="return confirm('Delete this draft transfer?');">
+                  th:data-confirm-message="${'Permanently delete draft ' + stockTransfer.transferNumber + ' and its item lines? No stock has moved yet. This cannot be undone.'}">
                 <button class="button danger" type="submit">Delete Draft</button>
             </form>
         </div>

@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 
 class WarehouseServiceTest {
 
@@ -60,5 +61,68 @@ class WarehouseServiceTest {
         assertThatThrownBy(() -> warehouseService.deactivateWarehouse(1L))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Move all stock out");
+    }
+
+    @Test
+    void warehouseWithoutLocationsIsDeletedPermanently() {
+        Warehouse warehouse = new Warehouse();
+        warehouse.setCode("WH-EMPTY");
+        when(warehouseRepository.findById(4L)).thenReturn(java.util.Optional.of(warehouse));
+        when(storageLocationRepository.countByWarehouseId(4L)).thenReturn(0L);
+
+        warehouseService.deleteWarehouse(4L);
+
+        verify(warehouseRepository).delete(warehouse);
+    }
+
+    @Test
+    void warehouseWithLocationsIsKept() {
+        Warehouse warehouse = new Warehouse();
+        warehouse.setCode("WH-MAIN");
+        when(warehouseRepository.findById(1L)).thenReturn(java.util.Optional.of(warehouse));
+        when(storageLocationRepository.countByWarehouseId(1L)).thenReturn(2L);
+
+        assertThatThrownBy(() -> warehouseService.deleteWarehouse(1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("2 storage location(s)");
+
+        verify(warehouseRepository, never()).delete(any(Warehouse.class));
+    }
+
+    @Test
+    void unusedLocationIsDeletedPermanently() {
+        StorageLocation location = location("NEW-BIN");
+        when(storageLocationRepository.findByIdWithWarehouse(8L)).thenReturn(java.util.Optional.of(location));
+
+        warehouseService.deleteLocation(8L);
+
+        verify(storageLocationRepository).delete(location);
+    }
+
+    @Test
+    void locationWithStockHistoryIsKept() {
+        StorageLocation location = location("RECEIVING");
+        when(storageLocationRepository.findByIdWithWarehouse(1L)).thenReturn(java.util.Optional.of(location));
+        when(storageLocationRepository.findLocationIdsUsedInStockMovements()).thenReturn(java.util.List.of(1L));
+        when(storageLocationRepository.findLocationIdsUsedAsTransferDestination()).thenReturn(java.util.List.of(1L));
+
+        assertThatThrownBy(() -> warehouseService.deleteLocation(1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("stock movements")
+                .hasMessageContaining("stock transfers (destination)")
+                .hasMessageContaining("Deactivate it instead");
+
+        verify(storageLocationRepository, never()).delete(any(StorageLocation.class));
+    }
+
+    private StorageLocation location(String code) {
+        Warehouse warehouse = new Warehouse();
+        warehouse.setCode("WH-MAIN");
+        warehouse.setName("Main Warehouse");
+        StorageLocation location = new StorageLocation();
+        location.setWarehouse(warehouse);
+        location.setCode(code);
+        location.setName("Test location");
+        return location;
     }
 }

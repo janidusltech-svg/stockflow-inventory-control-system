@@ -14,15 +14,19 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.any;
 
 class StockTransferServiceTest {
 
     private StockTransferService stockTransferService;
+    private StockTransferRepository stockTransferRepository;
     private StorageLocationRepository storageLocationRepository;
 
     @BeforeEach
     void setUp() {
-        StockTransferRepository stockTransferRepository = mock(StockTransferRepository.class);
+        stockTransferRepository = mock(StockTransferRepository.class);
         storageLocationRepository = mock(StorageLocationRepository.class);
         InventoryBalanceRepository inventoryBalanceRepository =
                 mock(InventoryBalanceRepository.class);
@@ -49,6 +53,30 @@ class StockTransferServiceTest {
         assertThatThrownBy(() -> stockTransferService.create(form))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("must be different");
+    }
+
+    @Test
+    void draftTransferIsDeletedTogetherWithItsOwnItemLines() {
+        StockTransfer transfer = new StockTransfer();
+        transfer.setTransferNumber("TRF-2026-0003");
+        when(stockTransferRepository.findByIdWithDetails(3L)).thenReturn(Optional.of(transfer));
+
+        stockTransferService.deleteDraft(3L);
+
+        verify(stockTransferRepository).delete(transfer);
+    }
+
+    @Test
+    void dispatchedTransferCannotBeDeleted() {
+        StockTransfer transfer = new StockTransfer();
+        transfer.setStatus(StockTransferStatus.DISPATCHED);
+        when(stockTransferRepository.findByIdWithDetails(4L)).thenReturn(Optional.of(transfer));
+
+        assertThatThrownBy(() -> stockTransferService.deleteDraft(4L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Only draft transfers can be changed");
+
+        verify(stockTransferRepository, never()).delete(any(StockTransfer.class));
     }
 
     private StorageLocation activeLocation() {

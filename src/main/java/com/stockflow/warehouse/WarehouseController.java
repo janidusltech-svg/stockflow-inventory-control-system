@@ -1,6 +1,7 @@
 package com.stockflow.warehouse;
 
 import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +27,8 @@ public class WarehouseController {
     public String list(Model model) {
         model.addAttribute("warehouses", warehouseService.findAllWarehouses());
         model.addAttribute("locations", warehouseService.findAllLocations());
+        model.addAttribute("warehouseIdsWithLocations", warehouseService.findWarehouseIdsWithLocations());
+        model.addAttribute("linkedLocationIds", warehouseService.findLinkedLocationIds());
         return "warehouses/list";
     }
 
@@ -183,6 +186,36 @@ public class WarehouseController {
             redirectAttributes.addFlashAttribute("successMessage", "Storage location deactivated");
         } catch (IllegalArgumentException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/warehouses";
+    }
+
+    @PostMapping("/{id}/delete")
+    public String deleteWarehouse(@PathVariable Long id,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            warehouseService.deleteWarehouse(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Warehouse deleted permanently");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        } catch (DataIntegrityViolationException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "This warehouse is linked to other records and was not deleted. Deactivate it instead.");
+        }
+        return "redirect:/warehouses";
+    }
+
+    @PostMapping("/locations/{id}/delete")
+    public String deleteLocation(@PathVariable Long id,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            warehouseService.deleteLocation(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Storage location deleted permanently");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        } catch (DataIntegrityViolationException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "This storage location is linked to other records and was not deleted. Deactivate it instead.");
         }
         return "redirect:/warehouses";
     }
