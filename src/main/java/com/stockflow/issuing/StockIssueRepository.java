@@ -13,6 +13,10 @@ public interface StockIssueRepository extends JpaRepository<StockIssue, Long> {
 
     Optional<StockIssue> findTopByOrderByIdDesc();
 
+    // Safe-delete check: an issue that has any return is kept.
+    @Query("select count(returned) from StockReturn returned where returned.stockIssue.id = :issueId")
+    long countReturnsByStockIssueId(@Param("issueId") Long issueId);
+
     @Query("""
             select distinct issue
             from StockIssue issue

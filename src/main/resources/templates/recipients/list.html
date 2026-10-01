@@ -51,6 +51,7 @@
                 <a class="button small" th:href="@{/recipients/{id}/edit(id=${recipient.id})}">Edit</a>
                 <form th:if="${recipient.active}" th:action="@{/recipients/{id}/deactivate(id=${recipient.id})}" method="post"><button class="button small danger" type="submit">Deactivate</button></form>
                 <form th:unless="${recipient.active}" th:action="@{/recipients/{id}/activate(id=${recipient.id})}" method="post"><button class="button small primary" type="submit">Activate</button></form>
+                <form th:if="${!linkedRecipientIds.contains(recipient.id)}" th:action="@{/recipients/{id}/delete(id=${recipient.id})}" th:data-confirm-message="${'Permanently delete recipient ' + recipient.code + '? It has no stock issues. This cannot be undone.'}" method="post"><button class="button small danger" type="submit">Delete</button></form>
             </td>
         </tr>
         </tbody>

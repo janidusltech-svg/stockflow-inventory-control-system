@@ -1,6 +1,7 @@
 package com.stockflow.issuing;
 
 import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +28,7 @@ public class RecipientController {
                        @RequestParam(required = false) Boolean active,
                        Model model) {
         model.addAttribute("recipients", recipientService.findAll(keyword, active));
+        model.addAttribute("linkedRecipientIds", recipientService.findRecipientIdsWithStockIssues());
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedActive", active);
         return "recipients/list";
@@ -99,6 +101,20 @@ public class RecipientController {
     public String activate(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         recipientService.setActive(id, true);
         redirectAttributes.addFlashAttribute("successMessage", "Recipient activated.");
+        return "redirect:/recipients";
+    }
+
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            recipientService.delete(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Recipient deleted permanently.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        } catch (DataIntegrityViolationException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "This recipient is linked to stock issues and was not deleted. Deactivate it instead.");
+        }
         return "redirect:/recipients";
     }
 
