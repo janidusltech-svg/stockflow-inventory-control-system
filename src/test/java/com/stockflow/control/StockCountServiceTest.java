@@ -19,6 +19,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 class StockCountServiceTest {
 
@@ -87,5 +90,83 @@ class StockCountServiceTest {
         assertThat(captor.getValue().getQuantityChange()).isEqualTo(-2);
         assertThat(captor.getValue().getStatus()).isEqualTo(AdjustmentStatus.PENDING);
         assertThat(count.getStatus()).isEqualTo(StockCountStatus.SUBMITTED);
+    }
+
+    @Test
+    void draftCountIsDeletedWithoutTouchingBalances() {
+        StockCount count = new StockCount();
+        count.setCountNumber("CNT-20261002-0001");
+        when(stockCountRepository.findByIdWithDetails(4L)).thenReturn(Optional.of(count));
+        when(adjustmentRepository.existsByStockCountId(4L)).thenReturn(false);
+
+        service.deleteDraft(4L);
+
+        verify(stockCountRepository).delete(count);
+        verifyNoInteractions(balanceRepository);
+    }
+
+    @Test
+    void submittedCountCannotBeDeleted() {
+        StockCount count = new StockCount();
+        count.setStatus(StockCountStatus.SUBMITTED);
+        when(stockCountRepository.findByIdWithDetails(5L)).thenReturn(Optional.of(count));
+
+        assertThatThrownBy(() -> service.deleteDraft(5L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Only draft stock counts can be changed");
+
+        verify(stockCountRepository, never()).delete(any(StockCount.class));
+    }
+
+    @Test
+    void newCountSkipsANumberThatStillExistsAfterADraftWasDeleted() {
+        Warehouse warehouse = new Warehouse();
+        warehouse.setActive(true);
+        StorageLocation location = new StorageLocation();
+        location.setWarehouse(warehouse);
+        location.setActive(true);
+        InventoryBalance balance = new InventoryBalance();
+        balance.setProduct(mock(Product.class));
+        balance.setLocation(location);
+        balance.setQuantityAvailable(15);
+        when(locationRepository.findByIdWithWarehouse(1L)).thenReturn(Optional.of(location));
+        when(balanceRepository.findAllByLocationIdWithDetails(null)).thenReturn(List.of(balance));
+        when(stockCountRepository.save(any(StockCount.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        // Counts 0001 and 0003 remain after draft 0002 was deleted, so count() is 2.
+        when(stockCountRepository.count()).thenReturn(2L);
+        when(stockCountRepository.existsByCountNumber(any(String.class)))
+                .thenAnswer(invocation -> invocation.<String>getArgument(0).endsWith("-0003"));
+
+        StockCountForm form = new StockCountForm();
+        form.setLocationId(1L);
+        form.setCountDate(LocalDate.now());
+        StockCount created = service.create(form);
+
+        assertThat(created.getCountNumber()).endsWith("-0004");
+    }
+
+    @Test
+    void generatedAdjustmentSkipsANumberThatStillExists() {
+        InventoryBalance balance = new InventoryBalance();
+        balance.setQuantityAvailable(10);
+        StockCount count = new StockCount();
+        StockCountItem item = new StockCountItem();
+        item.setStockCount(count);
+        item.setInventoryBalance(balance);
+        item.setSystemQuantity(10);
+        item.setCountedQuantity(9);
+        item.setVarianceNote("One missing");
+        count.getItems().add(item);
+        when(stockCountRepository.findByIdWithDetails(6L)).thenReturn(Optional.of(count));
+        when(adjustmentRepository.count()).thenReturn(2L);
+        when(adjustmentRepository.existsByAdjustmentNumber(any(String.class)))
+                .thenAnswer(invocation -> invocation.<String>getArgument(0).endsWith("-0003"));
+
+        service.submit(6L);
+
+        ArgumentCaptor<StockAdjustment> captor = ArgumentCaptor.forClass(StockAdjustment.class);
+        verify(adjustmentRepository).save(captor.capture());
+        assertThat(captor.getValue().getAdjustmentNumber()).endsWith("-0004");
     }
 }

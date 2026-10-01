@@ -143,7 +143,13 @@ public class StockAdjustmentService {
 
     private String nextNumber() {
         String date = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+        // count() + 1 alone can repeat an existing number after a draft is deleted,
+        // so skip forward until the number is free.
         long sequence = stockAdjustmentRepository.count() + 1;
-        return "ADJ-" + date + "-" + String.format("%04d", sequence);
+        String number;
+        do {
+            number = "ADJ-" + date + "-" + String.format("%04d", sequence++);
+        } while (stockAdjustmentRepository.existsByAdjustmentNumber(number));
+        return number;
     }
 }

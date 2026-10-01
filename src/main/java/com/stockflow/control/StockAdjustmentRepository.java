@@ -11,6 +11,10 @@ public interface StockAdjustmentRepository extends JpaRepository<StockAdjustment
 
     long countByStatus(AdjustmentStatus status);
 
+    boolean existsByAdjustmentNumber(String adjustmentNumber);
+
+    boolean existsByStockCountId(Long stockCountId);
+
     long countByStockCountIdAndStatus(Long stockCountId, AdjustmentStatus status);
 
     @Query("""

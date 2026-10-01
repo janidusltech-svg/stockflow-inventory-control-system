@@ -153,6 +153,10 @@ public class StockCountService {
     public void deleteDraft(Long id) {
         StockCount stockCount = findById(id);
         requireEditable(stockCount);
+        if (stockAdjustmentRepository.existsByStockCountId(id)) {
+            throw new IllegalArgumentException("This stock count has adjustments and cannot be deleted");
+        }
+        // Only the draft's own count lines are removed; inventory balances are not touched.
         stockCountRepository.delete(stockCount);
     }
 
@@ -162,13 +166,25 @@ public class StockCountService {
         }
     }
 
+    // count() + 1 alone can repeat an existing number after a draft is deleted,
+    // so skip forward until the number is free.
     private String nextNumber() {
         String date = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
-        return "CNT-" + date + "-" + String.format("%04d", stockCountRepository.count() + 1);
+        long sequence = stockCountRepository.count() + 1;
+        String number;
+        do {
+            number = "CNT-" + date + "-" + String.format("%04d", sequence++);
+        } while (stockCountRepository.existsByCountNumber(number));
+        return number;
     }
 
     private String nextAdjustmentNumber() {
         String date = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
-        return "ADJ-" + date + "-" + String.format("%04d", stockAdjustmentRepository.count() + 1);
+        long sequence = stockAdjustmentRepository.count() + 1;
+        String number;
+        do {
+            number = "ADJ-" + date + "-" + String.format("%04d", sequence++);
+        } while (stockAdjustmentRepository.existsByAdjustmentNumber(number));
+        return number;
     }
 }
