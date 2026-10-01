@@ -12,3 +12,4 @@ public class StockflowApplication {
 }
 
 // link to open http://127.0.0.1:8080
+//2026/01.10
