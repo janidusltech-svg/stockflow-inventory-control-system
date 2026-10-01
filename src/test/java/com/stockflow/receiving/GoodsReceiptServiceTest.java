@@ -23,6 +23,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -140,6 +142,31 @@ class GoodsReceiptServiceTest {
         verify(inventoryService).receive(product, location, null, 10, "GRN-2026-0001");
         verify(order).setStatus(PurchaseOrderStatus.RECEIVED);
         verify(goodsReceiptRepository).save(receipt);
+    }
+
+    @Test
+    void draftReceiptIsDeletedWithoutTouchingStockOrBatches() {
+        GoodsReceipt receipt = new GoodsReceipt();
+        receipt.setReceiptNumber("GRN-2026-0005");
+        when(goodsReceiptRepository.findByIdWithDetails(5L)).thenReturn(Optional.of(receipt));
+
+        goodsReceiptService.deleteDraft(5L);
+
+        verify(goodsReceiptRepository).delete(receipt);
+        verifyNoInteractions(inventoryService, batchService);
+    }
+
+    @Test
+    void confirmedReceiptCannotBeDeleted() {
+        GoodsReceipt receipt = new GoodsReceipt();
+        receipt.setStatus(GoodsReceiptStatus.CONFIRMED);
+        when(goodsReceiptRepository.findByIdWithDetails(6L)).thenReturn(Optional.of(receipt));
+
+        assertThatThrownBy(() -> goodsReceiptService.deleteDraft(6L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Only draft goods receipts can be changed");
+
+        verify(goodsReceiptRepository, never()).delete(any(GoodsReceipt.class));
     }
 
     private GoodsReceiptForm form(Long purchaseOrderId, Long locationId) {
