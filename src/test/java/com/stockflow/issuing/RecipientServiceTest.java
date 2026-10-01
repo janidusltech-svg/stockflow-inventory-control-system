@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 class RecipientServiceTest {
 
@@ -59,6 +60,33 @@ class RecipientServiceTest {
 
         assertThat(recipient.isActive()).isFalse();
         verify(recipientRepository).save(recipient);
+    }
+
+    @Test
+    void recipientWithoutStockIssuesIsDeletedPermanently() {
+        Recipient recipient = new Recipient();
+        recipient.setCode("CUS-NEW");
+        when(recipientRepository.findById(5L)).thenReturn(Optional.of(recipient));
+        when(recipientRepository.countStockIssuesByRecipientId(5L)).thenReturn(0L);
+
+        recipientService.delete(5L);
+
+        verify(recipientRepository).delete(recipient);
+    }
+
+    @Test
+    void recipientWithStockIssuesIsKept() {
+        Recipient recipient = new Recipient();
+        recipient.setCode("CUS-001");
+        when(recipientRepository.findById(1L)).thenReturn(Optional.of(recipient));
+        when(recipientRepository.countStockIssuesByRecipientId(1L)).thenReturn(4L);
+
+        assertThatThrownBy(() -> recipientService.delete(1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("4 stock issue(s)")
+                .hasMessageContaining("Deactivate it instead");
+
+        verify(recipientRepository, never()).delete(any(Recipient.class));
     }
 
     private RecipientForm form(String code) {

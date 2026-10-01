@@ -11,6 +11,8 @@ public interface StockCountRepository extends JpaRepository<StockCount, Long> {
 
     long countByStatus(StockCountStatus status);
 
+    boolean existsByCountNumber(String countNumber);
+
     @Query("""
             select distinct stockCount
             from StockCount stockCount

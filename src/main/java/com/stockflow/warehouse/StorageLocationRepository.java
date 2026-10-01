@@ -45,6 +45,35 @@ public interface StorageLocationRepository extends JpaRepository<StorageLocation
             @Param("warehouseId") Long warehouseId
     );
 
+    long countByWarehouseId(Long warehouseId);
+
+    @Query("select distinct location.warehouse.id from StorageLocation location")
+    List<Long> findWarehouseIdsWithLocations();
+
+    // Safe-delete checks: each query lists the location ids already used by
+    // another StockFlow record. A location found in any list must be kept.
+
+    @Query("select distinct balance.location.id from InventoryBalance balance")
+    List<Long> findLocationIdsUsedInInventoryBalances();
+
+    @Query("select distinct movement.location.id from StockMovement movement")
+    List<Long> findLocationIdsUsedInStockMovements();
+
+    @Query("select distinct receipt.location.id from GoodsReceipt receipt")
+    List<Long> findLocationIdsUsedInGoodsReceipts();
+
+    @Query("select distinct transfer.sourceLocation.id from StockTransfer transfer")
+    List<Long> findLocationIdsUsedAsTransferSource();
+
+    @Query("select distinct transfer.destinationLocation.id from StockTransfer transfer")
+    List<Long> findLocationIdsUsedAsTransferDestination();
+
+    @Query("select distinct item.location.id from StockIssueItem item")
+    List<Long> findLocationIdsUsedInStockIssues();
+
+    @Query("select distinct stockCount.location.id from StockCount stockCount")
+    List<Long> findLocationIdsUsedInStockCounts();
+
     boolean existsByWarehouseIdAndCodeIgnoreCase(Long warehouseId, String code);
 
     boolean existsByWarehouseIdAndCodeIgnoreCaseAndIdNot(

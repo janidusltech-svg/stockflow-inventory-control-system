@@ -141,6 +141,37 @@ public class ReferenceDataService {
         unitRepository.save(unit);
     }
 
+    // Permanent delete is allowed only for values no product has ever used.
+    // Used values must be deactivated so existing product links stay valid.
+
+    public void deleteCategory(Long id) {
+        Category category = findCategory(id);
+        requireUnused(productRepository.countByCategoryId(id), "Category " + category.getName());
+        categoryRepository.delete(category);
+        categoryRepository.flush();
+    }
+
+    public void deleteBrand(Long id) {
+        Brand brand = findBrand(id);
+        requireUnused(productRepository.countByBrandId(id), "Brand " + brand.getName());
+        brandRepository.delete(brand);
+        brandRepository.flush();
+    }
+
+    public void deleteUnit(Long id) {
+        Unit unit = findUnit(id);
+        requireUnused(productRepository.countByUnitId(id), "Measurement unit " + unit.getName());
+        unitRepository.delete(unit);
+        unitRepository.flush();
+    }
+
+    private void requireUnused(long productCount, String label) {
+        if (productCount > 0) {
+            throw new IllegalArgumentException(label + " cannot be deleted because "
+                    + productCount + " product(s) use it. Deactivate it instead.");
+        }
+    }
+
     private Category findCategory(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Category was not found"));

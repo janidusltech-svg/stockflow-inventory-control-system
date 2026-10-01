@@ -66,6 +66,16 @@ public class ReorderRuleService {
         return reorderRuleRepository.save(rule);
     }
 
+    /**
+     * Permanently removes a reorder rule. A rule is a stock-level setting, not
+     * transaction history, and no other table refers to it.
+     */
+    public void delete(Long id) {
+        ReorderRule rule = findById(id);
+        reorderRuleRepository.delete(rule);
+        reorderRuleRepository.flush();
+    }
+
     public void setActive(Long id, boolean active) {
         ReorderRule rule = findById(id);
         rule.setActive(active);

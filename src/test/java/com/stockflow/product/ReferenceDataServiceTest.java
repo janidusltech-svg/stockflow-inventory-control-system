@@ -91,6 +91,46 @@ class ReferenceDataServiceTest {
         verify(categoryRepository, never()).delete(any(Category.class));
     }
 
+    @Test
+    void unusedBrandCanBeDeletedPermanently() {
+        Brand brand = new Brand();
+        brand.setName("Test Brand");
+        when(brandRepository.findById(5L)).thenReturn(Optional.of(brand));
+        when(productRepository.countByBrandId(5L)).thenReturn(0L);
+
+        referenceDataService.deleteBrand(5L);
+
+        verify(brandRepository).delete(brand);
+    }
+
+    @Test
+    void categoryUsedByProductsCannotBeDeleted() {
+        Category category = new Category();
+        category.setName("Food");
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(productRepository.countByCategoryId(1L)).thenReturn(2L);
+
+        assertThatThrownBy(() -> referenceDataService.deleteCategory(1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("2 product(s) use it");
+
+        verify(categoryRepository, never()).delete(any(Category.class));
+    }
+
+    @Test
+    void unitUsedByProductsCannotBeDeleted() {
+        Unit unit = new Unit();
+        unit.setName("Pack");
+        when(unitRepository.findById(3L)).thenReturn(Optional.of(unit));
+        when(productRepository.countByUnitId(3L)).thenReturn(1L);
+
+        assertThatThrownBy(() -> referenceDataService.deleteUnit(3L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Deactivate it instead");
+
+        verify(unitRepository, never()).delete(any(Unit.class));
+    }
+
     private ReferenceDataForm form(String code, String name, String description) {
         ReferenceDataForm form = new ReferenceDataForm();
         form.setCode(code);

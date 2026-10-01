@@ -4,7 +4,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -65,6 +67,27 @@ public class SupplierService {
         supplier.setAddress(formSupplier.getAddress());
         supplier.setActive(formSupplier.isActive());
         return supplierRepository.save(supplier);
+    }
+
+    /**
+     * Permanently removes a supplier that has no purchase orders at all.
+     * Suppliers with purchase orders must be deactivated instead.
+     */
+    public void delete(Long id) {
+        Supplier supplier = findById(id);
+        long orders = supplierRepository.countPurchaseOrdersBySupplierId(id);
+        if (orders > 0) {
+            throw new IllegalArgumentException("Supplier " + supplier.getSupplierCode()
+                    + " cannot be deleted because it has " + orders
+                    + " purchase order(s). Deactivate it instead.");
+        }
+        supplierRepository.delete(supplier);
+        supplierRepository.flush();
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Long> findSupplierIdsWithPurchaseOrders() {
+        return new HashSet<>(supplierRepository.findSupplierIdsWithPurchaseOrders());
     }
 
     public void deactivate(Long id) {

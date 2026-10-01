@@ -205,7 +205,8 @@
             <form th:action="@{/goods-receipts/{id}/cancel(id=${goodsReceipt.id})}" method="post">
                 <button class="button danger" type="submit">Cancel Draft</button>
             </form>
-            <form th:action="@{/goods-receipts/{id}/delete(id=${goodsReceipt.id})}" method="post">
+            <form th:action="@{/goods-receipts/{id}/delete(id=${goodsReceipt.id})}" method="post"
+                  th:data-confirm-message="${'Permanently delete draft ' + goodsReceipt.receiptNumber + ' and its item lines? No stock has been received yet. This cannot be undone.'}">
                 <button class="button danger" type="submit">Delete Draft</button>
             </form>
         </div>

@@ -25,7 +25,7 @@
         <div class="section-heading">
             <div>
                 <h2>Warehouses</h2>
-                <p>Deactivate only after all stock has been moved out.</p>
+                <p>Deactivate only after all stock has been moved out. A warehouse with no storage locations can be deleted.</p>
             </div>
         </div>
         <div class="table-panel table-scroll">
@@ -58,8 +58,14 @@
                         <form th:if="${warehouse.active}"
                               th:action="@{/warehouses/{id}/deactivate(id=${warehouse.id})}"
                               method="post"
-                              onsubmit="return confirm('Deactivate this warehouse?');">
+                              data-confirm-message="Deactivate this warehouse? All its storage locations will also be deactivated.">
                             <button class="button small danger" type="submit">Deactivate</button>
+                        </form>
+                        <form th:if="${!warehouseIdsWithLocations.contains(warehouse.id)}"
+                              th:action="@{/warehouses/{id}/delete(id=${warehouse.id})}"
+                              th:data-confirm-message="${'Permanently delete warehouse ' + warehouse.code + '? It has no storage locations. This cannot be undone.'}"
+                              method="post">
+                            <button class="button small danger" type="submit">Delete</button>
                         </form>
                     </td>
                 </tr>
@@ -108,8 +114,14 @@
                         <form th:if="${location.active}"
                               th:action="@{/warehouses/locations/{id}/deactivate(id=${location.id})}"
                               method="post"
-                              onsubmit="return confirm('Deactivate this storage location?');">
+                              data-confirm-message="Deactivate this storage location?">
                             <button class="button small danger" type="submit">Deactivate</button>
+                        </form>
+                        <form th:if="${!linkedLocationIds.contains(location.id)}"
+                              th:action="@{/warehouses/locations/{id}/delete(id=${location.id})}"
+                              th:data-confirm-message="${'Permanently delete location ' + location.code + '? It has never held stock or been used in a document. This cannot be undone.'}"
+                              method="post">
+                            <button class="button small danger" type="submit">Delete</button>
                         </form>
                     </td>
                 </tr>

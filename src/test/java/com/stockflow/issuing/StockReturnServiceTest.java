@@ -13,6 +13,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.ArgumentMatchers.any;
 
 class StockReturnServiceTest {
 
@@ -72,5 +76,30 @@ class StockReturnServiceTest {
                 "RTN-2026-00001");
         verify(stockIssueRepository).save(issue);
         verify(stockReturnRepository).save(returned);
+    }
+
+    @Test
+    void draftReturnIsDeletedWithoutChangingTheIssueOrStock() {
+        StockReturn returned = new StockReturn();
+        returned.setReturnNumber("RTN-2026-00002");
+        when(stockReturnRepository.findByIdWithDetails(2L)).thenReturn(Optional.of(returned));
+
+        stockReturnService.deleteDraft(2L);
+
+        verify(stockReturnRepository).delete(returned);
+        verifyNoInteractions(inventoryService, stockIssueRepository);
+    }
+
+    @Test
+    void confirmedReturnCannotBeDeleted() {
+        StockReturn returned = new StockReturn();
+        returned.setStatus(StockReturnStatus.CONFIRMED);
+        when(stockReturnRepository.findByIdWithDetails(3L)).thenReturn(Optional.of(returned));
+
+        assertThatThrownBy(() -> stockReturnService.deleteDraft(3L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Only draft stock returns can be changed");
+
+        verify(stockReturnRepository, never()).delete(any(StockReturn.class));
     }
 }

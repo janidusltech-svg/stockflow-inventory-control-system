@@ -3,8 +3,10 @@ package com.stockflow.issuing;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -61,6 +63,27 @@ public class RecipientService {
         Recipient recipient = findById(id);
         recipient.setActive(active);
         recipientRepository.save(recipient);
+    }
+
+    /**
+     * Permanently removes a recipient that has no stock issues at all.
+     * Recipients with issue history must be deactivated instead.
+     */
+    public void delete(Long id) {
+        Recipient recipient = findById(id);
+        long issues = recipientRepository.countStockIssuesByRecipientId(id);
+        if (issues > 0) {
+            throw new IllegalArgumentException("Recipient " + recipient.getCode()
+                    + " cannot be deleted because it has " + issues
+                    + " stock issue(s). Deactivate it instead.");
+        }
+        recipientRepository.delete(recipient);
+        recipientRepository.flush();
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Long> findRecipientIdsWithStockIssues() {
+        return new HashSet<>(recipientRepository.findRecipientIdsWithStockIssues());
     }
 
     public RecipientForm toForm(Recipient recipient) {

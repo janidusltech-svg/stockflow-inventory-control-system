@@ -30,7 +30,7 @@ staff workspace, BCrypt password storage, role-based navigation and server-side 
 control. User and role management is maintained as a common function by the IT and
 Systems Officer. Operations and Store staff can also maintain active product categories,
 brands and measurement units through the shared Reference Data area. Permanent deletion
-is intentionally unavailable so existing product relationships remain valid. The secured
+is offered only for records that nothing else uses, so existing relationships remain valid. The secured
 workspace now uses one responsive sidebar, active role-aware navigation, automatic page
 context, read-only indicators, client-side table pagination, confirmation dialogs and
 friendly error pages across all six modules.
@@ -44,6 +44,30 @@ friendly error pages across all six modules.
 - Important workflow actions receive a confirmation dialog before submission.
 - The dashboard summarizes the authenticated role and the connected six-function workflow.
 - The UI respects reduced-motion settings and adapts to tablet and mobile widths.
+
+## Safe Permanent Delete
+
+Deactivate and Delete are separate options. Deactivate hides a record from new work and
+keeps it. Delete removes it permanently and is offered only when that cannot break history.
+
+| Record | Delete allowed when |
+|---|---|
+| Product | Never used in a purchase order, receipt, batch, balance, movement, transfer, issue or reorder rule |
+| Category, brand, unit | No product uses it |
+| Supplier | It has no purchase orders (drafts included) |
+| Purchase order | Status is DRAFT and no goods receipt refers to it |
+| Warehouse | It has no storage locations |
+| Storage location | No balance, movement, receipt, transfer, issue or count uses it |
+| Recipient | It has no stock issues |
+| Reorder rule | Always (it is a setting, not history) |
+| Goods receipt, transfer, issue, return, count, adjustment | Status is DRAFT |
+
+- A deleted draft's own item lines are removed with it. Linked products, batches, balances
+  and issue lines are never touched.
+- Stock movements, inventory balances and completed documents are never deleted.
+- Foreign keys stay enabled and no cascade rules were added. No SQL migration is required.
+- `src/main/resources/db/11_safe_delete_demo.sql` contains read-only queries for showing a
+  deletion in MySQL Workbench.
 
 ## Authorized Roles
 

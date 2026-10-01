@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import java.util.Optional;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class ReorderRuleServiceTest {
 
@@ -32,5 +35,21 @@ class ReorderRuleServiceTest {
         assertThatThrownBy(() -> reorderRuleService.create(form))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Maximum level");
+    }
+
+    @Test
+    void reorderRuleCanBeDeletedPermanently() {
+        ReorderRuleRepository repository = mock(ReorderRuleRepository.class);
+        ReorderRuleService service = new ReorderRuleService(
+                repository,
+                mock(ProductRepository.class),
+                mock(InventoryBalanceRepository.class)
+        );
+        ReorderRule rule = new ReorderRule();
+        when(repository.findByIdWithProduct(3L)).thenReturn(Optional.of(rule));
+
+        service.delete(3L);
+
+        verify(repository).delete(rule);
     }
 }

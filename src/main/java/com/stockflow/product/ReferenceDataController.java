@@ -1,6 +1,7 @@
 package com.stockflow.product;
 
 import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -174,6 +175,40 @@ public class ReferenceDataController {
         referenceDataService.setUnitActive(id, active);
         addStatusMessage(redirectAttributes, "Measurement unit", active);
         return "redirect:/reference-data#units";
+    }
+
+    @PostMapping("/categories/{id}/delete")
+    public String deleteCategory(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        return delete(() -> referenceDataService.deleteCategory(id), redirectAttributes,
+                "Category deleted permanently", "categories");
+    }
+
+    @PostMapping("/brands/{id}/delete")
+    public String deleteBrand(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        return delete(() -> referenceDataService.deleteBrand(id), redirectAttributes,
+                "Brand deleted permanently", "brands");
+    }
+
+    @PostMapping("/units/{id}/delete")
+    public String deleteUnit(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        return delete(() -> referenceDataService.deleteUnit(id), redirectAttributes,
+                "Measurement unit deleted permanently", "units");
+    }
+
+    private String delete(Runnable deleteAction,
+                          RedirectAttributes redirectAttributes,
+                          String successMessage,
+                          String section) {
+        try {
+            deleteAction.run();
+            redirectAttributes.addFlashAttribute("successMessage", successMessage);
+        } catch (IllegalArgumentException exception) {
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
+        } catch (DataIntegrityViolationException exception) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "This value is linked to existing products and was not deleted. Deactivate it instead.");
+        }
+        return "redirect:/reference-data#" + section;
     }
 
     private String processForm(ReferenceDataForm form,

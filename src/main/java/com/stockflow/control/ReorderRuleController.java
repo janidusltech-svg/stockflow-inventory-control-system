@@ -98,6 +98,17 @@ public class ReorderRuleController {
         return "redirect:/reorder-rules";
     }
 
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            reorderRuleService.delete(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Reorder rule deleted permanently.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/reorder-rules";
+    }
+
     private void prepareForm(Model model, String pageTitle, String formAction) {
         model.addAttribute("products", reorderRuleService.findProducts());
         model.addAttribute("pageTitle", pageTitle);

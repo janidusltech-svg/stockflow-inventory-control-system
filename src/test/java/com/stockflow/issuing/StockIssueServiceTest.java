@@ -15,6 +15,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.ArgumentMatchers.any;
 
 class StockIssueServiceTest {
 
@@ -68,5 +71,43 @@ class StockIssueServiceTest {
         assertThatThrownBy(() -> stockIssueService.confirm(2L))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("at least one product");
+    }
+
+    @Test
+    void draftIssueIsDeletedWithoutTouchingStock() {
+        StockIssue issue = new StockIssue();
+        issue.setIssueNumber("ISS-2026-00007");
+        when(stockIssueRepository.findByIdWithDetails(7L)).thenReturn(Optional.of(issue));
+        when(stockIssueRepository.countReturnsByStockIssueId(7L)).thenReturn(0L);
+
+        stockIssueService.deleteDraft(7L);
+
+        verify(stockIssueRepository).delete(issue);
+        verifyNoInteractions(inventoryService);
+    }
+
+    @Test
+    void confirmedIssueCannotBeDeleted() {
+        StockIssue issue = new StockIssue();
+        issue.setStatus(StockIssueStatus.CONFIRMED);
+        when(stockIssueRepository.findByIdWithDetails(8L)).thenReturn(Optional.of(issue));
+
+        assertThatThrownBy(() -> stockIssueService.deleteDraft(8L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Only draft stock issues can be changed");
+
+        verify(stockIssueRepository, never()).delete(any(StockIssue.class));
+    }
+
+    @Test
+    void issueWithReturnsCannotBeDeleted() {
+        StockIssue issue = new StockIssue();
+        when(stockIssueRepository.findByIdWithDetails(9L)).thenReturn(Optional.of(issue));
+        when(stockIssueRepository.countReturnsByStockIssueId(9L)).thenReturn(1L);
+
+        assertThatThrownBy(() -> stockIssueService.deleteDraft(9L))
+                .hasMessageContaining("has returns");
+
+        verify(stockIssueRepository, never()).delete(any(StockIssue.class));
     }
 }

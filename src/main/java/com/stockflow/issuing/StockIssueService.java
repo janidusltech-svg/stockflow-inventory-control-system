@@ -144,6 +144,10 @@ public class StockIssueService {
     public void deleteDraft(Long id) {
         StockIssue issue = findById(id);
         requireDraft(issue);
+        if (stockIssueRepository.countReturnsByStockIssueId(id) > 0) {
+            throw new IllegalArgumentException("This stock issue has returns and cannot be deleted");
+        }
+        // Only the draft's own item rows are removed with it; no stock was deducted yet.
         stockIssueRepository.delete(issue);
     }
 

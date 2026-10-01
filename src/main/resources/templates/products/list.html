@@ -30,6 +30,10 @@
          th:if="${successMessage}"
          th:text="${successMessage}">
     </div>
+    <div class="alert error-alert"
+         th:if="${errorMessage}"
+         th:text="${errorMessage}">
+    </div>
 
     <section class="table-panel">
         <table>
@@ -84,6 +88,14 @@
                           method="post">
                         <button class="button small danger" type="submit">
                             Deactivate
+                        </button>
+                    </form>
+                    <form th:if="${!linkedProductIds.contains(product.id)}"
+                          th:action="@{/products/{id}/delete(id=${product.id})}"
+                          th:data-confirm-message="${'Permanently delete product ' + product.sku + '? It has never been used, so no history is lost. This cannot be undone.'}"
+                          method="post">
+                        <button class="button small danger" type="submit">
+                            Delete
                         </button>
                     </form>
                 </td>
