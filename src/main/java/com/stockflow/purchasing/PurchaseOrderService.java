@@ -250,6 +250,27 @@ public class PurchaseOrderService {
         purchaseOrderRepository.save(order);
     }
 
+    /**
+     * Permanently removes a draft purchase order and its own item lines.
+     * Approved, received or cancelled orders are business history and are kept.
+     */
+    public void deleteDraft(Long orderId) {
+        PurchaseOrder order = findById(orderId);
+        if (order.getStatus() != PurchaseOrderStatus.DRAFT) {
+            throw new IllegalArgumentException(
+                    "Only draft purchase orders can be deleted. Cancel this order instead."
+            );
+        }
+        if (purchaseOrderRepository.countGoodsReceiptsByPurchaseOrderId(orderId) > 0) {
+            throw new IllegalArgumentException(
+                    "This purchase order has goods receipts and cannot be deleted"
+            );
+        }
+        // The draft's item rows are removed with it (orphan removal on PurchaseOrder.items).
+        purchaseOrderRepository.delete(order);
+        purchaseOrderRepository.flush();
+    }
+
     public PurchaseOrderForm toForm(
             PurchaseOrder order
     ) {

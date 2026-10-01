@@ -24,6 +24,7 @@
     </form>
 
     <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
 
     <section class="table-panel">
         <div class="table-scroll">
@@ -62,6 +63,12 @@
                               th:action="@{/suppliers/{id}/deactivate(id=${supplier.id})}"
                               method="post">
                             <button class="button small danger" type="submit">Deactivate</button>
+                        </form>
+                        <form th:if="${!linkedSupplierIds.contains(supplier.id)}"
+                              th:action="@{/suppliers/{id}/delete(id=${supplier.id})}"
+                              th:data-confirm-message="${'Permanently delete supplier ' + supplier.supplierCode + '? It has no purchase orders. This cannot be undone.'}"
+                              method="post">
+                            <button class="button small danger" type="submit">Delete</button>
                         </form>
                     </td>
                 </tr>

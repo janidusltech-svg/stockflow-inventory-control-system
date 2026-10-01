@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,6 +59,31 @@ class SupplierServiceTest {
 
         assertThat(supplier.isActive()).isFalse();
         verify(supplierRepository).save(supplier);
+    }
+
+    @Test
+    void supplierWithoutPurchaseOrdersIsDeletedPermanently() {
+        Supplier supplier = supplier("SUP-NEW");
+        when(supplierRepository.findById(2L)).thenReturn(Optional.of(supplier));
+        when(supplierRepository.countPurchaseOrdersBySupplierId(2L)).thenReturn(0L);
+
+        supplierService.delete(2L);
+
+        verify(supplierRepository).delete(supplier);
+    }
+
+    @Test
+    void supplierWithPurchaseOrdersIsKept() {
+        Supplier supplier = supplier("SUP-001");
+        when(supplierRepository.findById(1L)).thenReturn(Optional.of(supplier));
+        when(supplierRepository.countPurchaseOrdersBySupplierId(1L)).thenReturn(3L);
+
+        assertThatThrownBy(() -> supplierService.delete(1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("3 purchase order(s)")
+                .hasMessageContaining("Deactivate it instead");
+
+        verify(supplierRepository, never()).delete(any(Supplier.class));
     }
 
     private Supplier supplier(String code) {

@@ -2,6 +2,7 @@ package com.stockflow.purchasing;
 
 import com.stockflow.product.ProductRepository;
 import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -334,6 +335,29 @@ public class PurchaseOrderController {
             );
         }
 
+        return "redirect:/purchase-orders/" + id;
+    }
+
+    @PostMapping("/{id}/delete")
+    public String delete(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            purchaseOrderService.deleteDraft(id);
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Draft purchase order deleted permanently"
+            );
+            return "redirect:/purchase-orders";
+        } catch (IllegalArgumentException exception) {
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
+        } catch (DataIntegrityViolationException exception) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "This purchase order is linked to other records and was not deleted"
+            );
+        }
         return "redirect:/purchase-orders/" + id;
     }
 

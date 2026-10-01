@@ -32,4 +32,8 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Lo
     Optional<PurchaseOrder> findByIdWithDetails(@Param("id") Long id);
 
     Optional<PurchaseOrder> findTopByOrderByIdDesc();
+
+    // Safe-delete check: a purchase order linked to any goods receipt is kept.
+    @Query("select count(receipt) from GoodsReceipt receipt where receipt.purchaseOrder.id = :orderId")
+    long countGoodsReceiptsByPurchaseOrderId(@Param("orderId") Long orderId);
 }

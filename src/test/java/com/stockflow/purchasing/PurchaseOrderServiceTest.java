@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -86,6 +87,49 @@ class PurchaseOrderServiceTest {
         assertThatThrownBy(() -> orderService.changeStatus(10L, PurchaseOrderStatus.APPROVED))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Add at least one item before approving the purchase order");
+    }
+
+    @Test
+    void draftOrderIsDeletedTogetherWithItsOwnItemLines() {
+        PurchaseOrder order = new PurchaseOrder();
+        order.setOrderNumber("PO-2026-0009");
+        PurchaseOrderItem item = new PurchaseOrderItem();
+        item.setPurchaseOrder(order);
+        item.setProduct(activeProduct(1L));
+        item.setQuantity(5);
+        item.setUnitPrice(new BigDecimal("100.00"));
+        order.getItems().add(item);
+        when(orderRepository.findByIdWithDetails(9L)).thenReturn(Optional.of(order));
+        when(orderRepository.countGoodsReceiptsByPurchaseOrderId(9L)).thenReturn(0L);
+
+        orderService.deleteDraft(9L);
+
+        verify(orderRepository).delete(order);
+    }
+
+    @Test
+    void approvedOrderCannotBeDeleted() {
+        PurchaseOrder order = new PurchaseOrder();
+        order.setStatus(PurchaseOrderStatus.APPROVED);
+        when(orderRepository.findByIdWithDetails(3L)).thenReturn(Optional.of(order));
+
+        assertThatThrownBy(() -> orderService.deleteDraft(3L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Only draft purchase orders can be deleted");
+
+        verify(orderRepository, never()).delete(any(PurchaseOrder.class));
+    }
+
+    @Test
+    void draftOrderLinkedToGoodsReceiptIsKept() {
+        PurchaseOrder order = new PurchaseOrder();
+        when(orderRepository.findByIdWithDetails(4L)).thenReturn(Optional.of(order));
+        when(orderRepository.countGoodsReceiptsByPurchaseOrderId(4L)).thenReturn(1L);
+
+        assertThatThrownBy(() -> orderService.deleteDraft(4L))
+                .hasMessageContaining("has goods receipts");
+
+        verify(orderRepository, never()).delete(any(PurchaseOrder.class));
     }
 
     private PurchaseOrderForm orderForm(Long supplierId) {

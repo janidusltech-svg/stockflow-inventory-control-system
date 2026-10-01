@@ -1,6 +1,7 @@
 package com.stockflow.purchasing;
 
 import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,7 @@ public class SupplierController {
     @GetMapping
     public String list(@RequestParam(required = false) String keyword, Model model) {
         model.addAttribute("suppliers", supplierService.findAll(keyword));
+        model.addAttribute("linkedSupplierIds", supplierService.findSupplierIdsWithPurchaseOrders());
         model.addAttribute("keyword", keyword);
         return "suppliers/list";
     }
@@ -91,6 +93,20 @@ public class SupplierController {
     public String deactivate(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         supplierService.deactivate(id);
         redirectAttributes.addFlashAttribute("successMessage", "Supplier deactivated successfully");
+        return "redirect:/suppliers";
+    }
+
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            supplierService.delete(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Supplier deleted permanently");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        } catch (DataIntegrityViolationException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "This supplier is linked to purchase orders and was not deleted. Deactivate it instead.");
+        }
         return "redirect:/suppliers";
     }
 
