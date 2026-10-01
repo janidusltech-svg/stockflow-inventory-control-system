@@ -61,4 +61,31 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             ORDER BY p.name
             """)
     List<Product> search(@Param("keyword") String keyword);
+
+    // Safe-delete checks: each query lists the product ids already used by
+    // another StockFlow record. A product found in any list must be kept.
+
+    @Query("select distinct item.product.id from PurchaseOrderItem item")
+    List<Long> findProductIdsUsedInPurchaseOrders();
+
+    @Query("select distinct item.product.id from GoodsReceiptItem item")
+    List<Long> findProductIdsUsedInGoodsReceipts();
+
+    @Query("select distinct batch.product.id from Batch batch")
+    List<Long> findProductIdsUsedInBatches();
+
+    @Query("select distinct balance.product.id from InventoryBalance balance")
+    List<Long> findProductIdsUsedInInventoryBalances();
+
+    @Query("select distinct movement.product.id from StockMovement movement")
+    List<Long> findProductIdsUsedInStockMovements();
+
+    @Query("select distinct item.product.id from StockTransferItem item")
+    List<Long> findProductIdsUsedInStockTransfers();
+
+    @Query("select distinct item.product.id from StockIssueItem item")
+    List<Long> findProductIdsUsedInStockIssues();
+
+    @Query("select distinct rule.product.id from ReorderRule rule")
+    List<Long> findProductIdsUsedInReorderRules();
 }

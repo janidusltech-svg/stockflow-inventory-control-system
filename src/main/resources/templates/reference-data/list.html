@@ -15,13 +15,14 @@
     </header>
 
     <div class="alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert error-alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
 
     <aside class="reference-policy">
         <strong>Data protection rule</strong>
         <p>
-            Reference records are never permanently deleted through StockFlow. Deactivate an
-            unused value to remove it from new-product dropdowns while preserving every existing
-            product link and audit record.
+            A value that any product uses can only be deactivated, which removes it from
+            new-product dropdowns while preserving every existing product link. A value that no
+            product has ever used can be permanently deleted.
         </p>
     </aside>
 
@@ -57,6 +58,12 @@
                                 <input type="hidden" name="active" th:value="${!category.active}">
                                 <button class="button small" th:classappend="${category.active} ? ' danger' : ' primary'" type="submit" th:text="${category.active} ? 'Deactivate' : 'Activate'">Change</button>
                             </form>
+                            <form th:if="${categoryUsage[category.id] == 0}"
+                                  th:action="@{/reference-data/categories/{id}/delete(id=${category.id})}"
+                                  th:data-confirm-message="${'Permanently delete ' + category.name + '? No product uses it. This cannot be undone.'}"
+                                  method="post">
+                                <button class="button small danger" type="submit">Delete</button>
+                            </form>
                         </td>
                     </tr>
                     </tbody>
@@ -89,6 +96,12 @@
                             <form th:action="@{/reference-data/brands/{id}/status(id=${brand.id})}" method="post">
                                 <input type="hidden" name="active" th:value="${!brand.active}">
                                 <button class="button small" th:classappend="${brand.active} ? ' danger' : ' primary'" type="submit" th:text="${brand.active} ? 'Deactivate' : 'Activate'">Change</button>
+                            </form>
+                            <form th:if="${brandUsage[brand.id] == 0}"
+                                  th:action="@{/reference-data/brands/{id}/delete(id=${brand.id})}"
+                                  th:data-confirm-message="${'Permanently delete ' + brand.name + '? No product uses it. This cannot be undone.'}"
+                                  method="post">
+                                <button class="button small danger" type="submit">Delete</button>
                             </form>
                         </td>
                     </tr>
@@ -123,6 +136,12 @@
                             <form th:action="@{/reference-data/units/{id}/status(id=${unit.id})}" method="post">
                                 <input type="hidden" name="active" th:value="${!unit.active}">
                                 <button class="button small" th:classappend="${unit.active} ? ' danger' : ' primary'" type="submit" th:text="${unit.active} ? 'Deactivate' : 'Activate'">Change</button>
+                            </form>
+                            <form th:if="${unitUsage[unit.id] == 0}"
+                                  th:action="@{/reference-data/units/{id}/delete(id=${unit.id})}"
+                                  th:data-confirm-message="${'Permanently delete ' + unit.name + '? No product uses it. This cannot be undone.'}"
+                                  method="post">
+                                <button class="button small danger" type="submit">Delete</button>
                             </form>
                         </td>
                     </tr>

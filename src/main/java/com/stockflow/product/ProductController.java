@@ -1,6 +1,7 @@
 package com.stockflow.product;
 
 import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,6 +29,7 @@ public class ProductController {
             Model model
     ) {
         model.addAttribute("products", productService.findAll(keyword));
+        model.addAttribute("linkedProductIds", productService.findLinkedProductIds());
         model.addAttribute("keyword", keyword);
         return "products/list";
     }
@@ -115,6 +117,28 @@ public class ProductController {
                 "successMessage",
                 "Product deactivated successfully"
         );
+        return "redirect:/products";
+    }
+
+    @PostMapping("/{id}/delete")
+    public String delete(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            productService.delete(id);
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Product deleted permanently"
+            );
+        } catch (IllegalArgumentException exception) {
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
+        } catch (DataIntegrityViolationException exception) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "This product is linked to other StockFlow records and was not deleted. Deactivate it instead."
+            );
+        }
         return "redirect:/products";
     }
 

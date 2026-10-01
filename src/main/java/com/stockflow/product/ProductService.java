@@ -3,7 +3,11 @@ package com.stockflow.product;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -80,6 +84,51 @@ public class ProductService {
         Product product = findById(id);
         product.setActive(false);
         productRepository.save(product);
+    }
+
+    /**
+     * Permanently removes a product that was never used anywhere else.
+     * Used products must be deactivated instead so their history stays valid.
+     */
+    public void delete(Long id) {
+        Product product = findById(id);
+        List<String> usedIn = findDeleteBlockers(id);
+        if (!usedIn.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Product " + product.getSku() + " cannot be deleted because it is used in "
+                            + String.join(", ", usedIn) + ". Deactivate it instead."
+            );
+        }
+        productRepository.delete(product);
+        productRepository.flush();
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> findDeleteBlockers(Long id) {
+        return usageByRecordType().entrySet().stream()
+                .filter(entry -> entry.getValue().contains(id))
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Long> findLinkedProductIds() {
+        Set<Long> linked = new HashSet<>();
+        usageByRecordType().values().forEach(linked::addAll);
+        return linked;
+    }
+
+    private Map<String, List<Long>> usageByRecordType() {
+        Map<String, List<Long>> usage = new LinkedHashMap<>();
+        usage.put("purchase orders", productRepository.findProductIdsUsedInPurchaseOrders());
+        usage.put("goods receipts", productRepository.findProductIdsUsedInGoodsReceipts());
+        usage.put("batches", productRepository.findProductIdsUsedInBatches());
+        usage.put("inventory balances", productRepository.findProductIdsUsedInInventoryBalances());
+        usage.put("stock movements", productRepository.findProductIdsUsedInStockMovements());
+        usage.put("stock transfers", productRepository.findProductIdsUsedInStockTransfers());
+        usage.put("stock issues", productRepository.findProductIdsUsedInStockIssues());
+        usage.put("reorder rules", productRepository.findProductIdsUsedInReorderRules());
+        return usage;
     }
 
     private void applyForm(Product product, ProductForm form) {
