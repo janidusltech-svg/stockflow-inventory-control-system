@@ -198,16 +198,16 @@
             <p th:if="${goodsReceipt.confirmedAt}"
                th:text="${'Confirmed ' + #temporals.format(goodsReceipt.confirmedAt, 'dd MMM yyyy HH:mm')}"></p>
         </div>
-        <div class="workflow-actions" th:if="${goodsReceipt.editable and canManageReceiving}">
-            <form th:action="@{/goods-receipts/{id}/confirm(id=${goodsReceipt.id})}" method="post">
+        <div class="workflow-actions" th:if="${canManageReceiving}">
+            <form th:if="${goodsReceipt.editable}" th:action="@{/goods-receipts/{id}/confirm(id=${goodsReceipt.id})}" method="post">
                 <button class="button primary" type="submit">Confirm Receipt &amp; Update Stock</button>
             </form>
-            <form th:action="@{/goods-receipts/{id}/cancel(id=${goodsReceipt.id})}" method="post">
+            <form th:if="${goodsReceipt.editable}" th:action="@{/goods-receipts/{id}/cancel(id=${goodsReceipt.id})}" method="post">
                 <button class="button danger" type="submit">Cancel Draft</button>
             </form>
             <form th:action="@{/goods-receipts/{id}/delete(id=${goodsReceipt.id})}" method="post"
-                  th:data-confirm-message="${'Permanently delete draft ' + goodsReceipt.receiptNumber + ' and its item lines? No stock has been received yet. This cannot be undone.'}">
-                <button class="button danger" type="submit">Delete Draft</button>
+                  th:data-confirm-message="${'Request permanent deletion of ' + goodsReceipt.receiptNumber + '? Only a DRAFT receipt can be deleted. This cannot be undone.'}">
+                <button class="button danger" type="submit">Delete</button>
             </form>
         </div>
     </section>

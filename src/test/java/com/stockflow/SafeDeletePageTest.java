@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -42,8 +41,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Renders the list pages with real rows so the new Delete buttons are
- * actually drawn, then submits Delete through security and CSRF like a browser.
+ * Renders the list pages with real rows so every relevant record shows a
+ * Delete button, then proves the server still blocks unsafe deletion and
+ * accepts safe deletion through security and CSRF like a browser.
  * Each test rolls back, so it leaves no data behind.
  */
 @SpringBootTest
@@ -70,7 +70,7 @@ class SafeDeletePageTest {
     }
 
     @Test
-    void listPagesShowDeleteOnlyForUnusedRecords() throws Exception {
+    void listPagesShowDeleteForBothUnusedAndProtectedRecords() throws Exception {
         Product unused = newProduct("PAGE-UNUSED");
         Product withRule = newProduct("PAGE-RULE");
         ReorderRule rule = new ReorderRule();
@@ -86,14 +86,14 @@ class SafeDeletePageTest {
         mockMvc.perform(get("/products").session(operations))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("/products/" + unused.getId() + "/delete")))
-                .andExpect(content().string(not(containsString("/products/" + withRule.getId() + "/delete"))))
+                .andExpect(content().string(containsString("/products/" + withRule.getId() + "/delete")))
                 .andExpect(content().string(containsString("data-confirm-message=\"Permanently delete product PAGE-UNUSED?")));
 
         mockMvc.perform(get("/reference-data").session(operations))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("/reference-data/brands/" + brand.getId() + "/delete")))
-                .andExpect(content().string(not(containsString(
-                        "/reference-data/categories/" + unused.getCategory().getId() + "/delete"))));
+                .andExpect(content().string(containsString(
+                        "/reference-data/categories/" + unused.getCategory().getId() + "/delete")));
 
         mockMvc.perform(get("/reorder-rules").session(operations))
                 .andExpect(status().isOk())
@@ -130,8 +130,8 @@ class SafeDeletePageTest {
         mockMvc.perform(get("/warehouses").session(operations))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("/warehouses/locations/" + location.getId() + "/delete")))
-                // The warehouse still has a location, so it must not offer Delete yet.
-                .andExpect(content().string(not(containsString("/warehouses/" + warehouse.getId() + "/delete"))));
+                // The button is visible, but the service will block it while the location exists.
+                .andExpect(content().string(containsString("/warehouses/" + warehouse.getId() + "/delete")));
 
         mockMvc.perform(get("/recipients").session(operations))
                 .andExpect(status().isOk())

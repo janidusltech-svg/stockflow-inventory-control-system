@@ -200,11 +200,11 @@
                 <input type="hidden" name="status" value="CANCELLED">
                 <button class="button danger" type="submit">Cancel Order</button>
             </form>
-            <form th:if="${canManagePurchasing and purchaseOrder.status.name() == 'DRAFT'}"
+            <form th:if="${canManagePurchasing}"
                   th:action="@{/purchase-orders/{id}/delete(id=${purchaseOrder.id})}"
-                  th:data-confirm-message="${'Permanently delete draft ' + purchaseOrder.orderNumber + ' and its item lines? This cannot be undone.'}"
+                  th:data-confirm-message="${'Request permanent deletion of ' + purchaseOrder.orderNumber + '? Only an unlinked DRAFT order can be deleted. This cannot be undone.'}"
                   method="post">
-                <button class="button danger" type="submit">Delete Draft</button>
+                <button class="button danger" type="submit">Delete</button>
             </form>
         </div>
     </section>

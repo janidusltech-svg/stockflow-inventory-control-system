@@ -170,11 +170,10 @@
                   data-confirm-message="Cancel this transfer?">
                 <button class="button danger" type="submit">Cancel</button>
             </form>
-            <form th:if="${stockTransfer.editable}"
-                  th:action="@{/stock-transfers/{id}/delete(id=${stockTransfer.id})}"
+            <form th:action="@{/stock-transfers/{id}/delete(id=${stockTransfer.id})}"
                   method="post"
-                  th:data-confirm-message="${'Permanently delete draft ' + stockTransfer.transferNumber + ' and its item lines? No stock has moved yet. This cannot be undone.'}">
-                <button class="button danger" type="submit">Delete Draft</button>
+                  th:data-confirm-message="${'Request permanent deletion of ' + stockTransfer.transferNumber + '? Only a DRAFT transfer can be deleted. This cannot be undone.'}">
+                <button class="button danger" type="submit">Delete</button>
             </form>
         </div>
     </section>

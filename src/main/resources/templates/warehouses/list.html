@@ -61,9 +61,8 @@
                               data-confirm-message="Deactivate this warehouse? All its storage locations will also be deactivated.">
                             <button class="button small danger" type="submit">Deactivate</button>
                         </form>
-                        <form th:if="${!warehouseIdsWithLocations.contains(warehouse.id)}"
-                              th:action="@{/warehouses/{id}/delete(id=${warehouse.id})}"
-                              th:data-confirm-message="${'Permanently delete warehouse ' + warehouse.code + '? It has no storage locations. This cannot be undone.'}"
+                        <form th:action="@{/warehouses/{id}/delete(id=${warehouse.id})}"
+                              th:data-confirm-message="${'Permanently delete warehouse ' + warehouse.code + '? The system will first check for storage locations. This cannot be undone.'}"
                               method="post">
                             <button class="button small danger" type="submit">Delete</button>
                         </form>
@@ -117,9 +116,8 @@
                               data-confirm-message="Deactivate this storage location?">
                             <button class="button small danger" type="submit">Deactivate</button>
                         </form>
-                        <form th:if="${!linkedLocationIds.contains(location.id)}"
-                              th:action="@{/warehouses/locations/{id}/delete(id=${location.id})}"
-                              th:data-confirm-message="${'Permanently delete location ' + location.code + '? It has never held stock or been used in a document. This cannot be undone.'}"
+                        <form th:action="@{/warehouses/locations/{id}/delete(id=${location.id})}"
+                              th:data-confirm-message="${'Permanently delete location ' + location.code + '? The system will first check stock and document links. This cannot be undone.'}"
                               method="post">
                             <button class="button small danger" type="submit">Delete</button>
                         </form>
