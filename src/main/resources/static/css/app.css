@@ -369,8 +369,22 @@ td small {
     white-space: nowrap;
 }
 
-.actions form {
-    display: inline;
+/* Keep neighbouring table actions visually separate. Some templates place the
+   link and forms directly beside one another with no HTML whitespace. */
+td.actions > a,
+td.actions > form {
+    display: inline-flex;
+    align-items: center;
+    margin: 2px 0 2px 6px;
+    vertical-align: middle;
+}
+
+td.actions > :first-child {
+    margin-left: 0;
+}
+
+td.actions > form > .button {
+    margin: 0;
 }
 
 .status {

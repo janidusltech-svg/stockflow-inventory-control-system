@@ -58,9 +58,8 @@
                                 <input type="hidden" name="active" th:value="${!category.active}">
                                 <button class="button small" th:classappend="${category.active} ? ' danger' : ' primary'" type="submit" th:text="${category.active} ? 'Deactivate' : 'Activate'">Change</button>
                             </form>
-                            <form th:if="${categoryUsage[category.id] == 0}"
-                                  th:action="@{/reference-data/categories/{id}/delete(id=${category.id})}"
-                                  th:data-confirm-message="${'Permanently delete ' + category.name + '? No product uses it. This cannot be undone.'}"
+                            <form th:action="@{/reference-data/categories/{id}/delete(id=${category.id})}"
+                                  th:data-confirm-message="${'Permanently delete ' + category.name + '? The system will first check that no product uses it. This cannot be undone.'}"
                                   method="post">
                                 <button class="button small danger" type="submit">Delete</button>
                             </form>
@@ -97,9 +96,8 @@
                                 <input type="hidden" name="active" th:value="${!brand.active}">
                                 <button class="button small" th:classappend="${brand.active} ? ' danger' : ' primary'" type="submit" th:text="${brand.active} ? 'Deactivate' : 'Activate'">Change</button>
                             </form>
-                            <form th:if="${brandUsage[brand.id] == 0}"
-                                  th:action="@{/reference-data/brands/{id}/delete(id=${brand.id})}"
-                                  th:data-confirm-message="${'Permanently delete ' + brand.name + '? No product uses it. This cannot be undone.'}"
+                            <form th:action="@{/reference-data/brands/{id}/delete(id=${brand.id})}"
+                                  th:data-confirm-message="${'Permanently delete ' + brand.name + '? The system will first check that no product uses it. This cannot be undone.'}"
                                   method="post">
                                 <button class="button small danger" type="submit">Delete</button>
                             </form>
@@ -137,9 +135,8 @@
                                 <input type="hidden" name="active" th:value="${!unit.active}">
                                 <button class="button small" th:classappend="${unit.active} ? ' danger' : ' primary'" type="submit" th:text="${unit.active} ? 'Deactivate' : 'Activate'">Change</button>
                             </form>
-                            <form th:if="${unitUsage[unit.id] == 0}"
-                                  th:action="@{/reference-data/units/{id}/delete(id=${unit.id})}"
-                                  th:data-confirm-message="${'Permanently delete ' + unit.name + '? No product uses it. This cannot be undone.'}"
+                            <form th:action="@{/reference-data/units/{id}/delete(id=${unit.id})}"
+                                  th:data-confirm-message="${'Permanently delete ' + unit.name + '? The system will first check that no product uses it. This cannot be undone.'}"
                                   method="post">
                                 <button class="button small danger" type="submit">Delete</button>
                             </form>

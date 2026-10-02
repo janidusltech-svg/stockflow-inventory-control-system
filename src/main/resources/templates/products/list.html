@@ -90,9 +90,8 @@
                             Deactivate
                         </button>
                     </form>
-                    <form th:if="${!linkedProductIds.contains(product.id)}"
-                          th:action="@{/products/{id}/delete(id=${product.id})}"
-                          th:data-confirm-message="${'Permanently delete product ' + product.sku + '? It has never been used, so no history is lost. This cannot be undone.'}"
+                    <form th:action="@{/products/{id}/delete(id=${product.id})}"
+                          th:data-confirm-message="${'Permanently delete product ' + product.sku + '? The system will first check for linked records. This cannot be undone.'}"
                           method="post">
                         <button class="button small danger" type="submit">
                             Delete

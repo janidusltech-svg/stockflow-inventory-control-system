@@ -64,9 +64,8 @@
                               method="post">
                             <button class="button small danger" type="submit">Deactivate</button>
                         </form>
-                        <form th:if="${!linkedSupplierIds.contains(supplier.id)}"
-                              th:action="@{/suppliers/{id}/delete(id=${supplier.id})}"
-                              th:data-confirm-message="${'Permanently delete supplier ' + supplier.supplierCode + '? It has no purchase orders. This cannot be undone.'}"
+                        <form th:action="@{/suppliers/{id}/delete(id=${supplier.id})}"
+                              th:data-confirm-message="${'Permanently delete supplier ' + supplier.supplierCode + '? The system will first check for purchase orders. This cannot be undone.'}"
                               method="post">
                             <button class="button small danger" type="submit">Delete</button>
                         </form>
