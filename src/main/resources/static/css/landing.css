@@ -497,6 +497,251 @@ a:focus-visible,button:focus-visible { outline:3px solid rgba(11,145,133,.35); o
     .proof-card { padding:21px 19px; }.faq-item { padding:4px 16px; }.faq-item summary { padding:15px 0; font-size:13px; }
 }
 
+/* Professional layout refinement
+   Keeps every interaction while giving the landing page a clearer hierarchy. */
+.landing-shell { width:min(1260px,calc(100% - 64px)); }
+
+.landing-header { height:78px; background:rgba(246,251,250,.82); }
+.landing-header.scrolled { height:68px; }
+.header-inner { gap:28px; }
+.landing-brand { flex:0 0 auto; }
+.landing-nav { margin-left:auto; }
+.landing-nav > a { padding:10px 14px; font-size:13px; }
+
+.hero-sticky { padding:108px 0 78px; }
+.hero-center {
+    min-height:calc(100svh - 186px);
+    grid-template-columns:minmax(0,1.08fr) minmax(390px,.72fr);
+    align-items:center;
+    gap:clamp(42px,5vw,86px);
+    justify-items:stretch;
+}
+.hero-copy { width:auto; max-width:720px; padding:0; text-align:left; }
+.hero-copy h1 { font-size:clamp(50px,4.5vw,72px); line-height:1.01; }
+.hero-intro { max-width:650px; margin:22px 0 0; font-size:16px; }
+.hero-actions,.hero-facts { justify-content:flex-start; }
+.hero-actions { margin-top:26px; }
+.hero-facts { margin-top:25px; }
+.hero-flow-panel {
+    width:100%;
+    max-width:480px;
+    justify-self:end;
+    margin:0;
+    padding:22px;
+    border-color:rgba(151,220,216,.3);
+    border-radius:20px;
+    background:linear-gradient(155deg,rgba(4,38,47,.9),rgba(2,25,33,.78));
+    box-shadow:0 28px 70px rgba(0,0,0,.3);
+}
+.flow-panel-heading { padding-bottom:16px; }
+.flow-panel-heading span { font-size:10px; }
+.flow-panel-heading strong { font-size:10px; text-align:right; }
+.hero-flow-panel ol { grid-template-columns:1fr 1fr; gap:10px; }
+.hero-flow-panel li { min-height:58px; padding:12px; }
+.hero-flow-panel li:nth-child(2)::after { display:none; }
+.hero-flow-panel li strong { font-size:12px; }
+.hero-flow-panel li small { margin-top:3px; font-size:9px; }
+.flow-panel-pulse li span { font-size:9px; line-height:1.35; }
+.flow-panel-pulse li strong { font-size:20px; }
+.live-panel-head strong { font-size:12px; }
+.live-panel-head small { font-size:9px; }
+.warehouse-illustration { opacity:.72; }
+.hero-stage-icon { top:96px; right:max(24px,calc((100vw - 1500px)/2)); }
+.hero-motion-note { right:auto; left:28px; }
+
+.outcome-ribbon { padding:28px 0; background:var(--soft); }
+.outcome-grid { gap:16px; }
+.outcome-grid article,
+.outcome-grid article:first-child,
+.outcome-grid article:last-child {
+    min-height:126px;
+    align-items:flex-start;
+    padding:24px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    background:var(--surface);
+    box-shadow:0 12px 32px rgba(6,45,58,.055);
+}
+.outcome-grid article > span {
+    width:30px;
+    height:30px;
+    display:grid;
+    flex:0 0 auto;
+    place-items:center;
+    border-radius:9px;
+    color:var(--teal-dark);
+    background:rgba(11,145,133,.1);
+    font-size:10px;
+}
+.outcome-grid strong { font-size:15px; }
+.outcome-grid p { margin-top:8px; font-size:12px; line-height:1.6; }
+
+.journey-section { padding:104px 0 116px; }
+.journey-ambient { opacity:.62; }
+.journey-introduction {
+    grid-template-columns:minmax(0,1.15fr) minmax(300px,.55fr);
+    gap:70px;
+    align-items:end;
+    margin-bottom:54px;
+}
+.journey-introduction .section-label { grid-column:1/-1; padding:0; margin-bottom:-48px; }
+.journey-introduction h2 { max-width:720px; }
+.journey-layout { grid-template-columns:minmax(400px,.88fr) minmax(0,1.12fr); gap:70px; }
+.journey-stage { border-radius:22px; box-shadow:0 26px 70px rgba(6,45,58,.14); }
+.journey-chapter { min-height:520px; }
+.chapter-card { padding:30px; border-radius:17px; }
+.chapter-card h3 { font-size:28px; }
+.chapter-card > p { font-size:14px; }
+.chapter-card dt { font-size:8px; }
+.chapter-card dd { font-size:10px; }
+
+.scene3d-section::before {
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:linear-gradient(90deg,rgba(108,225,211,.035),transparent 36%,rgba(108,225,211,.03));
+}
+.scene3d-layout { position:relative; z-index:1; grid-template-columns:minmax(300px,.72fr) minmax(0,1.28fr); gap:72px; }
+.scene3d-copy { max-width:430px; }
+.scene3d-stage { height:500px; border-radius:24px; box-shadow:0 32px 80px rgba(0,0,0,.4); }
+.scene3d-hint { left:20px; bottom:18px; font-size:10px; }
+.scene3d-infocard { width:220px; padding:17px 18px 18px; }
+.infocard-eyebrow,.scene3d-infocard dt { font-size:9px; }
+.infocard-name { font-size:14px; }
+.scene3d-infocard dd { font-size:11px; }
+
+.control-layout { grid-template-columns:minmax(320px,.8fr) minmax(520px,1.2fr); gap:72px; }
+.role-orbit { max-width:720px; margin-left:auto; }
+.role-chip { min-width:170px; padding:13px; }
+.role-chip strong { font-size:11px; }
+.role-chip small { font-size:8px; }
+
+.proof-card,.faq-item { border-radius:16px; }
+.proof-grid { gap:18px; }
+.final-card { overflow:hidden; }
+
+@media (min-width:861px) and (max-width:1599px) {
+    .hero-center { grid-template-columns:minmax(0,1fr) minmax(370px,430px); gap:44px; }
+    .hero-copy h1 { font-size:clamp(48px,4.35vw,64px); }
+    .hero-stage-icon { display:none; }
+    .journey-layout { gap:48px; }
+}
+
+@media (max-width:1080px) {
+    .landing-shell { width:min(100% - 44px,920px); }
+    .hero-section,.hero-sticky { height:auto; min-height:0; }
+    .hero-sticky { position:relative; padding:104px 0 88px; overflow:hidden; }
+    .hero-center { grid-template-columns:1fr; align-content:center; gap:30px; }
+    .hero-copy { max-width:760px; margin-inline:auto; text-align:center; }
+    .hero-actions,.hero-facts { justify-content:center; }
+    .hero-flow-panel { max-width:700px; justify-self:center; }
+    .flow-panel-pulse ul { grid-template-columns:repeat(3,1fr); }
+    .flow-panel-pulse li { padding-right:10px; }
+    .flow-panel-pulse li:not(:last-child)::after { display:block; }
+    .journey-introduction { grid-template-columns:1fr; gap:18px; }
+    .journey-introduction .section-label { grid-column:auto; margin-bottom:0; }
+    .journey-introduction > p:last-child { grid-column:auto; max-width:680px; }
+    .journey-layout { gap:38px; }
+    .scene3d-layout { grid-template-columns:1fr; gap:36px; }
+    .scene3d-copy { max-width:700px; }
+    .control-layout { grid-template-columns:1fr; gap:52px; }
+    .control-copy { max-width:720px; }
+    .role-orbit { width:min(700px,100%); margin-inline:auto; }
+}
+
+@media (max-width:860px) {
+    .landing-shell { width:min(100% - 34px,700px); }
+    .landing-header,.landing-header.scrolled { height:70px; }
+    .hero-sticky { padding-top:98px; }
+    .hero-copy h1 { font-size:clamp(44px,7.5vw,58px); }
+    .hero-intro { font-size:15px; }
+    .hero-flow-panel { max-width:660px; }
+    .journey-layout { grid-template-columns:1fr; }
+    .journey-chapter { min-height:460px; }
+    .scene3d-stage { height:390px; }
+    .role-orbit {
+        height:auto;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+        padding:18px;
+        border:1px solid rgba(147,194,199,.2);
+        border-radius:22px;
+        background:rgba(4,35,43,.36);
+    }
+    .orbit-system {
+        position:relative;
+        left:auto;
+        top:auto;
+        grid-column:1/-1;
+        width:100%;
+        height:auto;
+        min-height:126px;
+        border-radius:16px;
+        transform:none;
+    }
+    .orbit-line { display:none; }
+    .role-chip {
+        position:relative;
+        inset:auto;
+        width:100%;
+        min-width:0;
+        animation:none;
+    }
+}
+
+@media (max-width:620px) {
+    .landing-shell { width:min(100% - 28px,560px); }
+    .header-inner { gap:10px; }
+    .landing-brand { margin-right:auto; }
+    .theme-toggle,.menu-toggle { width:42px; height:42px; margin:0; }
+    .hero-section,.hero-sticky { height:auto; min-height:0; }
+    .hero-sticky { padding:96px 0 76px; overflow:hidden; }
+    .hero-center { min-height:0; display:block; }
+    .hero-copy h1 { font-size:clamp(38px,11vw,48px); letter-spacing:-.05em; }
+    .hero-label { max-width:100%; font-size:9px; line-height:1.45; }
+    .hero-actions { margin-top:24px; }
+    .button { width:100%; min-height:50px; }
+    .hero-facts { justify-content:space-between; gap:0; }
+    .hero-facts div { flex:1; padding:0 9px; }
+    .hero-facts div:first-child { padding-left:0; }
+    .hero-facts div:last-child { padding-right:0; }
+    .hero-facts span { font-size:8px; line-height:1.4; }
+    .hero-flow-panel { margin-top:34px; padding:17px; }
+    .hero-flow-panel ol { grid-template-columns:1fr; }
+    .hero-flow-panel li:not(:last-child)::after { display:none; }
+    .flow-panel-pulse ul { grid-template-columns:repeat(3,1fr); gap:6px; }
+    .flow-panel-pulse li { padding:0 7px; }
+    .flow-panel-pulse li:not(:last-child)::after { display:block; }
+    .flow-panel-pulse li span { font-size:8px; text-transform:none; }
+    .flow-panel-pulse li strong { font-size:17px; }
+    .warehouse-illustration { inset:90px -470px 0; opacity:.38; }
+    .outcome-ribbon { padding:18px 0; }
+    .outcome-grid { gap:10px; }
+    .outcome-grid article,
+    .outcome-grid article:first-child,
+    .outcome-grid article:last-child { min-height:0; padding:20px; border:1px solid var(--line); }
+    .journey-section { padding:78px 0 88px; }
+    .journey-introduction h2 { font-size:clamp(34px,10vw,42px); }
+    .journey-stage { border-radius:18px; }
+    .journey-canvas { height:460px; min-height:460px; }
+    .journey-chapter { min-height:0; padding:58px 0; }
+    .scene3d-section { padding:78px 0; }
+    .scene3d-stage { height:360px; border-radius:18px; }
+    .scene3d-infocard { width:calc(100% - 24px); max-width:220px; right:12px; top:12px; }
+    .scene3d-hint { left:12px; bottom:12px; max-width:calc(100% - 24px); font-size:8px; text-align:center; }
+    .control-section { padding:82px 0; }
+    .control-copy h2 { font-size:clamp(35px,10vw,43px); }
+    .role-orbit { grid-template-columns:1fr; padding:14px; border-radius:18px; }
+    .orbit-system { grid-column:auto; min-height:118px; }
+    .proof-section,.faq-section { padding:82px 0; }
+    .final-card { gap:24px; padding:28px 22px; }
+    .button-final { width:100%; }
+    .autoplay-toggle { width:48px; height:48px; justify-content:center; padding:0; }
+    .autoplay-toggle > span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+}
+
 @media (prefers-reduced-motion:reduce) {
     html { scroll-behavior:auto; }
     *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; }
